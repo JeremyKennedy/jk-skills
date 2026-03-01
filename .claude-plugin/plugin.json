@@ -5,8 +5,8 @@
   "author": {
     "name": "Jeremy K"
   },
-  "homepage": "https://github.com/jeremyk/jk-skills",
-  "repository": "https://github.com/jeremyk/jk-skills",
+  "homepage": "https://git.jeremyk.net/jeremy/jk-skills",
+  "repository": "https://git.jeremyk.net/jeremy/jk-skills",
   "license": "GPL-3.0",
   "keywords": ["skills", "planning", "tdd", "debugging", "code-review", "execution"]
 }

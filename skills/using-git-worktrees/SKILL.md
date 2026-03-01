@@ -209,10 +209,7 @@ Ready to implement auth feature
 
 ## Integration
 
-**Called by:**
-- **jk-skills:jk-deep-plan** (Phase 4) - REQUIRED when design is approved and implementation follows
-- **jk-skills:jk-deep-execute** - REQUIRED before executing any tasks
-- Any skill needing isolated workspace
+**Pairs with:**
 
 **Pairs with:**
 - **jk-skills:finishing-a-development-branch** - REQUIRED for cleanup after work complete

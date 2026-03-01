@@ -14,7 +14,7 @@ If you cannot load jk-skills:jk-philosophy, STOP and tell the user the plugin is
 ## Plan File Discovery
 
 1. If a path is provided as argument, use it
-2. If no path, list recent `*-plan.md` and `*-plan.md` files in `docs/plans/` and ask the user to pick
+2. If no path, list recent `*-plan.md` and `*-design.md` files in `docs/plans/` and ask the user to pick
 3. If no plan files found, STOP and tell the user to create one first (use jk-skills:jk-deep-plan)
 
 ## Execution Modes
@@ -52,7 +52,7 @@ Choose execution mode:
 2. Extract all tasks with full text (provide text to subagents — do not make them read the file)
 3. Create task list
 4. Record `BASE_SHA` (current HEAD before any implementation)
-5. Create `.jksp/` directory if it doesn't exist
+5. Create `.jk-work/` directory if it doesn't exist
 
 ## Hard Directive (Deep and Swarm)
 
@@ -81,7 +81,7 @@ For each task:
 5. If spec fails → implementer fixes → re-review (max 3 cycles)
 6. **Dispatch code quality reviewer** — is the code clean?
 7. If quality fails → implementer fixes → re-review (max 3 cycles)
-8. **Extract wisdom** from this task and append to `.jksp/wisdom.md`:
+8. **Extract wisdom** from this task and append to `.jk-work/wisdom.md`:
    - Conventions discovered
    - Gotchas hit
    - Commands that worked
@@ -93,7 +93,7 @@ For each task:
 
 Each task's implementer receives all accumulated wisdom from previous tasks. This compounds — later tasks benefit from everything learned earlier.
 
-Write wisdom to `.jksp/wisdom.md` after each task. Read it before dispatching the next implementer.
+Write wisdom to `.jk-work/wisdom.md` after each task. Read it before dispatching the next implementer.
 
 ### Round Table
 
@@ -134,11 +134,11 @@ Before dispatching any agents, verify no two tasks touch the same files. For eac
 
 Dispatch implementer subagents for all independent tasks simultaneously. Each gets:
 - Full task text + context
-- Any existing wisdom files from `.jksp/`
+- Any existing wisdom files from `.jk-work/`
 
 ### Per-Agent Wisdom
 
-Each agent writes its learnings to `.jksp/wisdom-task-N.md` (where N is the task number). No shared file — no race conditions.
+Each agent writes its learnings to `.jk-work/wisdom-task-N.md` (where N is the task number). No shared file — no race conditions.
 
 Later-starting agents should read all existing `wisdom-task-*.md` files before beginning.
 
@@ -153,7 +153,7 @@ After each implementer completes:
 ### Coordinator
 
 After all tasks complete:
-1. Merge all `wisdom-task-*.md` files into `.jksp/wisdom.md`
+1. Merge all `wisdom-task-*.md` files into `.jk-work/wisdom.md`
 2. Report completion status for all tasks
 3. Report any failures or issues
 
@@ -169,7 +169,7 @@ After all tasks complete:
 
 ### Per-Task Execution
 
-Same as Deep mode: sequential, per-task review pipeline, wisdom accumulation in `.jksp/wisdom.md`.
+Same as Deep mode: sequential, per-task review pipeline, wisdom accumulation in `.jk-work/wisdom.md`.
 
 ### Human Checkpoints
 
