@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# SessionStart hook for jk-skills plugin
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+using_jk_skills_content=$(cat "${PLUGIN_ROOT}/skills/using-jk-skills/SKILL.md" 2>&1 || echo "Error reading using-jk-skills skill")
+
+jq -n --arg content "$using_jk_skills_content" '{
+  hookSpecificOutput: {
+    hookEventName: "SessionStart",
+    additionalContext: ("<EXTREMELY_IMPORTANT>\nYou have jk-skills installed.\n\n**Below is the full content of your jk-skills:using-jk-skills skill — your guide to using skills. For all other skills, use the Skill tool:**\n\n" + $content + "\n</EXTREMELY_IMPORTANT>")
+  }
+}'
