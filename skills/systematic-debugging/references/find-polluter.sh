@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
 # Bisection script to find which test creates unwanted files/state
-# Usage: ./find-polluter.sh <file_or_dir_to_check> <test_pattern>
-# Example: ./find-polluter.sh '.git' 'src/**/*.test.ts'
+# Usage: ./find-polluter.sh <test_runner_cmd> <file_or_dir_to_check> <test_pattern>
+# Example: ./find-polluter.sh 'npm test' '.git' 'src/**/*.test.ts'
+# Example: ./find-polluter.sh 'bun test' '.git' 'src/**/*.test.ts'
+# Example: ./find-polluter.sh 'pytest' '__pycache__' 'tests/**/*.py'
 
 set -e
 
-if [ $# -ne 2 ]; then
-  echo "Usage: $0 <file_to_check> <test_pattern>"
-  echo "Example: $0 '.git' 'src/**/*.test.ts'"
+if [ $# -ne 3 ]; then
+  echo "Usage: $0 <test_runner_cmd> <file_to_check> <test_pattern>"
+  echo "Example: $0 'npm test' '.git' 'src/**/*.test.ts'"
   exit 1
 fi
 
-POLLUTION_CHECK="$1"
-TEST_PATTERN="$2"
+TEST_CMD="$1"
+POLLUTION_CHECK="$2"
+TEST_PATTERN="$3"
 
 echo "Searching for test that creates: $POLLUTION_CHECK"
 echo "Test pattern: $TEST_PATTERN"
@@ -39,7 +42,7 @@ for TEST_FILE in $TEST_FILES; do
   echo "[$COUNT/$TOTAL] Testing: $TEST_FILE"
 
   # Run the test
-  npm test "$TEST_FILE" > /dev/null 2>&1 || true
+  $TEST_CMD "$TEST_FILE" > /dev/null 2>&1 || true
 
   # Check if pollution appeared
   if [ -e "$POLLUTION_CHECK" ]; then
@@ -52,7 +55,7 @@ for TEST_FILE in $TEST_FILES; do
     ls -la "$POLLUTION_CHECK"
     echo ""
     echo "To investigate:"
-    echo "  npm test $TEST_FILE    # Run just this test"
+    echo "  $TEST_CMD $TEST_FILE    # Run just this test"
     echo "  cat $TEST_FILE         # Review test code"
     exit 1
   fi

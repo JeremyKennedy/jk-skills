@@ -16,7 +16,7 @@ Flat marketplace+plugin repo. Repo root is both the marketplace and the plugin.
 ## Dual Distribution
 
 1. **Claude Code marketplace**: Users install via `/plugin marketplace add`
-2. **Nix flake**: `homeManagerModules.default` configures `programs.claude-code.*`
+2. **Nix flake**: `nixosModules.default` configures `programs.claude-code.*`
 
 Pick one, not both (duplicates otherwise).
 

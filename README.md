@@ -21,7 +21,7 @@ jk-skills = {
 };
 
 # home-manager config:
-imports = [ inputs.jk-skills.homeManagerModules.default ];
+imports = [ inputs.jk-skills.nixosModules.default ];
 programs.jk-skills.enable = true;
 ```
 

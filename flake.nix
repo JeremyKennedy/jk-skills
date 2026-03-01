@@ -6,7 +6,7 @@
   };
 
   outputs = { self, nixpkgs }: {
-    homeManagerModules.default = { config, lib, ... }:
+    nixosModules.default = { config, lib, ... }:
       let
         cfg = config.programs.jk-skills;
         skillNames = [
