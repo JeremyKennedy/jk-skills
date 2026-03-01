@@ -1,0 +1,172 @@
+---
+name: jk-deep-plan
+description: "Heavy upfront planning: deep interview, codebase research, review panel cycles, implementation plan. Use instead of brainstorming for non-trivial work."
+---
+
+# Deep Plan
+
+Heavy-weight planning that front-loads tokens into understanding before any code is written. Research, interview with hard gates, design, adversarial review panel that cycles until diminishing returns, then implementation plan.
+
+For small/quick changes, skip this skill — use brainstorming or just start building.
+
+> **REQUIRED SUB-SKILL:** Use jk-skills:jk-philosophy
+
+If you cannot load jk-skills:jk-philosophy, STOP and tell the user the plugin is misconfigured.
+
+## Hard Gates
+
+<HARD-GATE>
+You may NOT write any implementation code, invoke any implementation skill, or transition to execution until ALL of the following are true:
+
+1. **Codebase researched** — you have explored relevant files, patterns, and conventions
+2. **Interview complete** — all 5 clearance criteria pass (see below)
+3. **Intent classified** — work type confirmed with user (new feature / refactoring / bug fix / architecture)
+4. **Design doc written and approved** — saved to `docs/plans/YYYY-MM-DD-<topic>-design.md`
+5. **Review panel passed** — at least one cycle with no Critical/Important issues
+6. **Implementation plan written** — saved to `docs/plans/YYYY-MM-DD-<topic>.md`
+
+No exceptions. Not for "simple" tasks. Not for "obvious" changes. If it's simple, skip this skill entirely.
+</HARD-GATE>
+
+## Process
+
+### Phase 1: Research (use subagents)
+
+Before asking the user a single question, understand the landscape:
+
+- Launch an `Explore` subagent to map relevant code: file structure, existing patterns, conventions, related modules
+- Read project CLAUDE.md, docs/, and recent git history for context
+- If external technologies are involved, research them (web search, Context7)
+- Identify: what exists, what's adjacent, what conventions apply, what could break
+
+**Output:** Mental model of the codebase. Do NOT write a research doc — internalize it and use it to ask better questions.
+
+### Phase 2: Classify Intent
+
+Before interviewing, classify the work type. This changes how you interview:
+
+| Intent | Interview emphasis | Key questions |
+|--------|-------------------|---------------|
+| **New feature** | Discovery, patterns, boundaries | "I found pattern X in module Y — follow or deviate?" / "What's the MVP vs. full vision?" |
+| **Refactoring** | Safety, preservation, migration | "What tests verify current behavior?" / "Can this be done incrementally?" / "What breaks if we're wrong?" |
+| **Bug fix** | Root cause, reproduction, regression | "Can you reproduce reliably?" / "When did this last work?" / "What changed?" |
+| **Architecture** | Strategic impact, longevity, scale | "Expected lifespan?" / "What's the 10x scale scenario?" / "What do we want to be easy to change later?" |
+
+State the classification to the user and confirm before proceeding. If ambiguous (e.g., "fix this by rewriting it"), ask which lens to use.
+
+### Phase 3: Interview
+
+Interview the user until ALL FIVE clearance criteria pass:
+
+| # | Criterion | What "pass" means |
+|---|-----------|-------------------|
+| 1 | **Objective defined** | You can state the goal in one sentence and the user agrees |
+| 2 | **Scope established** | Clear boundaries — what's in, what's out, what's deferred |
+| 3 | **Ambiguities resolved** | No "it depends" or "we'll figure it out later" remaining |
+| 4 | **Technical approach decided** | Architecture, key patterns, data flow — all settled |
+| 5 | **Test strategy confirmed** | What gets tested, how, what "done" looks like |
+
+**Interview rules:**
+- One question at a time. Multiple choice when possible.
+- Adapt questions to the intent classification (see above).
+- Use your research to ask INFORMED questions — "I see you use X pattern in Y module, should we follow that here or is there a reason to diverge?"
+- Challenge quick answers to complex questions. Probe edge cases.
+- Follow the user's energy — if they elaborate, go deeper on that topic.
+- Ask "what happens when X fails?" for every integration point.
+- Do NOT accept "whatever you think is best" for architectural decisions. Push back with tradeoffs and force a choice.
+- Stop when all 5 criteria pass. Not before. If the user says "just do it," tell them which criteria haven't passed and ask the specific question that would resolve it.
+
+### Phase 4: Design Doc
+
+Present the design in sections, scaled to complexity. Get approval after each section.
+
+Cover: architecture, components, data flow, error handling, testing approach, file locations.
+
+Propose 2-3 approaches with tradeoffs for any non-obvious decision. Lead with your recommendation.
+
+**Save to:** `docs/plans/YYYY-MM-DD-<topic>-design.md`
+**Commit** the design doc.
+
+### Phase 5: Review Panel
+
+Launch 4-6 reviewer subagents **in parallel** to tear apart the design. Each reviewer is a fresh agent with no sunk cost in the plan.
+
+**All reviewers:**
+- Type: `general-purpose`
+- Model: `opus`
+- Tools: Read, Grep, Glob (read-only)
+- Must read the design doc AND the project CLAUDE.md
+- Must explore relevant codebase areas
+- Output: verdict (PASS/FAIL) + issues list, each with severity (Critical/Important/Minor) and a suggested fix
+
+**The panel:**
+
+| Reviewer | Prompt focus |
+|----------|-------------|
+| **Gaps** | What's missing? Requirements implied but not addressed? Error cases not handled? Features mentioned but not designed? |
+| **Assumptions** | What does the plan assume that might not be true? What's fragile? What could change? What external dependencies could break? |
+| **Edge Cases** | Empty input, concurrent access, partial failure, network errors, scale (10x and 0.1x), race conditions, data corruption |
+| **Conventions** | Does the plan follow project CLAUDE.md? Correct file locations, naming patterns, config patterns, error handling, testing patterns? |
+| **Security** | Injection vectors, auth gaps, secret handling, unsafe defaults, OWASP top 10, supply chain concerns |
+| **Simplicity** | Is any part over-engineered? Could anything be done more simply? Are there unnecessary abstractions? YAGNI violations? |
+
+#### Triage
+
+After all reviewers return:
+
+1. Collect all issues. Group by severity.
+2. **Critical/Important** → present to user, discuss, update the design doc
+3. **Minor** → fix if trivial, otherwise note and move on
+4. **Reviewer disagreements** → use your judgment, document the decision
+
+#### Re-Cycle
+
+After fixing issues, re-run ONLY the reviewers that found Critical/Important issues. Do NOT re-run the ones that passed.
+
+**Stop condition:** A cycle produces no Critical/Important issues. Minor-only means the design is solid.
+
+**Maximum:** 3 cycles. If still failing after 3, escalate to user — the design may need fundamental rethinking.
+
+#### Evidence
+
+Append review summary to the design doc:
+
+```markdown
+---
+
+## Review Notes
+
+Reviewed: YYYY-MM-DD
+Cycles: N
+Key decisions:
+- [decision from review discussion]
+- [decision from review discussion]
+
+Issues found and resolved:
+- [issue] → [resolution]
+```
+
+### Phase 6: Implementation Plan
+
+Write the implementation plan:
+
+- Bite-sized tasks (2-5 min each)
+- Exact file paths, complete code, exact commands with expected output
+- TDD: write test → verify fail → implement → verify pass → commit
+- Plan header with Goal / Architecture / Tech Stack
+
+**Save to:** `docs/plans/YYYY-MM-DD-<topic>.md`
+**Commit** the plan.
+
+### Phase 7: Execution Handoff
+
+Offer execution choice:
+
+```
+Choose execution mode:
+1. Deep  — One brain, sequential, full context. Round table at end. No human pauses.
+2. Swarm — Many brains, parallel dispatch. Per-task review. Maximum speed.
+3. Care  — Brain + human. Checkpoints with "what to check" guidance. You stay in the loop.
+```
+
+Once the user picks, invoke `jk-skills:jk-deep-execute` with the chosen mode and plan file path.
