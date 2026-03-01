@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "jk-skills",
+  "description": "Heavy-duty planning, execution, and development skills for Claude Code",
+  "owner": {
+    "name": "Jeremy K"
+  },
+  "plugins": [
+    {
+      "name": "jk-skills",
+      "description": "Planning, execution, TDD, debugging, and code review skills with aggressive scope expansion philosophy",
+      "category": "development",
+      "source": "."
+    }
+  ]
+}

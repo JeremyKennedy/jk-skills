@@ -1,0 +1,12 @@
+{
+  "name": "jk-skills",
+  "description": "Planning, execution, TDD, debugging, and code review skills with aggressive scope expansion philosophy",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jeremy K"
+  },
+  "homepage": "https://github.com/jeremyk/jk-skills",
+  "repository": "https://github.com/jeremyk/jk-skills",
+  "license": "GPL-3.0",
+  "keywords": ["skills", "planning", "tdd", "debugging", "code-review", "execution"]
+}
