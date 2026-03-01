@@ -58,7 +58,7 @@
               matcher = "startup|resume|clear|compact";
               hooks = [{
                 type = "command";
-                command = "~/.claude/hooks/session-start";
+                command = "bash ~/.claude/hooks/session-start";
               }];
             }];
           };
