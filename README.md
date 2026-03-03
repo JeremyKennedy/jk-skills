@@ -1,6 +1,17 @@
 # jk-skills
 
-Heavy-duty planning, execution, and development skills for Claude Code. Supersedes [superpowers](https://github.com/obra/superpowers).
+Heavy-duty planning, execution, and development skills for Claude Code.
+
+### Supersedes
+
+If you have any of these installed, **uninstall them** — jk-skills absorbs their functionality:
+
+- [superpowers](https://github.com/obra/superpowers) — all 10 skills + code-reviewer agent absorbed
+- [pr-review-toolkit](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/pr-review-toolkit) — all 3 review agents absorbed (silent-failure-hunter, test-analyzer, doc-analyzer)
+
+**Compatible with** (can run alongside jk-skills):
+- [code-review](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/code-review) — PR-specific automated review
+- [feature-dev](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/feature-dev) — guided feature development
 
 ## Installation
 
