@@ -1,0 +1,66 @@
+{
+  "upstreams": [
+    {
+      "name": "superpowers",
+      "repo": "obra/superpowers",
+      "path": null,
+      "last_checked_sha": "e4a2375cb705ca5800f0833528ce36a3faf9017a",
+      "last_checked_date": "2026-03-03",
+      "absorbed": {
+        "skills": [
+          "systematic-debugging",
+          "test-driven-development",
+          "verification-before-completion",
+          "receiving-code-review",
+          "requesting-code-review",
+          "finishing-a-development-branch",
+          "using-git-worktrees",
+          "dispatching-parallel-agents",
+          "writing-skills"
+        ],
+        "version": "v4.2.0"
+      },
+      "status": "absorbed",
+      "notes": "9 skills cherry-picked and adapted. Original MIT license."
+    },
+    {
+      "name": "code-review",
+      "repo": "anthropics/claude-plugins-official",
+      "path": "plugins/code-review",
+      "last_checked_sha": "55b58ec6e5649104f926ba7558b567dc8d33c5ff",
+      "last_checked_date": "2026-03-03",
+      "absorbed": {
+        "skills": [],
+        "agents": []
+      },
+      "status": "watching",
+      "notes": "PR-specific automated review with 5 parallel Sonnet agents. Complementary to jk-skills code-reviewer."
+    },
+    {
+      "name": "pr-review-toolkit",
+      "repo": "anthropics/claude-plugins-official",
+      "path": "plugins/pr-review-toolkit",
+      "last_checked_sha": "55b58ec6e5649104f926ba7558b567dc8d33c5ff",
+      "last_checked_date": "2026-03-03",
+      "absorbed": {
+        "skills": [],
+        "agents": []
+      },
+      "status": "watching",
+      "notes": "4 unique agents worth absorbing: silent-failure-hunter, comment-analyzer, pr-test-analyzer, type-design-analyzer. code-reviewer and code-simplifier overlap with jk-skills."
+    },
+    {
+      "name": "feature-dev",
+      "repo": "anthropics/claude-plugins-official",
+      "path": "plugins/feature-dev",
+      "last_checked_sha": "55b58ec6e5649104f926ba7558b567dc8d33c5ff",
+      "last_checked_date": "2026-03-03",
+      "absorbed": {
+        "skills": [],
+        "agents": []
+      },
+      "status": "watching",
+      "notes": "Complementary paradigm. code-explorer and code-architect agents are unique. 7-phase workflow."
+    }
+  ]
+}

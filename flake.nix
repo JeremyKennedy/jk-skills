@@ -24,6 +24,7 @@
           "using-git-worktrees"
           "dispatching-parallel-agents"
           "writing-skills"
+          "upstream-audit"
         ];
       in {
         options.programs.jk-skills = {

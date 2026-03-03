@@ -62,6 +62,12 @@ Usage: `/jk-execute deep`, `/jk-execute swarm`, `/jk-execute care`
 | `dispatching-parallel-agents` | Parallel subagent coordination |
 | `writing-skills` | Skill authoring with philosophy alignment |
 
+### Maintenance
+
+| Skill | Description |
+|-------|-------------|
+| `upstream-audit` | Check tracked upstream plugin repos for changes and evaluate diffs |
+
 ### Meta-Skill
 
 | Skill | Description |
