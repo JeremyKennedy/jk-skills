@@ -36,6 +36,7 @@ programs.jk-skills.enable = true;
 | `jk-philosophy` | Development philosophy directives: code is free, expand scope, refactor always |
 | `jk-plan` | Heavy-weight planning: research, interview, design, review panel, implementation plan |
 | `jk-execute` | Execute plans in Deep, Swarm, or Care mode |
+| `jk-brainstorm` | Lightweight ideation: bounce ideas before committing to formal planning |
 | `jk-prove-it` | Ship gate: mechanical verification + self-review + ship report |
 
 ### Execution Modes
@@ -74,11 +75,14 @@ Usage: `/jk-execute deep`, `/jk-execute swarm`, `/jk-execute care`
 |-------|-------------|
 | `using-jk-skills` | Auto-loaded via SessionStart hook. Teaches skill discovery and invocation. |
 
-## Agent
+## Agents
 
-| Agent | Description |
-|-------|-------------|
-| `code-reviewer` | Review completed work against plan and coding standards |
+| Agent | Source | Description |
+|-------|--------|-------------|
+| `code-reviewer` | superpowers | Review completed work against plan and coding standards |
+| `silent-failure-hunter` | pr-review-toolkit | Audit error handling for silent failures and swallowed errors |
+| `test-analyzer` | pr-review-toolkit | Behavioral test coverage analysis with criticality ratings |
+| `doc-analyzer` | pr-review-toolkit | Documentation accuracy, staleness, and AI-generated drift detection |
 
 ## Philosophy
 

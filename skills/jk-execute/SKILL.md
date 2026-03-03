@@ -106,23 +106,38 @@ Write wisdom to `.jk-work/wisdom.md` after each task. Read it before dispatching
 
 ### Round Table
 
-After ALL tasks are complete, launch 6 parallel reviewers on the full diff (`git diff {BASE_SHA}..HEAD`):
+After ALL tasks are complete, launch reviewers in parallel on the full diff (`git diff {BASE_SHA}..HEAD`):
 
-| Reviewer | Focus |
-|----------|-------|
-| **Spec Compliance** | Does the complete implementation match the plan holistically? |
-| **Code Quality** | Cross-cutting quality: consistency, duplication, naming coherence |
-| **Security** | Full attack surface: input validation, auth, secrets, injection |
-| **Test Coverage** | End-to-end test sufficiency, integration gaps, edge cases |
-| **Convention Compliance** | Project CLAUDE.md adherence across all changes |
-| **Integration** | Do all pieces work together? Will this break existing code? |
+| Reviewer | Type | Focus |
+|----------|------|-------|
+| **Spec Compliance** | general-purpose | Does the complete implementation match the plan holistically? |
+| **Code Quality** | general-purpose | Cross-cutting quality: consistency, duplication, naming coherence |
+| **Security** | general-purpose | Full attack surface: input validation, auth, secrets, injection |
+| **Convention Compliance** | general-purpose | Project CLAUDE.md adherence across all changes |
+| **Integration** | general-purpose | Do all pieces work together? Will this break existing code? |
+| **Error Handling** | `silent-failure-hunter` agent | Silent failures, swallowed errors, inadequate fallbacks |
+| **Test Coverage** | `test-analyzer` agent | Behavioral test gaps, criticality-rated |
+| **Documentation** | `doc-analyzer` agent | Doc accuracy, staleness, AI-generated drift |
 
-**All reviewers:** Type `general-purpose`, model `sonnet`, read-only tools.
+**Generic reviewers:** Type `general-purpose`, model `sonnet`, read-only tools.
+**Specialized agents:** Use the named agent definitions directly.
+
+**Confidence Scoring:**
+
+Each reviewer must score every issue 0-100:
+- **0-25**: Likely false positive, pre-existing, or thing linters catch
+- **26-50**: Minor nitpick, pedantic
+- **51-75**: Real issue but low impact
+- **76-90**: Important, should fix
+- **91-100**: Critical, must fix
+
+**Only act on issues scoring ≥80.** This prevents reviewer noise from drowning out real problems.
 
 **Triage:**
-1. Critical/Important → fix, re-run only failed reviewers
-2. Minor → fix if trivial, note otherwise
-3. Max 2 round table cycles. After that, remaining issues go to the user.
+1. Issues ≥80 confidence → fix, re-run only failed reviewers
+2. Issues 50-79 → fix if trivial, note otherwise
+3. Issues <50 → discard
+4. Max 2 round table cycles. After that, remaining issues go to the user.
 
 ### Finish
 

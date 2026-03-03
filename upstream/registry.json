@@ -16,12 +16,13 @@
           "finishing-a-development-branch",
           "using-git-worktrees",
           "dispatching-parallel-agents",
-          "writing-skills"
+          "writing-skills",
+          "jk-brainstorm"
         ],
-        "version": "v4.2.0"
+        "version": "v4.3.1"
       },
       "status": "absorbed",
-      "notes": "9 skills cherry-picked and adapted. Original MIT license."
+      "notes": "9 skills + brainstorming cherry-picked and adapted. Hook async fix ported. Original MIT license."
     },
     {
       "name": "code-review",
@@ -44,10 +45,14 @@
       "last_checked_date": "2026-03-03",
       "absorbed": {
         "skills": [],
-        "agents": []
+        "agents": [
+          "silent-failure-hunter",
+          "test-analyzer",
+          "doc-analyzer"
+        ]
       },
-      "status": "watching",
-      "notes": "4 unique agents worth absorbing: silent-failure-hunter, comment-analyzer, pr-test-analyzer, type-design-analyzer. code-reviewer and code-simplifier overlap with jk-skills."
+      "status": "absorbed",
+      "notes": "3 agents absorbed (silent-failure-hunter, pr-test-analyzer→test-analyzer, comment-analyzer→doc-analyzer). Confidence scoring pattern adopted in jk-execute. code-reviewer and code-simplifier overlap with jk-skills."
     },
     {
       "name": "feature-dev",

@@ -1,0 +1,54 @@
+---
+name: jk-brainstorm
+description: "Lightweight ideation: bounce ideas, explore approaches, and refine thinking before committing to formal planning."
+---
+
+<!-- Derived from superpowers v4.3.1: brainstorming -->
+
+# Brainstorm
+
+Collaborative ideation mode. Chat, explore, refine ideas. No structure, no gates, no design docs. This is the "let's think about this" phase before you decide whether something needs full planning (jk-plan) or can just be built.
+
+## When to Use
+
+- Vague idea, not sure what to build yet
+- Multiple approaches, want to explore tradeoffs
+- Need to think out loud before committing to a direction
+- "What if we..." / "How would you approach..." / "I'm thinking about..."
+
+## When NOT to Use
+
+- You already know what to build → use jk-plan or just start
+- You have a clear bug → use systematic-debugging
+- You're ready to execute → use jk-execute
+
+## How It Works
+
+**Be conversational.** This is a dialogue, not a process.
+
+1. **Understand context** — Quickly scan relevant code, docs, recent commits. Build a mental model.
+2. **Ask questions** — One at a time. Multiple choice when possible. Follow the user's energy.
+3. **Explore approaches** — When you have enough context, propose 2-3 approaches with tradeoffs. Lead with your recommendation.
+4. **Iterate** — The user will push back, refine, redirect. Go with it. Ask follow-ups. Probe edge cases.
+5. **Crystallize** — When an approach solidifies, summarize it clearly: what we're building, how, and why.
+
+## Rules
+
+- **One question per message.** Don't overwhelm.
+- **Follow energy.** If the user digs into a topic, go deeper. Don't redirect to your agenda.
+- **Challenge quick answers to complex questions.** "Whatever you think" is not an answer to an architectural decision — push back with tradeoffs.
+- **No implementation.** Don't write code, create files, or scaffold anything. Ideas only.
+- **No design docs.** This isn't jk-plan. If the idea needs formal planning, suggest transitioning to jk-plan at the end.
+
+## Ending a Brainstorm
+
+When ideas have crystallized, offer the next step:
+
+```
+We've landed on [summary]. Want to:
+1. Start building (simple enough to just go)
+2. Plan it formally (/jk-plan)
+3. Keep exploring
+```
+
+Don't push toward planning unless the idea is complex enough to warrant it. Simple ideas can go straight to implementation.

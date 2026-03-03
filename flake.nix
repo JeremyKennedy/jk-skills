@@ -25,6 +25,7 @@
           "dispatching-parallel-agents"
           "writing-skills"
           "upstream-audit"
+          "jk-brainstorm"
         ];
       in {
         options.programs.jk-skills = {
@@ -45,6 +46,9 @@
 
             agents = {
               code-reviewer = ./agents/code-reviewer.md;
+              silent-failure-hunter = ./agents/silent-failure-hunter.md;
+              test-analyzer = ./agents/test-analyzer.md;
+              doc-analyzer = ./agents/doc-analyzer.md;
             };
 
             hooks.session-start = builtins.readFile ./hooks/session-start;

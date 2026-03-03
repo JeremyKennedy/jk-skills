@@ -41,3 +41,20 @@ The following skills are derived from superpowers and have been modified:
 - using-git-worktrees
 - dispatching-parallel-agents
 - writing-skills
+- jk-brainstorm (derived from brainstorming, added in v4.3.1)
+
+---
+
+## Anthropic claude-plugins-official
+
+This project includes agents derived from [claude-plugins-official](https://github.com/anthropics/claude-plugins-official) by Anthropic.
+
+The original code is licensed under the Apache License 2.0.
+
+### Derived Agents
+
+The following agents are derived from the pr-review-toolkit plugin and have been adapted (made language-agnostic, removed project-specific references):
+
+- silent-failure-hunter
+- test-analyzer (from pr-test-analyzer)
+- doc-analyzer (from comment-analyzer)
