@@ -65,6 +65,17 @@ All skills should embody the development philosophy: code is free, expand scope 
 3. Add skill name to `skillNames` list in `flake.nix`
 4. Run `just check`
 
+## Releasing
+
+Claude Code caches plugins locally. Users only get updates when the `version` in `.claude-plugin/plugin.json` changes — same version = skip, even if code changed.
+
+**Release flow:**
+1. Make changes, `just check`
+2. Bump `version` in `.claude-plugin/plugin.json` (semver: patch for fixes, minor for new/changed skills, major for breaking changes)
+3. Commit and push to both remotes: `git push && git push github main`
+
+Nix flake users get updates on next `flake lock --update-input jk-skills`. Marketplace users get updates via `/plugin update` or auto-update (disabled by default for third-party marketplaces).
+
 ## Commits
 
 Use conventional commits: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`.
