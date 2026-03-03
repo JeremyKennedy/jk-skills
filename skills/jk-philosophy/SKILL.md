@@ -39,6 +39,18 @@ The codebase should always be getting cleaner. Technical debt compounds. Clean c
 - **Never introduce debt.** Every change you make should leave the codebase strictly better. If a quick hack would work but a clean solution takes 20% more effort, always take the clean solution.
 - **Refactor confidently.** Don't ask permission to make code better. Just do it and show the result.
 
+## Fix Root Causes, Not Symptoms
+
+Workarounds are debt that disguises itself as productivity. When something is broken, fix the broken thing — don't route around it.
+
+This is especially true when the broken thing is **code you can modify**. The instinct to "just get past this" is strong, especially mid-task. Resist it:
+- **Label the problem explicitly.** "This is a bug in X" — don't euphemize it as a "known issue" or "quirk."
+- **Assess the fix cost.** Often the root-cause fix is smaller than you think.
+- **If the fix is large, escalate — don't suppress.** Surface the tradeoff and let the user choose. Silently picking the workaround is never acceptable.
+- **Upstream issues are different.** If you can't modify the broken code, a workaround may be the only option. But document it.
+
+The test: after you're done, is the system **actually better**, or did you just push the problem somewhere harder to see?
+
 ## No Dead Code, No Compromises
 
 - Delete what's broken. Don't comment it out.
