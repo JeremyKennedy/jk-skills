@@ -11,18 +11,21 @@
           "systematic-debugging",
           "test-driven-development",
           "verification-before-completion",
-          "receiving-code-review",
-          "requesting-code-review",
-          "finishing-a-development-branch",
+          "jk-receive-review",
+          "jk-code-review",
+          "jk-finish-branch",
           "using-git-worktrees",
           "dispatching-parallel-agents",
           "writing-skills",
           "jk-brainstorm"
         ],
+        "agents": [
+          "code-reviewer"
+        ],
         "version": "v4.3.1"
       },
       "status": "absorbed",
-      "notes": "10 skills cherry-picked and adapted. Hook async fix ported. Original MIT license."
+      "notes": "10 skills + 1 agent cherry-picked and adapted. Hook async fix ported. Original MIT license."
     },
     {
       "name": "code-review",

@@ -1,6 +1,6 @@
 ---
-name: finishing-a-development-branch
-description: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup
+name: jk-finish-branch
+description: Use when implementation is complete and you need to decide how to integrate — analyzes branch state, presents structured options for merge, PR, push, or cleanup
 ---
 <!-- Derived from superpowers v4.2.0: finishing-a-development-branch -->
 
@@ -14,7 +14,7 @@ Guide completion of development work by presenting clear options and handling ch
 
 **Default workflow:** Direct push to main. PRs are the exception, not the rule.
 
-**Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
+**Announce at start:** "I'm using the jk-finish-branch skill to complete this work."
 
 ## The Process
 
@@ -40,7 +40,37 @@ Stop. Don't proceed to Step 2.
 
 **If tests pass:** Continue to Step 2.
 
-### Step 2: Determine Base Branch
+### Step 2: Analyze Branch State
+
+Understand the branch before presenting options. Don't assume every branch merges to main.
+
+```bash
+# What branch are we on?
+CURRENT=$(git branch --show-current)
+
+# How old is this branch? How many commits ahead/behind?
+git log --oneline main..$CURRENT 2>/dev/null | wc -l
+git log --oneline $CURRENT..main 2>/dev/null | wc -l
+
+# Is there an upstream tracking branch?
+git rev-parse --abbrev-ref @{upstream} 2>/dev/null
+
+# Any open PRs for this branch?
+gh pr list --head $CURRENT --state open 2>/dev/null
+```
+
+**Determine branch type:**
+
+| Signal | Branch type | Default action |
+|--------|------------|----------------|
+| Branch name is `main`/`master`/`dev` | Trunk development | Push directly |
+| Branch has upstream tracking, many commits, old history | Long-lived branch | Push to remote, do NOT suggest merge |
+| Branch is recent, few commits, no upstream | Feature branch | Offer merge options |
+| Open PR exists | PR branch | Push and update PR |
+
+**For long-lived branches:** Skip merge options. The right action is pushing to the remote branch, not merging to main. Present only options 2-4 (no merge).
+
+### Step 3: Determine Base Branch (Feature Branches Only)
 
 ```bash
 # Try common base branches
@@ -49,9 +79,9 @@ git merge-base HEAD main 2>/dev/null || git merge-base HEAD master 2>/dev/null
 
 Or ask: "This branch split from main - is that correct?"
 
-### Step 3: Present Options
+### Step 4: Present Options
 
-If already on main (direct development), skip to pushing. Otherwise present options:
+If already on main (direct development), skip to pushing. Otherwise present options based on branch type:
 
 ```
 Implementation complete. What would you like to do?
@@ -66,7 +96,7 @@ Which option? (default: 1)
 
 **Don't add explanation** - keep options concise.
 
-### Step 4: Execute Choice
+### Step 5: Execute Choice
 
 #### Option 1: Merge and Push (Default)
 
@@ -88,7 +118,7 @@ git push
 git branch -d <feature-branch>
 ```
 
-Then: Cleanup worktree (Step 5)
+Then: Cleanup worktree (Step 6)
 
 #### Option 2: Push and Create PR
 
@@ -107,7 +137,7 @@ EOF
 )"
 ```
 
-Then: Cleanup worktree (Step 5)
+Then: Cleanup worktree (Step 6)
 
 #### Option 3: Keep As-Is
 
@@ -135,9 +165,9 @@ git checkout <base-branch>
 git branch -D <feature-branch>
 ```
 
-Then: Cleanup worktree (Step 5)
+Then: Cleanup worktree (Step 6)
 
-### Step 5: Cleanup Worktree
+### Step 6: Cleanup Worktree
 
 **For Options 1, 2, 4:**
 

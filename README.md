@@ -56,18 +56,20 @@ Usage: `/jk-execute deep`, `/jk-execute swarm`, `/jk-execute care`
 | `systematic-debugging` | Root cause investigation before fixes |
 | `test-driven-development` | TDD workflow, no exceptions |
 | `verification-before-completion` | Evidence before claims |
-| `receiving-code-review` | Challenge assumptions, verify independently |
-| `requesting-code-review` | Code review dispatch template |
-| `finishing-a-development-branch` | Merge/push decision (default: direct push) |
+| `jk-receive-review` | Challenge assumptions, verify independently |
+| `jk-code-review` | Code review dispatch template |
+| `jk-finish-branch` | Branch analysis + merge/push/PR decision |
 | `using-git-worktrees` | Isolated workspace setup |
 | `dispatching-parallel-agents` | Parallel subagent coordination |
 | `writing-skills` | Skill authoring with philosophy alignment |
 
-### Maintenance
+### Maintenance (repo-local, not shipped with plugin)
 
 | Skill | Description |
 |-------|-------------|
 | `upstream-audit` | Check tracked upstream plugin repos for changes and evaluate diffs |
+
+Lives in `.claude/skills/` — available when working in this repo but not distributed to users.
 
 ### Meta-Skill
 

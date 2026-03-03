@@ -51,21 +51,14 @@ Cross-reference every claim against actual code:
 
 ## Output Format
 
-**Critical issues**: Factually incorrect or misleading docs
-- Location: file:line
-- Confidence: 0-100 (how certain this is a real issue, not a false positive)
-- Issue: what's wrong
-- Suggestion: recommended fix
+For each issue:
 
-**Improvement opportunities**: Docs that could be enhanced
-- Location: file:line
-- Current state: what's lacking
-- Suggestion: how to improve
+1. **Location**: file:line
+2. **Severity**: Critical / Important / Minor
+3. **Confidence**: 0-100 (how certain this is a real issue, not a false positive)
+4. **Issue**: What's wrong — inaccurate, misleading, stale, or valueless
+5. **Recommendation**: Specific fix, improvement, or removal with rationale
 
-**Recommended removals**: Docs that add no value or create confusion
-- Location: file:line
-- Rationale: why it should go
-
-**Positive findings**: Well-written docs that serve as good examples
+Also note **positive findings** — well-written docs that serve as good examples.
 
 You analyze and recommend only. Do not modify code or documentation directly.

@@ -42,15 +42,29 @@ These thoughts mean STOP — you're rationalizing:
 | "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
 | "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
 
+## Task Routing
+
+| User says | Start with |
+|-----------|-----------|
+| "Build X" / "Add feature Y" | jk-plan (or jk-brainstorm if vague) |
+| "Fix bug Y" / "This is broken" | systematic-debugging |
+| "What if we..." / "I'm thinking about..." | jk-brainstorm |
+| "Execute this plan" / "Start building" | jk-execute |
+| "I'm done" / "Is this ready?" | jk-prove-it |
+| "Review this code" / "Check my work" | jk-code-review |
+| "I got feedback" / review comments | jk-receive-review |
+| "Let's merge" / "Ship this" | jk-finish-branch |
+| "Refactor X" | jk-plan (refactoring intent) |
+| "Add tests" / "Write tests for" | test-driven-development |
+| "Set up a worktree" | using-git-worktrees |
+| "Write a new skill" | writing-skills |
+
 ## Skill Priority
 
 When multiple skills could apply, use this order:
 
 1. **Process skills first** (jk-plan, systematic-debugging) — these determine HOW to approach the task
 2. **Implementation skills second** (test-driven-development, dispatching-parallel-agents) — these guide execution
-
-"Let's build X" → jk-plan first, then implementation skills.
-"Fix this bug" → systematic-debugging first, then domain-specific skills.
 
 ## Skill Types
 

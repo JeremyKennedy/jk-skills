@@ -6,6 +6,8 @@ description: Use when implementing any feature or bugfix, before writing impleme
 
 # Test-Driven Development (TDD)
 
+**Announce at start:** "I'm using the test-driven-development skill — tests first."
+
 ## Overview
 
 Write the test first. Watch it fail. Write minimal code to pass.
@@ -31,7 +33,7 @@ Write the test first. Watch it fail. Write minimal code to pass.
 
 Thinking "skip TDD just this once"? Stop. That's rationalization.
 
-## The Iron Law
+## Hard Rule
 
 ```
 NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST

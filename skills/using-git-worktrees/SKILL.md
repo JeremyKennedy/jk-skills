@@ -210,4 +210,4 @@ Ready to implement auth feature
 ## Integration
 
 **Pairs with:**
-- **jk-skills:finishing-a-development-branch** - REQUIRED for cleanup after work complete
+- **jk-skills:jk-finish-branch** - REQUIRED for cleanup after work complete

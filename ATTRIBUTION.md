@@ -1,6 +1,6 @@
 # Attribution
 
-This project includes skills derived from [superpowers](https://github.com/obra/superpowers) v4.2.0 by Jesse Vincent.
+This project includes skills and agents derived from [superpowers](https://github.com/obra/superpowers) v4.2.0 / v4.3.1 by Jesse Vincent.
 
 The original superpowers code is licensed under the MIT License:
 
@@ -28,20 +28,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## Derived Skills
+## Derived Skills and Agents
 
-The following skills are derived from superpowers and have been modified:
+The following are derived from superpowers and have been modified:
 
 - systematic-debugging
 - test-driven-development
 - verification-before-completion
-- receiving-code-review
-- requesting-code-review
-- finishing-a-development-branch
+- jk-receive-review (from receiving-code-review)
+- jk-code-review (from requesting-code-review)
+- jk-finish-branch (from finishing-a-development-branch)
 - using-git-worktrees
 - dispatching-parallel-agents
 - writing-skills
 - jk-brainstorm (derived from brainstorming, added in v4.3.1)
+- code-reviewer agent (derived from code-reviewer agent, v4.2.0)
 
 ---
 

@@ -6,6 +6,8 @@ description: Use when creating new skills, editing existing skills, or verifying
 
 # Writing Skills
 
+**Announce at start:** "I'm using the writing-skills skill for skill authoring."
+
 ## Overview
 
 **Writing skills IS Test-Driven Development applied to process documentation.**
@@ -381,7 +383,7 @@ pptx/
 ```
 When: Reference material too large for inline
 
-## The Iron Law (Same as TDD)
+## Hard Rule (Same as TDD)
 
 ```
 NO SKILL WITHOUT A FAILING TEST FIRST
@@ -657,7 +659,7 @@ How future Claude finds your skill:
 
 **Creating skills IS TDD for process documentation.**
 
-Same Iron Law: No skill without failing test first.
+Same hard rule: No skill without failing test first.
 Same cycle: RED (baseline) -> GREEN (write skill) -> REFACTOR (close loopholes).
 Same benefits: Better quality, fewer surprises, bulletproof results.
 

@@ -6,6 +6,8 @@ description: Use when encountering any bug, test failure, or unexpected behavior
 
 # Systematic Debugging
 
+**Announce at start:** "I'm using the systematic-debugging skill to find the root cause."
+
 ## Overview
 
 Random fixes waste time and create new bugs. Quick patches mask underlying issues.
@@ -16,7 +18,7 @@ Random fixes waste time and create new bugs. Quick patches mask underlying issue
 
 **Scope expansion:** Debugging is an opportunity. When you're investigating a bug, you're reading code deeply -- use that context. Fix adjacent issues you find during investigation. Delete dead code. Clean up inconsistencies. The investigation already paid the cost of understanding; the fixes are nearly free. See jk-skills:jk-philosophy.
 
-## The Iron Law
+## Hard Rule
 
 ```
 NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST

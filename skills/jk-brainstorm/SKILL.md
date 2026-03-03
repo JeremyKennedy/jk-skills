@@ -1,11 +1,13 @@
 ---
 name: jk-brainstorm
-description: "Lightweight ideation: bounce ideas, explore approaches, and refine thinking before committing to formal planning."
+description: "Use when exploring ideas before committing to a direction — lightweight conversational ideation, no code, no design docs."
 ---
 
 <!-- Derived from superpowers v4.3.1: brainstorming -->
 
 # Brainstorm
+
+**Announce at start:** "I'm using the jk-brainstorm skill — let's explore ideas."
 
 Collaborative ideation mode. Chat, explore, refine ideas. No structure, no gates, no design docs. This is the "let's think about this" phase before you decide whether something needs full planning (jk-plan) or can just be built.
 

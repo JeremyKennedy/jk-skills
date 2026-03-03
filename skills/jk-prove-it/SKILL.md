@@ -1,9 +1,11 @@
 ---
 name: jk-prove-it
-description: "Ship gate: you claim you're done — prove it. Mechanical verification, self-review of your own diff, structured ship report."
+description: "Use when claiming work is complete — mechanical verification, self-review of own diff, liveness check, structured ship report."
 ---
 
 # Prove It
+
+**Announce at start:** "I'm using the jk-prove-it skill to verify this work is ready to ship."
 
 You claim you're done. Prove it.
 
@@ -145,3 +147,11 @@ If you can't fill out every section of the ship report with confidence, you are 
 If your liveness section is empty or says "N/A" for user-facing work, you are not done.
 
 Go back. Do more work. Then prove it again.
+
+## Step 5: Finish the Branch
+
+Ship report complete. Now finish the work:
+
+> **REQUIRED SUB-SKILL:** Use jk-skills:jk-finish-branch
+
+If you cannot load jk-skills:jk-finish-branch, STOP and tell the user the plugin is misconfigured.

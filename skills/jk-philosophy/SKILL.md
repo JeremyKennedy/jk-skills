@@ -1,6 +1,6 @@
 ---
 name: jk-philosophy
-description: "Development philosophy: scope expansion, relentless refactoring, aggressive productivity, more questions"
+description: "Use as foundational philosophy for all development work — scope expansion, relentless refactoring, aggressive productivity, more questions"
 ---
 
 # Development Philosophy

@@ -1,9 +1,11 @@
 ---
 name: upstream-audit
-description: Check upstream plugin repos for changes since last review, evaluate diffs for relevance, and report what's new
+description: Use when checking upstream plugin repos for changes since last review — evaluate diffs for relevance and report what's new
 ---
 
 # Upstream Audit
+
+**Announce at start:** "I'm using the upstream-audit skill to check for upstream changes."
 
 Check tracked upstream repos for changes since the last review. Evaluate diffs for relevance to absorbed or watched plugins. Present a structured report.
 

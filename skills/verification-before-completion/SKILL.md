@@ -6,6 +6,8 @@ description: Use when about to claim work is complete, fixed, or passing, before
 
 # Verification Before Completion
 
+**Announce at start:** "I'm using the verification-before-completion skill to verify before claiming done."
+
 ## Overview
 
 Claiming work is complete without verification is dishonesty, not efficiency.
@@ -14,7 +16,7 @@ Claiming work is complete without verification is dishonesty, not efficiency.
 
 **Violating the letter of this rule is violating the spirit of this rule.**
 
-## The Iron Law
+## Hard Rule
 
 ```
 NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE

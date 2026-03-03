@@ -18,13 +18,12 @@
           "systematic-debugging"
           "test-driven-development"
           "verification-before-completion"
-          "receiving-code-review"
-          "requesting-code-review"
-          "finishing-a-development-branch"
+          "jk-receive-review"
+          "jk-code-review"
+          "jk-finish-branch"
           "using-git-worktrees"
           "dispatching-parallel-agents"
           "writing-skills"
-          "upstream-audit"
           "jk-brainstorm"
         ];
       in {

@@ -7,9 +7,11 @@ Claude Code plugin marketplace: planning, execution, TDD, debugging, and code re
 Flat marketplace+plugin repo. Repo root is both the marketplace and the plugin.
 
 - `.claude-plugin/` — Marketplace + plugin manifests
-- `skills/` — Each subdirectory has a `SKILL.md` with YAML frontmatter (`name:`, `description:`)
+- `skills/` — Plugin skills (shipped to users). Each subdirectory has a `SKILL.md` with YAML frontmatter (`name:`, `description:`)
+- `.claude/skills/` — Repo-local skills (maintenance tools, not shipped). Same format as `skills/`.
 - `agents/` — Agent definitions
 - `hooks/` — SessionStart hook (injects `using-jk-skills` into conversation)
+- `upstream/` — Upstream tracking registry
 - `scripts/check.sh` — Validation (run via `just check` or `nix flake check`)
 
 ## Dual Distribution
@@ -34,9 +36,20 @@ Every `SKILL.md` must have:
 ```yaml
 ---
 name: skill-name
-description: What this skill does
+description: Use when [trigger condition] — [what it does]
 ---
 ```
+
+Descriptions must start with "Use when" to clearly indicate when the skill applies.
+
+### Announcements
+
+All user-facing skills must include after the `# Title`:
+```markdown
+**Announce at start:** "I'm using the <skill-name> skill to [action]."
+```
+
+Exceptions: jk-philosophy (foundational reference) and using-jk-skills (meta-skill injected by hook).
 
 ### Sub-Skill References
 
@@ -72,6 +85,15 @@ All skills should embody the development philosophy: code is free, expand scope 
 3. Register in `flake.nix` under `programs.claude-code.agents`
 4. Update `upstream/registry.json` absorbed list if applicable
 5. Run `just check`
+
+### Agent Output Format
+
+All review agents must use a consistent per-issue format:
+1. **Location**: file:line
+2. **Severity**: Critical / Important / Minor
+3. **Confidence**: 0-100 (is this a real issue, not a false positive?)
+4. **Issue**: What's wrong
+5. **Recommendation**: Specific fix
 
 ## Releasing
 

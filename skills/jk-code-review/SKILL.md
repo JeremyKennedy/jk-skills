@@ -1,20 +1,24 @@
 ---
-name: requesting-code-review
-description: Use when completing tasks, implementing major features, or before merging to verify work meets requirements
+name: jk-code-review
+description: Use when completing tasks, implementing major features, or before merging — dispatches code-reviewer agent to catch issues early
 ---
 <!-- Derived from superpowers v4.2.0: requesting-code-review -->
 
-# Requesting Code Review
+# Code Review
 
-Dispatch the `code-reviewer` agent to catch issues before they cascade.
+**Announce at start:** "I'm using the jk-code-review skill to dispatch a code review."
+
+Dispatch the `code-reviewer` agent to catch issues before they cascade. This is the canonical review dispatch — jk-execute invokes this skill for per-task code quality reviews.
 
 **Core principle:** Review early, review often.
 
 ## When to Request Review
 
-**Mandatory:**
-- After each task in jk-execute
-- After completing major feature
+**Automatic (via jk-execute):**
+- Per-task code quality review during Deep/Swarm/Care execution
+
+**Manual:**
+- After completing major feature (ad-hoc development)
 - Before merge to main
 
 **Optional but valuable:**
@@ -32,7 +36,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 **2. Dispatch code-reviewer subagent:**
 
-Use Task tool with the `code-reviewer` agent type, fill template at `references/code-reviewer.md`
+Dispatch the `code-reviewer` agent as a subagent, filling the template at `references/code-reviewer.md`
 
 **Placeholders:**
 - `{WHAT_WAS_IMPLEMENTED}` - What you just built
@@ -75,16 +79,11 @@ You: [Fix progress indicators]
 [Continue to Task 3]
 ```
 
-## Integration with Workflows
+## Integration
 
-**jk-execute:**
-- Review after EACH task
-- Catch issues before they compound
-- Fix before moving to next task
+**jk-execute** invokes this skill automatically for per-task code quality reviews. You do NOT need to separately invoke jk-code-review during jk-execute.
 
-**Ad-Hoc Development:**
-- Review before merge
-- Review when stuck
+**Ad-hoc development:** Invoke this skill manually whenever you want a code review outside of jk-execute.
 
 ## Red Flags
 
@@ -99,4 +98,4 @@ You: [Fix progress indicators]
 - Show code/tests that prove it works
 - Request clarification
 
-See template at: requesting-code-review/references/code-reviewer.md
+See template at: jk-code-review/references/code-reviewer.md

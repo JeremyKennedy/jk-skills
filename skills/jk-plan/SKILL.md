@@ -1,9 +1,11 @@
 ---
 name: jk-plan
-description: "Heavy upfront planning: deep interview, codebase research, review panel cycles, implementation plan. Use instead of jk-brainstorm for non-trivial work."
+description: "Use when starting non-trivial work — deep interview, codebase research, adversarial review panel, implementation plan. Use jk-brainstorm for lighter ideation."
 ---
 
 # Deep Plan
+
+**Announce at start:** "I'm using the jk-plan skill for heavy-weight planning."
 
 Heavy-weight planning that front-loads tokens into understanding before any code is written. Research, interview with hard gates, design, adversarial review panel that cycles until diminishing returns, then implementation plan.
 

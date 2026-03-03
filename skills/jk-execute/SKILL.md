@@ -1,9 +1,11 @@
 ---
 name: jk-execute
-description: "Execute a plan in Deep, Swarm, or Care mode. Three execution topologies: one brain, many brains, or brain + human."
+description: "Use when executing an implementation plan — three modes: Deep (one brain, sequential), Swarm (many brains, parallel), Care (brain + human, checkpoints)."
 ---
 
 # Deep Execute
+
+**Announce at start:** "I'm using the jk-execute skill to execute the plan."
 
 Execute an implementation plan using one of three execution topologies. Each mode uses per-task review (spec compliance + code quality) and ends with jk-prove-it.
 
@@ -246,7 +248,7 @@ If you have questions about requirements, approach, dependencies, or anything un
 
 ## Your Job
 1. Implement exactly what the task specifies
-2. Write tests (TDD if task requires it)
+2. Follow TDD: write failing test first, then implement, then refactor. Use jk-skills:test-driven-development.
 3. Verify implementation works
 4. Commit your work
 5. Self-review: completeness, quality, discipline, testing
@@ -281,14 +283,7 @@ Report: ✅ Spec compliant OR ❌ Issues found [with file:line references]
 
 ### Code Quality Reviewer
 
-```
-Review the implementation for code quality.
-
-Dispatch using the code-reviewer agent
-
-Check: clean code, proper testing, naming, patterns, maintainability.
-Report: Strengths, Issues (Critical/Important/Minor), Assessment.
-```
+Dispatch the code-reviewer agent using the process from jk-skills:jk-code-review. Fill the template with the current task's context.
 
 ---
 
@@ -297,5 +292,6 @@ Report: Strengths, Issues (Critical/Important/Minor), Assessment.
 - **jk-skills:jk-plan** creates the plan this skill executes
 - **jk-skills:jk-prove-it** is REQUIRED at the end of every mode
 - **jk-skills:verification-before-completion** is invoked by jk-prove-it
-- **jk-skills:finishing-a-development-branch** for merge/push decision after prove-it
+- **jk-skills:jk-finish-branch** for merge/push decision after prove-it
+- **jk-skills:jk-code-review** — per-task code quality review dispatch
 - **jk-skills:test-driven-development** — subagents should follow TDD for each task

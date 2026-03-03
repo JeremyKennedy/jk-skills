@@ -1,10 +1,12 @@
 ---
-name: receiving-code-review
-description: Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation
+name: jk-receive-review
+description: Use when receiving code review feedback, before implementing suggestions — requires technical rigor and verification, not performative agreement or blind implementation
 ---
 <!-- Derived from superpowers v4.2.0: receiving-code-review -->
 
 # Code Review Reception
+
+**Announce at start:** "I'm using the jk-receive-review skill to handle this feedback."
 
 ## Overview
 

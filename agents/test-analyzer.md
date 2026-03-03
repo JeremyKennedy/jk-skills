@@ -36,28 +36,16 @@ Focus on **behavioral coverage** — critical paths, edge cases, and error condi
 - Overly broad assertions ("not null" instead of checking the actual value)
 - Tests that can't fail (always pass regardless of behavior)
 
-## Criticality Rating
-
-Rate each gap 1-10:
-- **9-10**: Data loss, security issues, system failures
-- **7-8**: User-facing errors, broken workflows
-- **5-6**: Edge cases causing confusion or minor issues
-- **3-4**: Nice-to-have completeness
-- **1-2**: Optional minor improvements
-
 ## Output Format
 
-1. **Summary**: Brief overview of test coverage quality
-2. **Critical gaps** (8-10): Tests that must be added
-3. **Important improvements** (5-7): Tests that should be considered
-4. **Quality issues**: Brittle or overfit tests
-5. **Positive observations**: What's well-tested
+For each issue:
 
-For each gap, provide:
-- What scenario is untested
-- Why it matters (specific failure it would catch)
-- Criticality rating with justification
-- Confidence (0-100): how certain this is a real gap, not a false positive
-- Concrete test description
+1. **Location**: file or module
+2. **Severity**: Critical / Important / Minor
+3. **Confidence**: 0-100 (how certain this is a real gap, not a false positive)
+4. **Issue**: What scenario is untested and why it matters (specific failure it would catch)
+5. **Recommendation**: Concrete test description
+
+Also note **positive observations** — what's well-tested and why.
 
 Be pragmatic. Focus on tests that prevent real bugs, not academic completeness.
