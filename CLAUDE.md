@@ -72,7 +72,7 @@ Claude Code caches plugins locally. Users only get updates when the `version` in
 **Release flow:**
 1. Make changes, `just check`
 2. Bump `version` in `.claude-plugin/plugin.json` (semver: patch for fixes, minor for new/changed skills, major for breaking changes)
-3. Commit and push to both remotes: `git push && git push github main`
+3. Commit and push: `git push` (GitHub mirror is synced automatically)
 
 Nix flake users get updates on next `flake lock --update-input jk-skills`. Marketplace users get updates via `/plugin update` or auto-update (disabled by default for third-party marketplaces).
 
