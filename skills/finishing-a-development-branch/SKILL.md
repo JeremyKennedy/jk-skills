@@ -197,7 +197,7 @@ git worktree remove <worktree-path>
 ## Integration
 
 **Called by:**
-- **jk-skills:jk-deep-execute** - After all tasks complete
+- **jk-skills:jk-execute** - After all tasks complete
 - Any workflow needing branch completion
 
 **Pairs with:**

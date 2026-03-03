@@ -1,5 +1,5 @@
 ---
-name: jk-deep-plan
+name: jk-plan
 description: "Heavy upfront planning: deep interview, codebase research, review panel cycles, implementation plan. Use instead of brainstorming for non-trivial work."
 ---
 
@@ -175,4 +175,4 @@ Choose execution mode:
 3. Care  — Brain + human. Checkpoints with "what to check" guidance. You stay in the loop.
 ```
 
-Once the user picks, invoke `jk-skills:jk-deep-execute` with the chosen mode and plan file path.
+Once the user picks, invoke `jk-skills:jk-execute` with the chosen mode and plan file path.

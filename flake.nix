@@ -12,8 +12,8 @@
         skillNames = [
           "using-jk-skills"
           "jk-philosophy"
-          "jk-deep-plan"
-          "jk-deep-execute"
+          "jk-plan"
+          "jk-execute"
           "jk-prove-it"
           "systematic-debugging"
           "test-driven-development"
@@ -41,12 +41,6 @@
               inherit name;
               value = ./skills/${name};
             }) skillNames);
-
-            commands = {
-              jk-plan = ./commands/jk-plan.md;
-              jk-execute = ./commands/jk-execute.md;
-              jk-philosophy = ./commands/jk-philosophy.md;
-            };
 
             agents = {
               code-reviewer = ./agents/code-reviewer.md;

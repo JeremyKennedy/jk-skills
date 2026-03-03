@@ -7,7 +7,7 @@ Heavy-duty planning, execution, and development skills for Claude Code. Supersed
 ### Option A: Claude Code Plugin Marketplace
 
 ```
-/plugin marketplace add jeremyk/jk-skills
+/plugin marketplace add JeremyKennedy/jk-skills
 /plugin install jk-skills@jk-skills
 ```
 
@@ -31,12 +31,12 @@ programs.jk-skills.enable = true;
 
 ### Original Skills
 
-| Skill | Command | Description |
-|-------|---------|-------------|
-| `jk-philosophy` | `/jk-philosophy` | Development philosophy directives: code is free, expand scope, refactor always |
-| `jk-deep-plan` | `/jk-plan` | Heavy-weight planning: research, interview, design, review panel, implementation plan |
-| `jk-deep-execute` | `/jk-execute` | Execute plans in Deep, Swarm, or Care mode |
-| `jk-prove-it` | — | Ship gate: mechanical verification + self-review + ship report |
+| Skill | Description |
+|-------|-------------|
+| `jk-philosophy` | Development philosophy directives: code is free, expand scope, refactor always |
+| `jk-plan` | Heavy-weight planning: research, interview, design, review panel, implementation plan |
+| `jk-execute` | Execute plans in Deep, Swarm, or Care mode |
+| `jk-prove-it` | Ship gate: mechanical verification + self-review + ship report |
 
 ### Execution Modes
 

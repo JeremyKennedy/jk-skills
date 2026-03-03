@@ -26,7 +26,7 @@ for skill in skills/*/SKILL.md; do
 done
 
 # Check no superpowers:* references remain
-if grep -r 'superpowers:' skills/ commands/ agents/ 2>/dev/null; then
+if grep -r 'superpowers:' skills/ agents/ 2>/dev/null; then
     echo "ERROR: Found superpowers:* references (should be jk-skills:*)"
     errors=$((errors + 1))
 fi
@@ -36,14 +36,6 @@ for ref in $(grep -roh 'jk-skills:[a-z-]*' skills/ 2>/dev/null | sort -u); do
     skill_name="${ref#jk-skills:}"
     if [[ ! -d "skills/${skill_name}" ]]; then
         echo "ERROR: Sub-skill reference '${ref}' points to non-existent skill"
-        errors=$((errors + 1))
-    fi
-done
-
-# Check command frontmatter
-for cmd in commands/*.md; do
-    if ! head -10 "$cmd" | grep -q '^description:'; then
-        echo "ERROR: Missing 'description:' in frontmatter of ${cmd}"
         errors=$((errors + 1))
     fi
 done

@@ -1,5 +1,5 @@
 ---
-name: jk-deep-execute
+name: jk-execute
 description: "Execute a plan in Deep, Swarm, or Care mode. Three execution topologies: one brain, many brains, or brain + human."
 ---
 
@@ -15,7 +15,7 @@ If you cannot load jk-skills:jk-philosophy, STOP and tell the user the plugin is
 
 1. If a path is provided as argument, use it
 2. If no path, list recent `*-plan.md` and `*-design.md` files in `docs/plans/` and ask the user to pick
-3. If no plan files found, STOP and tell the user to create one first (use jk-skills:jk-deep-plan)
+3. If no plan files found, STOP and tell the user to create one first (use jk-skills:jk-plan)
 
 ## Execution Modes
 
@@ -283,7 +283,7 @@ Report: Strengths, Issues (Critical/Important/Minor), Assessment.
 
 ## Integration
 
-- **jk-skills:jk-deep-plan** creates the plan this skill executes
+- **jk-skills:jk-plan** creates the plan this skill executes
 - **jk-skills:jk-prove-it** is REQUIRED at the end of every mode
 - **jk-skills:verification-before-completion** is invoked by jk-prove-it
 - **jk-skills:finishing-a-development-branch** for merge/push decision after prove-it

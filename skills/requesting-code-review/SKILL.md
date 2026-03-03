@@ -13,7 +13,7 @@ Dispatch the `code-reviewer` agent to catch issues before they cascade.
 ## When to Request Review
 
 **Mandatory:**
-- After each task in jk-deep-execute
+- After each task in jk-execute
 - After completing major feature
 - Before merge to main
 
@@ -77,7 +77,7 @@ You: [Fix progress indicators]
 
 ## Integration with Workflows
 
-**jk-deep-execute:**
+**jk-execute:**
 - Review after EACH task
 - Catch issues before they compound
 - Fix before moving to next task

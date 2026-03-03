@@ -8,7 +8,6 @@ Flat marketplace+plugin repo. Repo root is both the marketplace and the plugin.
 
 - `.claude-plugin/` — Marketplace + plugin manifests
 - `skills/` — Each subdirectory has a `SKILL.md` with YAML frontmatter (`name:`, `description:`)
-- `commands/` — Slash commands (`.md` files with YAML frontmatter)
 - `agents/` — Agent definitions
 - `hooks/` — SessionStart hook (injects `using-jk-skills` into conversation)
 - `scripts/check.sh` — Validation (run via `just check` or `nix flake check`)
