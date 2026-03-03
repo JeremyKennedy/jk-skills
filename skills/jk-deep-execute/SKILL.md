@@ -35,14 +35,23 @@ Sequential like Deep, but pauses at meaningful phase boundaries for human review
 
 ## Mode Selection
 
-If the user specified a mode, use it. If not, present:
+If the user specified a mode, use it. If not, analyze the plan and recommend one:
+
+**Recommendation heuristics** (in priority order):
+1. **Swarm** if there are 3+ tasks AND most tasks are independent (no shared files or sequential dependencies)
+2. **Care** if the plan touches unfamiliar patterns, involves high-risk changes (auth, data migration, billing), or the user seems uncertain
+3. **Deep** as the default — it's the safest and most thorough option
+
+Present with your recommendation marked. Example if recommending Deep:
 
 ```
 Choose execution mode:
-1. Deep  — One brain, sequential, full context. Round table at end. No human pauses.
+1. Deep  — One brain, sequential, full context. Round table at end. No human pauses. (Recommended — tasks are tightly coupled)
 2. Swarm — Many brains, parallel dispatch. Per-task review. Maximum speed.
 3. Care  — Brain + human. Checkpoints with "what to check" guidance. You stay in the loop.
 ```
+
+Include a one-line reason for the recommendation (e.g., "tasks share state", "8 independent modules", "unfamiliar codebase").
 
 ---
 
