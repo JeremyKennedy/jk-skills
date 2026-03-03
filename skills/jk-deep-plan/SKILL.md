@@ -121,7 +121,13 @@ After all reviewers return:
 
 #### Re-Cycle
 
-After fixing issues, re-run ONLY the reviewers that found Critical/Important issues. Do NOT re-run the ones that passed.
+After fixing issues, run three categories of reviewers:
+
+1. **Failed dedicated agents** — Re-run the reviewers that found Critical/Important issues, to verify fixes.
+2. **Delta agent** — A new reviewer focused on second-order effects. Prompt: "Here is the design doc diff since last cycle and a summary of what was flagged and fixed. What new issues do these changes introduce? Look for second-order effects: a fix in one area creating problems in another, shifted assumptions, new gaps, new complexity." Give it the diff AND a short summary of each fix (issue → resolution).
+3. **Free agent** — A new reviewer with no assigned domain and no access to previous reviewer outputs. Prompt: "You are a fresh reviewer with no assigned domain. Review this design for any issues — correctness, completeness, consistency, elegance, anything. You are specifically valuable because the dedicated reviewers each have a narrow lens. Find what they missed." Give it only the current design doc and project CLAUDE.md. Do NOT show it previous cycle results — avoid anchoring.
+
+This means round 2+ always has at least 3 agents even if only one dedicated agent failed.
 
 **Stop condition:** A cycle produces no Critical/Important issues. Minor-only means the design is solid.
 
