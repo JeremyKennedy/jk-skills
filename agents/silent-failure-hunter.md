@@ -58,10 +58,11 @@ For every handler, evaluate:
 For each issue:
 
 1. **Location**: file:line
-2. **Severity**: CRITICAL / HIGH / MEDIUM
-3. **Issue**: What's wrong and why it's problematic
-4. **Hidden errors**: Specific unexpected errors this could suppress
-5. **User impact**: How this affects debugging and user experience
-6. **Recommendation**: Specific fix with example code
+2. **Severity**: Critical / Important / Minor
+3. **Confidence**: 0-100 (how certain this is a real issue, not a false positive)
+4. **Issue**: What's wrong and why it's problematic
+5. **Hidden errors**: Specific unexpected errors this could suppress
+6. **User impact**: How this affects debugging and user experience
+7. **Recommendation**: Specific fix with example code
 
 Be thorough, skeptical, and constructive. Every silent failure you catch prevents hours of debugging.

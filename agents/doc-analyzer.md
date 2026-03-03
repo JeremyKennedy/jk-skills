@@ -53,6 +53,7 @@ Cross-reference every claim against actual code:
 
 **Critical issues**: Factually incorrect or misleading docs
 - Location: file:line
+- Confidence: 0-100 (how certain this is a real issue, not a false positive)
 - Issue: what's wrong
 - Suggestion: recommended fix
 

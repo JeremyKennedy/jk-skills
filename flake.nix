@@ -58,6 +58,7 @@
               hooks = [{
                 type = "command";
                 command = "bash ~/.claude/hooks/session-start";
+                async = false;
               }];
             }];
           };

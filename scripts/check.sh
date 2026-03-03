@@ -31,6 +31,18 @@ if grep -r 'superpowers:' skills/ agents/ 2>/dev/null; then
     errors=$((errors + 1))
 fi
 
+# Check agent frontmatter has name and description
+for agent in agents/*.md; do
+    if ! head -10 "$agent" | grep -q '^name:'; then
+        echo "ERROR: Missing 'name:' in frontmatter of ${agent}"
+        errors=$((errors + 1))
+    fi
+    if ! head -10 "$agent" | grep -q '^description:'; then
+        echo "ERROR: Missing 'description:' in frontmatter of ${agent}"
+        errors=$((errors + 1))
+    fi
+done
+
 # Check sub-skill references point to existing skills
 for ref in $(grep -roh 'jk-skills:[a-z-]*' skills/ 2>/dev/null | sort -u); do
     skill_name="${ref#jk-skills:}"

@@ -57,6 +57,7 @@ For each gap, provide:
 - What scenario is untested
 - Why it matters (specific failure it would catch)
 - Criticality rating with justification
+- Confidence (0-100): how certain this is a real gap, not a false positive
 - Concrete test description
 
 Be pragmatic. Focus on tests that prevent real bugs, not academic completeness.

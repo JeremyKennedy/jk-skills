@@ -22,7 +22,7 @@
         "version": "v4.3.1"
       },
       "status": "absorbed",
-      "notes": "9 skills + brainstorming cherry-picked and adapted. Hook async fix ported. Original MIT license."
+      "notes": "10 skills cherry-picked and adapted. Hook async fix ported. Original MIT license."
     },
     {
       "name": "code-review",
