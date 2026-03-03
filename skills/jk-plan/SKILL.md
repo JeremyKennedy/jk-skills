@@ -32,12 +32,23 @@ No exceptions. Not for "simple" tasks. Not for "obvious" changes. If it's simple
 
 ## Process
 
-### Phase 1: Research (use subagents)
+### Phase 1: Research (parallel exploration)
 
-Before asking the user a single question, understand the landscape:
+Before asking the user a single question, understand the landscape from multiple angles.
 
-- Launch an `Explore` subagent to map relevant code: file structure, existing patterns, conventions, related modules
-- Read project CLAUDE.md, docs/, and recent git history for context
+Launch **2-3 code-explorer agents in parallel**, each with a different focus. Each agent should trace through code comprehensively and return a list of 5-10 key files to read.
+
+**Example agent focuses** (adapt to the task):
+
+| Focus | Prompt |
+|-------|--------|
+| **Similar features** | "Find features similar to [X] and trace their implementation — patterns, abstractions, data flow" |
+| **Architecture** | "Map the architecture and abstractions for [area] — layers, boundaries, integration points" |
+| **Existing implementation** | "Analyze the current implementation of [related area] — how it works, what it depends on, what could break" |
+
+After agents return:
+- **Read all key files they identified** — build deep context, not just summaries
+- Read project CLAUDE.md, docs/, and recent git history
 - If external technologies are involved, research them (web search, Context7)
 - Identify: what exists, what's adjacent, what conventions apply, what could break
 
@@ -80,11 +91,23 @@ Interview the user until ALL FIVE clearance criteria pass:
 
 ### Phase 4: Design Doc
 
+For non-obvious architectural decisions, launch **2-3 code-architect agents in parallel** with different design philosophies. Each agent independently designs a full approach without seeing the others — this avoids anchoring bias.
+
+| Architect | Philosophy |
+|-----------|-----------|
+| **Minimal** | Smallest change, maximum reuse of existing code and patterns |
+| **Clean** | Best architecture, elegant abstractions, long-term maintainability |
+| **Pragmatic** | Balance of speed and quality, practical tradeoffs |
+
+After architects return:
+1. Synthesize their approaches — summarize each with concrete implementation differences
+2. Form your recommendation with reasoning
+3. Present to user: approaches, tradeoffs, your recommendation
+4. Get the user's choice before writing the design doc
+
 Present the design in sections, scaled to complexity. Get approval after each section.
 
 Cover: architecture, components, data flow, error handling, testing approach, file locations.
-
-Propose 2-3 approaches with tradeoffs for any non-obvious decision. Lead with your recommendation.
 
 **Save to:** `docs/plans/YYYY-MM-DD-<topic>-design.md`
 **Commit** the design doc.

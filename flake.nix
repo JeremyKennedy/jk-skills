@@ -45,6 +45,8 @@
 
             agents = {
               code-reviewer = ./agents/code-reviewer.md;
+              code-explorer = ./agents/code-explorer.md;
+              code-architect = ./agents/code-architect.md;
               silent-failure-hunter = ./agents/silent-failure-hunter.md;
               test-analyzer = ./agents/test-analyzer.md;
               doc-analyzer = ./agents/doc-analyzer.md;

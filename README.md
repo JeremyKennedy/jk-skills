@@ -8,10 +8,10 @@ If you have any of these installed, **uninstall them** — jk-skills absorbs the
 
 - [superpowers](https://github.com/obra/superpowers) — all 10 skills + code-reviewer agent absorbed
 - [pr-review-toolkit](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/pr-review-toolkit) — all 3 review agents absorbed (silent-failure-hunter, test-analyzer, doc-analyzer)
+- [feature-dev](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/feature-dev) — code-explorer and code-architect agents absorbed into jk-plan
 
 **Compatible with** (can run alongside jk-skills):
-- [code-review](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/code-review) — PR-specific automated review
-- [feature-dev](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/feature-dev) — guided feature development
+- [code-review](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/code-review) — PR-specific automated review (not absorbed, you don't review others' PRs)
 
 ## Installation
 
@@ -93,8 +93,10 @@ Lives in `.claude/skills/` — available when working in this repo but not distr
 | Agent | Source | Description |
 |-------|--------|-------------|
 | `code-reviewer` | superpowers | Review completed work against plan and coding standards |
+| `code-explorer` | feature-dev | Deep codebase analysis — trace execution paths, map architecture layers |
+| `code-architect` | feature-dev | Design feature architectures with implementation blueprints |
 | `silent-failure-hunter` | pr-review-toolkit | Audit error handling for silent failures and swallowed errors |
-| `test-analyzer` | pr-review-toolkit | Behavioral test coverage analysis with criticality ratings |
+| `test-analyzer` | pr-review-toolkit | Behavioral test coverage analysis |
 | `doc-analyzer` | pr-review-toolkit | Documentation accuracy, staleness, and AI-generated drift detection |
 
 ## Philosophy

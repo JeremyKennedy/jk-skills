@@ -54,8 +54,13 @@ The original code is licensed under the Apache License 2.0.
 
 ### Derived Agents
 
-The following agents are derived from the pr-review-toolkit plugin and have been adapted (made language-agnostic, removed project-specific references):
+From **pr-review-toolkit** (made language-agnostic, removed project-specific references):
 
 - silent-failure-hunter
 - test-analyzer (from pr-test-analyzer)
 - doc-analyzer (from comment-analyzer)
+
+From **feature-dev** (adapted for jk-plan integration):
+
+- code-explorer
+- code-architect

@@ -65,10 +65,13 @@
       "last_checked_date": "2026-03-03",
       "absorbed": {
         "skills": [],
-        "agents": []
+        "agents": [
+          "code-explorer",
+          "code-architect"
+        ]
       },
-      "status": "watching",
-      "notes": "Complementary paradigm. code-explorer and code-architect agents are unique. 7-phase workflow."
+      "status": "absorbed",
+      "notes": "code-explorer and code-architect agents absorbed into jk-plan Phase 1 and Phase 4. Workflow superseded by jk-plan + jk-execute. code-reviewer overlaps with jk-skills."
     }
   ]
 }
