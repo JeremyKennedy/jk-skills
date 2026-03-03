@@ -28,21 +28,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## Derived Skills and Agents
+### Derived Skills
 
-The following are derived from superpowers and have been modified:
+The following skills are derived from superpowers and have been modified:
 
-- systematic-debugging
-- test-driven-development
-- verification-before-completion
-- jk-receive-review (from receiving-code-review)
-- jk-code-review (from requesting-code-review)
-- jk-finish-branch (from finishing-a-development-branch)
-- using-git-worktrees
-- dispatching-parallel-agents
-- writing-skills
-- jk-brainstorm (derived from brainstorming, added in v4.3.1)
-- code-reviewer agent (derived from code-reviewer agent, v4.2.0)
+- systematic-debugging (v4.2.0)
+- test-driven-development (v4.2.0)
+- verification-before-completion (v4.2.0)
+- using-git-worktrees (v4.2.0)
+- dispatching-parallel-agents (v4.2.0)
+- writing-skills (v4.2.0)
+- jk-receive-review (from receiving-code-review, v4.2.0)
+- jk-code-review (from requesting-code-review, v4.2.0)
+- jk-finish-branch (from finishing-a-development-branch, v4.2.0)
+- jk-brainstorm (from brainstorming, v4.3.1)
+
+### Derived Agents
+
+- code-reviewer (v4.2.0)
 
 ---
 
@@ -50,7 +53,23 @@ The following are derived from superpowers and have been modified:
 
 This project includes agents derived from [claude-plugins-official](https://github.com/anthropics/claude-plugins-official) by Anthropic.
 
-The original code is licensed under the Apache License 2.0.
+The original code is licensed under the Apache License 2.0:
+
+```
+Copyright 2025 Anthropic, PBC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
 
 ### Derived Agents
 

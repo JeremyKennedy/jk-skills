@@ -40,15 +40,18 @@ programs.jk-skills.enable = true;
 
 ## Skills
 
-### Original Skills
+### jk- Skills (owned, customized)
 
 | Skill | Description |
 |-------|-------------|
-| `jk-philosophy` | Development philosophy directives: code is free, expand scope, refactor always |
-| `jk-plan` | Heavy-weight planning: research, interview, design, review panel, implementation plan |
-| `jk-execute` | Execute plans in Deep, Swarm, or Care mode |
-| `jk-brainstorm` | Lightweight ideation: bounce ideas before committing to formal planning |
-| `jk-prove-it` | Ship gate: mechanical verification + self-review + ship report |
+| `jk-philosophy` | Foundational development philosophy: scope expansion, relentless refactoring, aggressive productivity |
+| `jk-plan` | Deep interview, parallel codebase research, adversarial review panel, implementation plan |
+| `jk-execute` | Execute plans in Deep, Swarm, or Care mode with mandatory TDD and code review |
+| `jk-brainstorm` | Lightweight conversational ideation — no code, no design docs |
+| `jk-prove-it` | Ship gate: mechanical verification, self-review, liveness check, ship report |
+| `jk-code-review` | Dispatch code-reviewer agent to catch issues early (automatic in jk-execute, manual for ad-hoc) |
+| `jk-receive-review` | Receive code review feedback with technical rigor — challenge assumptions, verify independently |
+| `jk-finish-branch` | Analyze branch state (long-lived, feature, PR, trunk), present merge/push/PR/cleanup options |
 
 ### Execution Modes
 
@@ -60,19 +63,22 @@ programs.jk-skills.enable = true;
 
 Usage: `/jk-execute deep`, `/jk-execute swarm`, `/jk-execute care`
 
-### Cherry-Picked Skills (from superpowers)
+### Adopted Skills (from superpowers, unmodified)
 
 | Skill | Description |
 |-------|-------------|
-| `systematic-debugging` | Root cause investigation before fixes |
-| `test-driven-development` | TDD workflow, no exceptions |
-| `verification-before-completion` | Evidence before claims |
-| `jk-receive-review` | Challenge assumptions, verify independently |
-| `jk-code-review` | Code review dispatch template |
-| `jk-finish-branch` | Branch analysis + merge/push/PR decision |
-| `using-git-worktrees` | Isolated workspace setup |
-| `dispatching-parallel-agents` | Parallel subagent coordination |
-| `writing-skills` | Skill authoring with philosophy alignment |
+| `systematic-debugging` | Root cause investigation before proposing fixes |
+| `test-driven-development` | TDD workflow: write failing test, implement, refactor |
+| `verification-before-completion` | Evidence before claims — run verification, confirm output |
+| `using-git-worktrees` | Isolated workspace setup with safety verification |
+| `dispatching-parallel-agents` | Parallel subagent coordination for independent tasks |
+| `writing-skills` | Skill authoring and verification before deployment |
+
+### Meta-Skill
+
+| Skill | Description |
+|-------|-------------|
+| `using-jk-skills` | Auto-loaded via SessionStart hook. Skill discovery and invocation routing. |
 
 ### Maintenance (repo-local, not shipped with plugin)
 
@@ -81,12 +87,6 @@ Usage: `/jk-execute deep`, `/jk-execute swarm`, `/jk-execute care`
 | `upstream-audit` | Check tracked upstream plugin repos for changes and evaluate diffs |
 
 Lives in `.claude/skills/` — available when working in this repo but not distributed to users.
-
-### Meta-Skill
-
-| Skill | Description |
-|-------|-------------|
-| `using-jk-skills` | Auto-loaded via SessionStart hook. Teaches skill discovery and invocation. |
 
 ## Agents
 
@@ -101,7 +101,7 @@ Lives in `.claude/skills/` — available when working in this repo but not distr
 
 ## Philosophy
 
-See [docs/philosophy.md](docs/philosophy.md) for the full development philosophy.
+Invoke via `/jk-philosophy`. Full text in [docs/philosophy.md](docs/philosophy.md).
 
 TL;DR: Code is free, expand scope relentlessly, refactor always, ask more questions, TDD when building features, envision the ideal end state.
 
@@ -116,4 +116,4 @@ nix flake check   # Nix-wrapped validation
 
 GPL v3. See [LICENSE](LICENSE).
 
-Cherry-picked skills are derived from [superpowers](https://github.com/obra/superpowers) (MIT, Jesse Vincent). See [ATTRIBUTION.md](ATTRIBUTION.md).
+Derived works from [superpowers](https://github.com/obra/superpowers) (MIT, Jesse Vincent) and [claude-plugins-official](https://github.com/anthropics/claude-plugins-official) (Apache 2.0, Anthropic). See [ATTRIBUTION.md](ATTRIBUTION.md).
