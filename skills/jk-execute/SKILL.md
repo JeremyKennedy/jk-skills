@@ -124,19 +124,15 @@ After ALL tasks are complete, launch reviewers in parallel on the full diff (`gi
 
 **Confidence Scoring:**
 
-Each reviewer must score every issue 0-100:
-- **0-25**: Likely false positive, pre-existing, or thing linters catch
-- **26-50**: Minor nitpick, pedantic
-- **51-75**: Real issue but low impact
-- **76-90**: Important, should fix
-- **91-100**: Critical, must fix
-
-**Only act on issues scoring ≥80.** This prevents reviewer noise from drowning out real problems.
+Each reviewer must score every issue 0-100 for **confidence that it's a real issue** (not severity):
+- **0-25**: False positive, pre-existing, or linter territory — not a real issue
+- **26-50**: Probably not real, but worth a second look
+- **51-100**: Real issue — fix it. Code is free, refactoring is always worth it.
 
 **Triage:**
-1. Issues ≥80 confidence → fix, re-run only failed reviewers
-2. Issues 50-79 → fix if trivial, note otherwise
-3. Issues <50 → discard
+1. Issues ≥51 confidence → fix. All real issues get fixed, regardless of severity.
+2. Issues 26-50 → quick second look. Fix if real, discard if false positive.
+3. Issues <26 → discard (false positives).
 4. Max 2 round table cycles. After that, remaining issues go to the user.
 
 ### Finish
