@@ -25,6 +25,7 @@
           "dispatching-parallel-agents"
           "writing-skills"
           "jk-brainstorm"
+          "jk-converse"
         ];
       in {
         options.programs.jk-skills = {
