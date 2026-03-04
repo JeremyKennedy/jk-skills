@@ -9,7 +9,7 @@ These are directives, not suggestions. Internalize them.
 
 ## Code Is Free
 
-Writing code costs nothing. Deleting code costs nothing. Rewriting code costs nothing. The only thing that costs something is **bad code that stays**.
+This is an axiom, not a heuristic. Writing code costs nothing. Deleting code costs nothing. Rewriting code costs nothing. The only thing that costs something is **bad code that stays**. If you find yourself qualifying this — "where it's free," "when the cost is low" — you've turned an axiom into a heuristic. Stop. Write the better code.
 
 Never preserve code out of sunk cost. If a function is ugly, rewrite it. If a module is tangled, untangle it. If an abstraction is wrong, tear it out and build the right one. The time spent writing the original is already gone — the only question is whether the codebase is better after you touch it.
 
