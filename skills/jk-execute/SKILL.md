@@ -1,13 +1,13 @@
 ---
 name: jk-execute
-description: "Use when executing an implementation plan — three modes: Deep (one brain, sequential), Swarm (many brains, parallel), Care (brain + human, checkpoints)."
+description: "Use when executing an implementation plan — four modes: Deep (subagent per task, clean orchestrator), Direct (main thread, full visibility), Swarm (parallel independent tasks), Care (human checkpoints)."
 ---
 
 # Deep Execute
 
 **Announce at start:** "I'm using the jk-execute skill to execute the plan."
 
-Execute an implementation plan using one of three execution topologies. Each mode uses per-task review (spec compliance + code quality) and ends with jk-prove-it.
+Execute an implementation plan using one of four execution topologies. Each mode uses per-task review (spec compliance + code quality) and ends with jk-prove-it.
 
 > **REQUIRED SUB-SKILL:** Use jk-skills:jk-philosophy
 
@@ -21,39 +21,60 @@ If you cannot load jk-skills:jk-philosophy, STOP and tell the user the plugin is
 
 ## Execution Modes
 
-### Deep — One Brain
+### Deep — Subagent Per Task
 
-Single orchestrator, sequential, full context. Best for tightly coupled tasks, refactoring, architectural changes where context matters.
+Sequential execution where each task is dispatched to a subagent. The main thread orchestrates: reading results, extracting wisdom, dispatching reviewers, managing the task list. The dirty work happens in subagents, keeping orchestrator context clean for high-quality coordination.
 
-### Swarm — Many Brains
+**Best for:** Most plans. Tightly coupled tasks, refactoring, architectural changes. The orchestrator retains full context across all tasks without burning tokens on implementation details.
 
-Parallel dispatch, independent tasks. Best for many independent tasks (add tests to 5 modules, update 8 configs, bulk changes). For plans with fewer than 3 tasks, suggest Deep instead — Swarm adds overhead for no benefit.
+### Direct — Main Thread
+
+Sequential execution where all work happens in the main conversation thread. No subagents for implementation — you do the work directly. The user sees every file read, every edit, every test run in real time.
+
+**Best for:** Risky or uncertain work where the user wants full visibility. Tasks expected to be problematic, unfamiliar codebases, or situations where you expect to need user input mid-task. Different from Care mode — Direct has no prescribed pauses, it just keeps the work visible.
+
+### Swarm — Parallel Independent
+
+Multiple subagents working simultaneously on independent tasks in the same worktree. Maximum speed, but requires strict discipline — agents are modifying files in a shared workspace.
+
+**Best for:** 3+ tasks that touch completely independent files (add tests to 5 modules, update 8 configs, implement 6 unrelated endpoints). For plans with fewer than 3 independent tasks, suggest Deep instead — Swarm adds overhead for no benefit.
 
 ### Care — Brain + Human
 
-Sequential like Deep, but pauses at meaningful phase boundaries for human review. Best for unfamiliar codebases, high-stakes changes, learning.
+Sequential like Deep (subagent per task), but pauses at meaningful phase boundaries for human review. The user stays in the loop with structured checkpoints.
+
+**Best for:** High-stakes changes (auth, data migration, billing), learning a new codebase, or when the user explicitly wants to review progress before continuing.
 
 ---
 
 ## Mode Selection
 
-If the user specified a mode, use it. If not, analyze the plan and recommend one:
+If the user specified a mode, use it. If not, analyze the plan and recommend one.
 
 **Recommendation heuristics** (in priority order):
-1. **Swarm** if there are 3+ tasks AND most tasks are independent (no shared files or sequential dependencies)
-2. **Care** if the plan touches unfamiliar patterns, involves high-risk changes (auth, data migration, billing), or the user seems uncertain
-3. **Deep** as the default — it's the safest and most thorough option
+1. **Swarm** if there are 3+ tasks AND most tasks touch completely independent files (no shared files or sequential dependencies)
+2. **Direct** if the plan touches risky areas, the user seems uncertain, or tasks are expected to be problematic
+3. **Care** if the plan is high-stakes or the user is learning the codebase
+4. **Deep** as the default — cleanest orchestration, good for most work
 
-Present with your recommendation marked. Example if recommending Deep:
+**When presenting the choice**, include your analysis:
 
 ```
 Choose execution mode:
-1. Deep  — One brain, sequential, full context. Round table at end. No human pauses. (Recommended — tasks are tightly coupled)
-2. Swarm — Many brains, parallel dispatch. Per-task review. Maximum speed.
-3. Care  — Brain + human. Checkpoints with "what to check" guidance. You stay in the loop.
+
+1. Deep    — Subagent per task, sequential. Orchestrator stays clean, reviews between tasks.
+             Good default for most plans.
+2. Direct  — Main thread, sequential. You see everything in real time. No subagents for implementation.
+             Best when you want full visibility or expect trouble.
+3. Swarm   — Parallel subagents on independent files. Maximum speed, atomic commits.
+             Best for N independent tasks touching separate files.
+4. Care    — Subagent per task with human checkpoints. Structured pauses between phases.
+             Best for high-stakes work or when you want to review progress.
+
+Recommended: [mode] — [one-line reason with specifics about the plan]
 ```
 
-Include a one-line reason for the recommendation (e.g., "tasks share state", "8 independent modules", "unfamiliar codebase").
+If recommending Swarm, include the proposed wave/phase breakdown showing which tasks run in parallel and which must be serialized. If recommending Deep or Direct, explain why the tasks are too coupled for Swarm.
 
 ---
 
@@ -61,11 +82,18 @@ Include a one-line reason for the recommendation (e.g., "tasks share state", "8 
 
 1. Read the plan file
 2. Extract all tasks with full text (provide text to subagents — do not make them read the file)
-3. Create task list
-4. Record `BASE_SHA` (current HEAD before any implementation)
-5. Create `.jk-work/` directory if it doesn't exist
+3. **Enter plan mode** using `EnterPlanMode`, then write an execution-focused summary to the plan file:
+   - **Executing**: Plan name and file path
+   - **Mode**: Selected execution mode and why
+   - **Tasks** (numbered, with status markers): The full task list about to be executed
+   - **Waves** (Swarm only): Which tasks run in parallel, which are serialized, and why
+   - **Verification**: What "done" looks like (test commands, expected behavior)
+   Then call `ExitPlanMode` for final user approval before any code is written. This names the session to reflect the execution work.
+4. Create task list
+5. Record `BASE_SHA` (current HEAD before any implementation)
+6. Create `.jk-work/` directory if it doesn't exist
 
-## Hard Directive (Deep and Swarm)
+## Hard Directive (Deep, Direct, and Swarm)
 
 <HARD-GATE>
 Do NOT stop, pause, or ask "should I continue?" between tasks. Execute ALL tasks until every one is complete or you hit a blocker you cannot resolve. The only acceptable reasons to stop mid-execution are:
@@ -143,26 +171,90 @@ Each reviewer must score every issue 0-100 for **confidence that it's a real iss
 
 ---
 
+## Direct Mode
+
+### Per-Task Execution
+
+For each task, execute directly in the main thread — no implementer subagent:
+
+1. Read relevant files and understand the task context
+2. Implement with TDD: write failing test, implement, verify pass
+3. Commit your work
+4. Self-review: completeness, quality, discipline, testing
+5. **Dispatch spec compliance reviewer** (subagent) — does code match the plan?
+6. If spec fails → fix directly → re-review (max 3 cycles)
+7. **Dispatch code quality reviewer** (subagent) — is the code clean?
+8. If quality fails → fix directly → re-review (max 3 cycles)
+9. **Extract wisdom** and append to `.jk-work/wisdom.md`
+10. Mark task complete
+
+Reviewers still run as subagents — the point of Direct mode is that *implementation* happens in the main thread, not that everything does.
+
+### Wisdom Accumulation
+
+Same as Deep mode. Write wisdom after each task, read before starting the next.
+
+### Round Table
+
+Same as Deep mode.
+
+### Finish
+
+> **REQUIRED SUB-SKILL:** Use jk-skills:jk-prove-it
+
+---
+
 ## Swarm Mode
 
-### Pre-Dispatch Check
+### Critical: Shared Worktree Safety
 
-Before dispatching any agents, verify no two tasks touch the same files. For each task, identify the files it will modify.
+<HARD-GATE>
+Swarm agents work in the SAME worktree simultaneously. Every agent MUST be briefed on this situation in their prompt. The rules are non-negotiable:
 
-- If overlap found: serialize overlapping tasks or merge them into one
-- If no overlap: proceed with parallel dispatch
+1. **Atomic commits only.** Each agent commits with a single `git add <specific-files> && git commit` command. NEVER `git add .` or `git add -A` — this will commit another agent's in-progress work.
+2. **NEVER stash.** `git stash` in a shared worktree will capture another agent's changes. Forbidden.
+3. **NEVER reset.** `git reset`, `git checkout .`, `git restore .` will destroy another agent's work. Forbidden.
+4. **NEVER rebase.** Rewriting history while other agents are committing will cause chaos. Forbidden.
+5. **Own your files.** Only modify files assigned to your task. If you discover you need to touch a file assigned to another task, STOP and report the conflict to the orchestrator.
+6. **Wait if needed.** If your task depends on another agent's output (e.g., a shared type definition), wait for that agent to finish. Use `inotifywait` on the expected file, or poll with short sleeps (5s intervals, max 2 minutes), or simply report the dependency to the orchestrator.
+</HARD-GATE>
 
-### Parallel Dispatch
+### Wave Planning
 
-Dispatch implementer subagents for all independent tasks simultaneously. Each gets:
-- Full task text + context
-- Any existing wisdom files from `.jk-work/`
+Before dispatching, organize tasks into waves of parallel work:
+
+1. **Identify file ownership** — for each task, list every file it will create or modify
+2. **Check for overlaps** — if two tasks touch the same file, they CANNOT be in the same wave
+3. **Check for dependencies** — if task B needs task A's output, B goes in a later wave
+4. **Group into waves** — tasks in the same wave run in parallel, waves run sequentially
+
+Present the wave plan to the user during mode selection:
+
+```
+Wave 1 (parallel): Task 1 (src/auth/), Task 3 (src/billing/), Task 5 (tests/e2e/)
+Wave 2 (parallel): Task 2 (src/api/ — depends on Task 1), Task 4 (src/billing/reports/ — depends on Task 3)
+Wave 3 (sequential): Task 6 (integration — touches files from waves 1-2)
+```
+
+### Per-Wave Dispatch
+
+For each wave:
+
+1. Dispatch all wave's implementer subagents simultaneously
+2. Each agent gets:
+   - Full task text + context
+   - **Explicit list of files they own** (and may modify)
+   - **The shared worktree safety rules** (copy the HARD-GATE above into the prompt)
+   - Any existing wisdom files from `.jk-work/`
+3. Wait for all agents in the wave to complete
+4. Run per-task review for each completed task (spec + quality)
+5. Merge wisdom files, proceed to next wave
 
 ### Per-Agent Wisdom
 
 Each agent writes its learnings to `.jk-work/wisdom-task-N.md` (where N is the task number). No shared file — no race conditions.
 
-Later-starting agents should read all existing `wisdom-task-*.md` files before beginning.
+Later waves read all existing `wisdom-task-*.md` files before beginning.
 
 ### Per-Task Review
 
@@ -174,12 +266,12 @@ After each implementer completes:
 
 ### Coordinator
 
-After all tasks complete:
+After all waves complete:
 1. Merge all `wisdom-task-*.md` files into `.jk-work/wisdom.md`
 2. Report completion status for all tasks
 3. Report any failures or issues
 
-**No round table in Swarm mode** — there's no single coherent diff to review when work happened in parallel.
+**No round table in Swarm mode** — there's no single coherent diff to review when work happened across waves.
 
 ### Finish
 
@@ -191,7 +283,7 @@ After all tasks complete:
 
 ### Per-Task Execution
 
-Same as Deep mode: sequential, per-task review pipeline, wisdom accumulation in `.jk-work/wisdom.md`.
+Same as Deep mode: subagent per task, sequential, per-task review pipeline, wisdom accumulation in `.jk-work/wisdom.md`.
 
 ### Human Checkpoints
 
@@ -258,6 +350,53 @@ If you have questions about requirements, approach, dependencies, or anything un
 - What you implemented
 - What you tested and results
 - Files changed
+- Self-review findings
+- Wisdom learned (conventions, gotchas, patterns discovered)
+```
+
+### Swarm Implementer
+
+```
+You are implementing Task N: [task name]
+
+## CRITICAL: Shared Worktree
+You are ONE OF SEVERAL agents working in the SAME worktree simultaneously. Other agents are modifying other files right now. Follow these rules exactly:
+
+- **Atomic commits only:** `git add <your-specific-files> && git commit -m "..."` — NEVER `git add .` or `git add -A`
+- **NEVER stash** — `git stash` will capture other agents' changes
+- **NEVER reset/restore/checkout .** — this destroys other agents' work
+- **NEVER rebase** — rewriting history while others commit causes chaos
+- **Only touch YOUR files:** [list of assigned files]
+- **If you need a file not on your list**, STOP and report the conflict — do not modify it
+
+## Task Description
+[FULL TEXT of task from plan]
+
+## Your Assigned Files
+You may ONLY create or modify these files:
+[explicit file list]
+
+## Context
+[Where this fits, dependencies, architectural context]
+
+## Accumulated Wisdom
+[All wisdom from previous tasks — conventions, gotchas, patterns]
+
+## Dependencies
+[If waiting on another agent: "Task M must finish first. Wait for [file/condition] to exist before proceeding. Use: inotifywait -e close_write [path] or poll with 5s sleeps, max 2 minutes."]
+
+## Your Job
+1. Implement exactly what the task specifies
+2. Follow TDD: write failing test first, then implement, then refactor. Use jk-skills:test-driven-development.
+3. Verify implementation works
+4. Commit ONLY your files: `git add [your files] && git commit -m "task N: [description]"`
+5. Self-review: completeness, quality, discipline, testing
+6. If you find issues during self-review, fix them before reporting
+
+## Report Format
+- What you implemented
+- What you tested and results
+- Files changed (should match your assigned files)
 - Self-review findings
 - Wisdom learned (conventions, gotchas, patterns discovered)
 ```

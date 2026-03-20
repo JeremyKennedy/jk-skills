@@ -195,9 +195,10 @@ Offer execution choice:
 
 ```
 Choose execution mode:
-1. Deep  — One brain, sequential, full context. Round table at end. No human pauses.
-2. Swarm — Many brains, parallel dispatch. Per-task review. Maximum speed.
-3. Care  — Brain + human. Checkpoints with "what to check" guidance. You stay in the loop.
+1. Deep    — Subagent per task, sequential. Orchestrator stays clean, reviews between tasks.
+2. Direct  — Main thread, sequential. You see everything in real time. No subagents for implementation.
+3. Swarm   — Parallel subagents on independent files. Maximum speed, atomic commits.
+4. Care    — Subagent per task with human checkpoints. Structured pauses between phases.
 ```
 
 Once the user picks, invoke `jk-skills:jk-execute` with the chosen mode and plan file path.
