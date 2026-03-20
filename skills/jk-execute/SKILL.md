@@ -112,7 +112,9 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 
    **Top (main content — user scrolls up to read):**
    Skimmable. Bullets, short tables, and brief elaboration — not essays or walls of text. Cover:
-   - What the plan accomplishes and key decisions
+   - What the plan accomplishes
+   - How it's done (approach, architecture, key patterns)
+   - Key decisions made during planning — surface these explicitly so the user can catch anything they've had second thoughts about since the interview
    - Task list: one line per task (number + short name)
    - Waves (Swarm only): which tasks run together
    - Verification: the commands to run
