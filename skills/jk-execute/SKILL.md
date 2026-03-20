@@ -106,6 +106,8 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
    - **Tasks** (numbered, with status markers): The full task list about to be executed
    - **Waves** (Swarm only): Which tasks run in parallel, which are serialized, and why
    - **Verification**: What "done" looks like (test commands, expected behavior)
+   - **TL;DR** (at the bottom): A 2-3 sentence plain-English summary of what's about to happen — what gets built, how many tasks/waves, what the user should expect. This is for the user scanning the plan presentation, NOT written to the plan file on disk.
+   - **Context note** (after the TL;DR): "The plan on disk is self-contained. You can clear context (`/clear`) before execution to free up your full context window — execution will pick up from the plan file. [If there is conversation context not captured in the plan, note it and recommend against clearing.]"
    Then call `ExitPlanMode` for final user approval before any code is written. This names the session to reflect the execution work.
 4. Create task list
 5. Record `BASE_SHA` (current HEAD before any implementation)
