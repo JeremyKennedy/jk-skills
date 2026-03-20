@@ -48,6 +48,10 @@ Use for ANY technical issue:
 - You're in a hurry (rushing guarantees rework)
 - Manager wants it fixed NOW (systematic is faster than thrashing)
 
+## Before You Start
+
+Check what's already known. Read auto memory and `docs/` for documented gotchas, known failure modes, and past debugging wisdom. Check `docs/plans/` for archived wisdom from past executions — the same issue may have been encountered and solved before.
+
 ## The Four Phases
 
 You MUST complete each phase before proceeding to the next.

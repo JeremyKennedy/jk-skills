@@ -59,6 +59,10 @@ The test: after you're done, is the system **actually better**, or did you just 
 - No feature flags for incomplete work that will never ship.
 - If something exists in the codebase, it must earn its place. If it doesn't pull its weight, remove it.
 
+## Build on What's Already Known
+
+Before starting work, check what past sessions learned. Read auto memory for user preferences and project context. Check `docs/plans/` for archived wisdom from past executions — they document gotchas, patterns, and conventions already discovered. Check `docs/` for project knowledge. Don't rediscover what's already been learned. Don't repeat mistakes that were already documented. The persistence system exists so that knowledge compounds across sessions — but only if you read it.
+
 ## Ask More Questions, Not Fewer
 
 Understanding the problem deeply produces better solutions than guessing and iterating.

@@ -52,7 +52,7 @@ No exceptions. Not for "simple" tasks. Not for "obvious" changes. If it's simple
 
 ### Phase 1: Research (parallel exploration)
 
-Before asking the user a single question, understand the landscape from multiple angles.
+Before asking the user a single question, understand the landscape from multiple angles. **Start by reading what's already known** — check auto memory, `docs/plans/` for archived wisdom from past executions in this area, and `docs/` for project knowledge. Don't rediscover what past sessions already learned.
 
 Launch **2-3 code-explorer agents in parallel** (model: `sonnet` — exploration, no decisions), each with a different focus. Each agent should trace through code comprehensively and return a list of 5-10 key files to read.
 

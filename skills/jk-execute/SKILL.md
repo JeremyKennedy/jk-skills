@@ -120,7 +120,8 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 ## Setup (All Modes)
 
 1. Read the plan file
-2. Extract all tasks with full text (provide text to subagents — do not make them read the file)
+2. **Read prior knowledge.** Check auto memory, `docs/plans/` for archived wisdom from past executions (especially in the same area), and `docs/` for project knowledge. Feed relevant context into the Plan Context section for implementers.
+3. Extract all tasks with full text (provide text to subagents — do not make them read the file)
 3. **Check for outstanding context.** Is anything from the conversation not captured in the plan files? Decisions, design choices, context that only exists in the conversation.
 4. **Determine execution mode.** If the user specified a mode, use it. Otherwise, analyze the plan and recommend one (see Mode Selection above). If recommending Swarm, work out the wave breakdown.
 5. **Persist learnings.** Invoke `jk-skills:jk-remember` — last chance before the user might `/clear`.
