@@ -170,6 +170,11 @@ After all reviewers return:
 3. **Minor** → fix if trivial, otherwise note and move on
 4. **Reviewer disagreements** → use your judgment, document the decision
 
+**When a fix contradicts a user decision:**
+If the review panel flags something the user explicitly decided during the interview, do NOT silently change it. You can fix minor issues on your own, but if a fix reverses or significantly alters something the user said they wanted, you MUST either ask the user before changing it OR — if you judge it's clearly the right call — make the change but record it as a **plan diversion** that will be highlighted in the final presentation. The user will see it before approving execution.
+
+Track all diversions from user decisions in a running list. These get surfaced in Phase 7.
+
 #### Re-Cycle
 
 After fixing issues, run three categories of reviewers:
@@ -201,6 +206,9 @@ Key decisions:
 
 Issues found and resolved:
 - [issue] → [resolution]
+
+Diversions from user decisions (if any):
+- [what user said] → [what changed and why]
 ```
 
 ### Phase 6: Implementation Plan
