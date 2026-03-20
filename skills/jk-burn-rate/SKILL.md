@@ -33,7 +33,7 @@ Light means: choose cheaper models where quality won't suffer, and be less aggre
 
 User says it directly: "burn rate max", "go light", "standard tokens". Or infer from context.
 
-If the user hasn't set it, the default is **standard**. Skills don't need to load this skill to function — they follow their own model selection guidance, which already assumes standard. Only load jk-burn-rate when the user explicitly sets a level.
+If the user hasn't set a burn rate, skills follow their own model selection guidance using whatever model the user has selected in their harness. This skill only needs to be loaded when the user explicitly wants to override that default.
 
 ## How Skills Use It
 
