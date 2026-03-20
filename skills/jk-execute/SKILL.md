@@ -191,11 +191,15 @@ For each task:
 5. **Dispatch code quality reviewer** — is the code clean?
 6. If quality fails → implementer fixes → re-review (max 3 cycles)
 7. **Extract wisdom** from this task and append to `.jk-work/<plan-slug>/wisdom.md`:
+   - **Plan diversions**: anything the implementer did differently from the plan — changed approach, skipped a step, added something unplanned, discovered the plan was wrong
+   - **Plan revisions**: if the plan needs updating for future tasks based on what was learned
    - Conventions discovered
    - Gotchas hit
    - Commands that worked
    - Patterns to follow
    - Mistakes to avoid
+
+   Each wisdom entry must include: `[Task N | agent: <mode/model> | <timestamp>]` header for traceability.
 8. Mark task complete
 
 ### Wisdom Accumulation
@@ -433,6 +437,7 @@ or break the task into smaller pieces.
 ## Report Format
 - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
 - What you implemented (or what you attempted, if blocked)
+- **Plan diversions**: anything you did differently from the plan and why. If none, say "none."
 - What you tested and results
 - Files changed
 - Self-review findings
