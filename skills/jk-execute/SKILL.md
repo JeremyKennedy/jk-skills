@@ -102,22 +102,28 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 2. Extract all tasks with full text (provide text to subagents — do not make them read the file)
 3. **Check for outstanding context.** Is anything from the conversation not captured in the plan files? Decisions, design choices, context that only exists in the conversation.
 4. **Determine execution mode.** If the user specified a mode, use it. Otherwise, analyze the plan and recommend one (see Mode Selection above). If recommending Swarm, work out the wave breakdown.
-5. **Present the plan to the user** using `EnterPlanMode`. This is user-facing — keep it concise. The detailed docs on disk are for agents; this presentation is for the human to understand and approve. The plan mode UI shows the **bottom** first, so structure accordingly:
+5. **Present the plan to the user** using `EnterPlanMode`.
 
-   **Top (detail the user can scroll up to see if curious):**
-   - Task list (numbered, short descriptions — NOT the full verbose task text from the plan doc)
-   - Waves (Swarm only): which tasks parallelize, which serialize
-   - What "done" looks like (test commands, expected behavior)
+   <HARD-GATE>
+   This is a SHORT, user-facing summary — NOT the plan doc. Do NOT dump the plan doc contents into the presentation. The plan doc is for agents. This presentation is for a human who wants to understand what's about to happen and approve it.
 
-   **Bottom (what the user actually sees first — must be self-contained):**
+   **Maximum length:** The entire presentation should fit on one screen (~30 lines). If you're writing tables of API endpoints, file-by-file descriptions, interface definitions, or test case lists, you are doing it wrong. Those belong in the plan doc on disk.
+   </HARD-GATE>
+
+   The plan mode UI shows the **bottom** first. Structure accordingly:
+
+   **Top (user scrolls up if curious):**
+   - Task list: one line per task, just the number and a short name (e.g., "1. Create safety.ts")
+   - Waves (Swarm only): which tasks run together, one line per wave
+   - Verification: the commands to run (e.g., `just check`)
+
+   **Bottom (what the user sees first — self-contained):**
    - **Title**: what's being built
-   - **TL;DR**: 2-3 sentences covering: what gets built, how (N tasks, execution mode), key decisions. Must make complete sense without scrolling up.
-   - **Execution mode**: your recommendation with one-line reasoning + all 4 options listed
-   - **Context note**:
-     - If self-contained: "Plan docs have everything needed. You can `/clear` before execution to free up context."
-     - If uncaptured context: "This conversation has context not in the plan: [list]. Recommend NOT clearing."
+   - **TL;DR**: 2-3 sentences. What gets built, how many tasks, which mode. Must stand alone.
+   - **Mode**: recommendation + one-line reasoning
+   - **Context note**: can they `/clear` or not
 
-   Then `ExitPlanMode`. One decision point — user accepts and picks a mode.
+   Then `ExitPlanMode`. One decision point.
 
 6. Create task list
 7. Record `BASE_SHA` (current HEAD before any implementation)
