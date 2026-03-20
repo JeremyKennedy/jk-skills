@@ -22,7 +22,6 @@ This is not a formality. This is not a checkbox. You are about to tell a human t
 
 > **REQUIRED SUB-SKILL:** Use jk-skills:verification-before-completion
 
-If you cannot load jk-skills:verification-before-completion, STOP and tell the user the plugin is misconfigured.
 
 Follow it completely. Run every verification command. Read every output. No shortcuts.
 
@@ -154,4 +153,4 @@ Ship report complete. Now finish the work:
 
 > **REQUIRED SUB-SKILL:** Use jk-skills:jk-finish-branch
 
-If you cannot load jk-skills:jk-finish-branch, STOP and tell the user the plugin is misconfigured.
+

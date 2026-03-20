@@ -58,8 +58,6 @@ Reference other skills via:
 > **REQUIRED SUB-SKILL:** Use jk-skills:<skill-name>
 ```
 
-Include failure gate text: "If you cannot load jk-skills:<name>, STOP and tell the user the plugin is misconfigured."
-
 ### Provenance
 
 Cherry-picked skills include a provenance comment:

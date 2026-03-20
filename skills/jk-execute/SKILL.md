@@ -69,7 +69,6 @@ This is lightweight — the subagent only reads the tree and wisdom, not every d
 
 > **REQUIRED SUB-SKILL:** Use jk-skills:jk-philosophy
 
-If you cannot load jk-skills:jk-philosophy, STOP and tell the user the plugin is misconfigured.
 
 ## Model Selection
 

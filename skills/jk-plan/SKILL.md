@@ -13,7 +13,6 @@ For small/quick changes, skip this skill — use jk-skills:jk-brainstorm or just
 
 > **REQUIRED SUB-SKILL:** Use jk-skills:jk-philosophy
 
-If you cannot load jk-skills:jk-philosophy, STOP and tell the user the plugin is misconfigured.
 
 **The philosophy governs every phase of planning.** Code is free, expand scope relentlessly, refactor always, envision the ideal end state. During the interview, push for the ambitious version. During design, don't settle for "good enough." During review, treat every real issue as worth fixing. Read the philosophy and keep it in mind — it's not just a preamble.
 
