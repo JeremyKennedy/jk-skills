@@ -279,4 +279,16 @@ If there are no diversions, skip this phase. Do not present an empty report.
 
 ### Phase 7: Execution Handoff
 
-jk-plan ends here. Save all documents to disk, verify they exist, commit them. Then invoke `jk-skills:jk-execute` with the plan file path. jk-execute handles everything from here — evaluating context, choosing execution mode, presenting the plan to the user, and executing.
+jk-plan ends here. Save all documents to disk, verify they exist, commit them.
+
+**Update the plan index.** Add or update an entry in `docs/plans/INDEX.md` (create if it doesn't exist):
+
+```markdown
+| Plan | Status | Date | Summary |
+|------|--------|------|---------|
+| [plan-name](YYYY-MM-DD-topic.md) | planned | YYYY-MM-DD | One-line summary |
+```
+
+Statuses: `planned` → `in-progress` → `complete` / `abandoned`. jk-execute updates status during execution.
+
+Then invoke `jk-skills:jk-execute` with the plan file path. jk-execute handles everything from here — evaluating context, choosing execution mode, presenting the plan to the user, and executing.

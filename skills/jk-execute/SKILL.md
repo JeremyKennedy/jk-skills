@@ -29,6 +29,37 @@ Execute an implementation plan using one of four execution topologies. Each mode
 
 **After execution completes**, archive the wisdom file alongside the plan: copy `.jk-work/<plan-slug>/wisdom.md` to `docs/plans/<plan-slug>-wisdom.md` and commit. This preserves execution context with the plan for reference.
 
+### Knowledge Promotion (runs once, before jk-prove-it)
+
+After all tasks complete, promote project-level learnings from wisdom to docs. This is how cross-plan knowledge compounds — future planning sessions benefit from what past executions discovered.
+
+1. **Gather candidates.** Read the wisdom file. Filter for entries that are about the *project* (not about this specific execution). "The API paginates at 100" is project knowledge. "Task 3 needed a retry" is not.
+2. **Map the doc structure.** Run `tree docs/` (or `ls docs/` if no tree). Read `CLAUDE.md` references section if it exists. This gives you the project's documentation topology.
+3. **Dispatch a sonnet subagent** with the wisdom candidates + the doc tree. Prompt:
+
+   ```
+   You have project learnings from a completed plan execution and the project's doc structure.
+
+   Learnings to place:
+   [filtered wisdom entries]
+
+   Doc structure:
+   [tree output]
+
+   For each learning, decide:
+   - EXISTING: belongs in [specific doc file] — append under [section]
+   - NEW: important enough for a new doc file — suggest filename and location
+   - GENERAL: no specific doc fits — goes in docs/project-knowledge.md
+   - SKIP: not worth persisting (too specific to this execution)
+
+   Output a routing table: one line per learning with the decision and target.
+   ```
+
+4. **Apply the routing.** Read each target doc, append the learning in context. For `docs/project-knowledge.md`, create it if it doesn't exist — organized by topic headings, append-only.
+5. **Commit** the doc updates.
+
+This is lightweight — the subagent only reads the tree and wisdom, not every doc file. The orchestrator reads individual docs only when appending.
+
 > **REQUIRED SUB-SKILL:** Use jk-skills:jk-philosophy
 
 If you cannot load jk-skills:jk-philosophy, STOP and tell the user the plugin is misconfigured.
@@ -154,6 +185,7 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 6. Create task list
 7. Record `BASE_SHA` (current HEAD before any implementation)
 8. Derive `<plan-slug>` from the plan filename (e.g., `2026-03-20-mcp-safety` from `2026-03-20-mcp-safety.md`). Create `.jk-work/<plan-slug>/` directory.
+9. **Update plan index.** Set status to `in-progress` in `docs/plans/INDEX.md`. At the end of execution (after knowledge promotion, before prove-it), update to `complete`.
 
 ## Hard Directive (Deep, Direct, and Swarm)
 
