@@ -105,7 +105,9 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 5. **Present the plan to the user** using `EnterPlanMode`.
 
    <HARD-GATE>
-   This is a user-facing summary — NOT the plan doc. Do NOT dump the plan doc into the presentation. No interface definitions, no full API endpoint tables, no exact code snippets, no test case lists. Those are for agents and live in the plan doc on disk. This presentation is for a human — write it like you're explaining the plan to a person, not feeding it to a machine.
+   Write a FRESH presentation to the plan mode tool. Do NOT edit the plan doc file on disk. Do NOT copy-paste from the plan doc. The plan doc is an agent-facing reference — detailed, verbose, exact code. The presentation is a separate artifact you write from scratch for a human audience.
+
+   No interface definitions, no full API endpoint tables, no exact code snippets, no test case lists.
    </HARD-GATE>
 
    The plan mode UI shows the **bottom** first. Structure accordingly:
