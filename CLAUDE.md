@@ -69,6 +69,16 @@ Cherry-picked skills include a provenance comment:
 
 All skills should embody the development philosophy: code is free, expand scope relentlessly, refactor always, ask more questions, TDD when building features, envision the ideal end state. See `skills/jk-philosophy/SKILL.md`.
 
+### Autonomy by Default
+
+Skills should run autonomously — ending a turn to wait for user input is a **conscious decision**, not an accident. This plugin is designed for heavyweight autonomous work.
+
+**When blocking is appropriate:** interview questions, user approval gates (plan presentation, doc updates), Care mode checkpoints, decisions only the user can make.
+
+**When blocking is NOT appropriate:** between tasks in Deep/Swarm mode (use the hard directive), between phases that don't need user input, for informational updates that could be a non-blocking message.
+
+If a skill must block, be explicit about it: tell the user what you're waiting for and why. Never silently end a turn.
+
 ## Adding a Skill
 
 1. Create `skills/<name>/SKILL.md` with frontmatter
