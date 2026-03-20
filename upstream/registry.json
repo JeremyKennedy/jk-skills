@@ -4,8 +4,8 @@
       "name": "superpowers",
       "repo": "obra/superpowers",
       "path": null,
-      "last_checked_sha": "e4a2375cb705ca5800f0833528ce36a3faf9017a",
-      "last_checked_date": "2026-03-03",
+      "last_checked_sha": "8ea39819eed74fe2a0338e71789f06b30e953041",
+      "last_checked_date": "2026-03-20",
       "absorbed": {
         "skills": [
           "systematic-debugging",
@@ -22,10 +22,10 @@
         "agents": [
           "code-reviewer"
         ],
-        "version": "v4.3.1"
+        "version": "v5.0.5"
       },
       "status": "absorbed",
-      "notes": "10 skills + 1 agent cherry-picked and adapted. Hook async fix ported. Original MIT license."
+      "notes": "10 skills + 1 agent cherry-picked and adapted. v5.0.5 port: implementer status protocol, escalation guidance, context isolation, visual brainstorm companion, scope check, file structure mapping, plan review loop. Original MIT license."
     },
     {
       "name": "code-review",
