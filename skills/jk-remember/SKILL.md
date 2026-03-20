@@ -92,6 +92,10 @@ For deep/overhaul, check the session's burn rate (see `jk-skills:jk-burn-rate`) 
 
   Surface these to the user — sometimes the fix is better docs, sometimes it's a better tool or script.
 
+- Did you follow a recurring workflow pattern that isn't captured in a skill? Did you work around a skill's limitations? Did you wish a skill existed? Suggest:
+  - **New skill**: if a workflow was repeated or improvised that would benefit from structure
+  - **Skill update**: if an existing skill was missing a step, had stale advice, or didn't cover an edge case you hit
+
 ### 2. Filter
 
 Skip:
