@@ -13,6 +13,24 @@ Execute an implementation plan using one of four execution topologies. Each mode
 
 If you cannot load jk-skills:jk-philosophy, STOP and tell the user the plugin is misconfigured.
 
+## Model Selection
+
+Choose `haiku`, `sonnet`, or `opus` for subagents based on what the task demands:
+
+| Signal | Haiku | Sonnet | Opus |
+|--------|-------|--------|------|
+| **Reasoning** | None — mechanical, no judgment | Some — following patterns, clear criteria | Deep — novel design, ambiguous tradeoffs |
+| **Risk** | Zero — output is trivially verifiable | Low — reviewer can catch it, easily re-run | High — wrong answer cascades, hard to detect |
+| **Task type** | File listing, formatting, grep-and-summarize | Exploration, convention checking, focused review | Design, root-cause analysis, adversarial review |
+
+**In this skill:**
+- **Implementers** → `opus` by default. `sonnet` only for truly straightforward tasks (clear spec, known patterns, no judgment calls)
+- **Per-task reviewers** (spec compliance, code quality) → `sonnet` — narrow scope, clear criteria
+- **Round table reviewers** → `sonnet` for generic reviewers (already specified), specialized agents use their own model
+- **Haiku** → mechanical subtasks only: generating boilerplate, formatting, file scaffolding
+
+**Default:** Lean towards heavier models — this plugin values correctness over token cost. Use `opus` unless the task is clearly mechanical. `sonnet` for focused work with clear criteria. `haiku` only for truly mechanical subtasks (file listing, formatting, boilerplate).
+
 ## Plan File Discovery
 
 1. If a path is provided as argument, use it

@@ -15,6 +15,23 @@ For small/quick changes, skip this skill — use jk-skills:jk-brainstorm or just
 
 If you cannot load jk-skills:jk-philosophy, STOP and tell the user the plugin is misconfigured.
 
+## Model Selection
+
+Choose `haiku`, `sonnet`, or `opus` for subagents based on what the task demands:
+
+| Signal | Haiku | Sonnet | Opus |
+|--------|-------|--------|------|
+| **Reasoning** | None — mechanical, no judgment | Some — following patterns, clear criteria | Deep — novel design, ambiguous tradeoffs |
+| **Risk** | Zero — output is trivially verifiable | Low — reviewer can catch it, easily re-run | High — wrong answer cascades, hard to detect |
+| **Task type** | File listing, formatting, grep-and-summarize | Exploration, convention checking, focused review | Design, root-cause analysis, adversarial review |
+
+**In this skill:**
+- **Phase 1 research agents** → `sonnet` — exploration and summarization, no design decisions
+- **Phase 4 design architects** → `opus` — creative design work with real tradeoffs
+- **Phase 5 review panel** → mixed per reviewer (see table below)
+
+**Default:** Lean towards heavier models — this is heavyweight planning where getting it right matters more than token cost. Use `opus` unless the task is clearly mechanical. `sonnet` for focused work with clear criteria. `haiku` only for truly mechanical subtasks (file listing, formatting).
+
 ## Hard Gates
 
 <HARD-GATE>
@@ -36,7 +53,7 @@ No exceptions. Not for "simple" tasks. Not for "obvious" changes. If it's simple
 
 Before asking the user a single question, understand the landscape from multiple angles.
 
-Launch **2-3 code-explorer agents in parallel**, each with a different focus. Each agent should trace through code comprehensively and return a list of 5-10 key files to read.
+Launch **2-3 code-explorer agents in parallel** (model: `sonnet` — exploration, no decisions), each with a different focus. Each agent should trace through code comprehensively and return a list of 5-10 key files to read.
 
 **Example agent focuses** (adapt to the task):
 
@@ -91,7 +108,7 @@ Interview the user until ALL FIVE clearance criteria pass:
 
 ### Phase 4: Design Doc
 
-For non-obvious architectural decisions, launch **2-3 code-architect agents in parallel** with different design philosophies. Each agent independently designs a full approach without seeing the others — this avoids anchoring bias.
+For non-obvious architectural decisions, launch **2-3 code-architect agents in parallel** (model: `opus`) with different design philosophies. Each agent independently designs a full approach without seeing the others — this avoids anchoring bias.
 
 | Architect | Philosophy |
 |-----------|-----------|
@@ -118,7 +135,6 @@ Launch 4-6 reviewer subagents **in parallel** to tear apart the design. Each rev
 
 **All reviewers:**
 - Type: `general-purpose`
-- Model: `opus`
 - Tools: Read, Grep, Glob (read-only)
 - Must read the design doc AND the project CLAUDE.md
 - Must explore relevant codebase areas
@@ -126,14 +142,16 @@ Launch 4-6 reviewer subagents **in parallel** to tear apart the design. Each rev
 
 **The panel:**
 
-| Reviewer | Prompt focus |
-|----------|-------------|
-| **Gaps** | What's missing? Requirements implied but not addressed? Error cases not handled? Features mentioned but not designed? |
-| **Assumptions** | What does the plan assume that might not be true? What's fragile? What could change? What external dependencies could break? |
-| **Edge Cases** | Empty input, concurrent access, partial failure, network errors, scale (10x and 0.1x), race conditions, data corruption |
-| **Conventions** | Does the plan follow project CLAUDE.md? Correct file locations, naming patterns, config patterns, error handling, testing patterns? |
-| **Security** | Injection vectors, auth gaps, secret handling, unsafe defaults, OWASP top 10, supply chain concerns |
-| **Simplicity** | Is any part over-engineered? Could anything be done more simply? Are there unnecessary abstractions? YAGNI violations? |
+| Reviewer | Model | Prompt focus |
+|----------|-------|-------------|
+| **Gaps** | `opus` | What's missing? Requirements implied but not addressed? Error cases not handled? Features mentioned but not designed? |
+| **Assumptions** | `opus` | What does the plan assume that might not be true? What's fragile? What could change? What external dependencies could break? |
+| **Edge Cases** | `opus` | Empty input, concurrent access, partial failure, network errors, scale (10x and 0.1x), race conditions, data corruption |
+| **Conventions** | `sonnet` | Does the plan follow project CLAUDE.md? Correct file locations, naming patterns, config patterns, error handling, testing patterns? |
+| **Security** | `opus` | Injection vectors, auth gaps, secret handling, unsafe defaults, OWASP top 10, supply chain concerns |
+| **Simplicity** | `sonnet` | Is any part over-engineered? Could anything be done more simply? Are there unnecessary abstractions? YAGNI violations? |
+
+Model rationale: Gaps, Assumptions, Edge Cases, and Security require deep judgment about what *could* go wrong — hard to verify if the reviewer misses something. Conventions and Simplicity have clear, checkable criteria against the CLAUDE.md and codebase.
 
 #### Triage
 
@@ -189,6 +207,28 @@ Write the implementation plan:
 **Save to:** `docs/plans/YYYY-MM-DD-<topic>.md`
 **Commit** the plan.
 
+### Phase 6.5: Pre-Presentation Checkpoint
+
+Before presenting the plan to the user, STOP and do the following:
+
+1. **Save all documents to disk.** The design doc and implementation plan MUST be written to their files and committed before proceeding. Verify the files exist on disk — do not rely on in-memory state.
+2. **Check for outstanding work.** Think about whether anything from this conversation is not yet captured in the plan files — decisions made during interview, design choices from the review panel, context that only exists in the conversation.
+3. **Present a readiness check to the user:**
+
+```
+I'm about to present the plan for review.
+
+[If everything is captured in the plan files]:
+All decisions and context from our discussion are captured in the plan documents. I recommend clearing context after reviewing the plan — the plan is self-contained and execution can start fresh.
+
+[If there is important context NOT in the plan files]:
+Note: We still have important context in this conversation that isn't fully captured in the plan:
+- [list what's not captured]
+I recommend NOT clearing context if you accept the plan, unless we capture these items first.
+```
+
+Then ask: **"Ready to review the plan?"** — wait for confirmation before entering plan mode.
+
 ### Phase 7: Execution Handoff
 
 Offer execution choice:
@@ -199,6 +239,9 @@ Choose execution mode:
 2. Direct  — Main thread, sequential. You see everything in real time. No subagents for implementation.
 3. Swarm   — Parallel subagents on independent files. Maximum speed, atomic commits.
 4. Care    — Subagent per task with human checkpoints. Structured pauses between phases.
+
+You may also clear context before execution — the plan on disk has everything needed
+to continue in a fresh conversation. This frees up your full context window for implementation.
 ```
 
 Once the user picks, invoke `jk-skills:jk-execute` with the chosen mode and plan file path.
