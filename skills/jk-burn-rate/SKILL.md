@@ -1,42 +1,43 @@
 ---
 name: jk-burn-rate
-description: "Use when the user wants to set token spending level for the session — controls model selection and parallelism across all skills."
+description: "Use when the user wants to set token spending level for the session — controls model selection and parallelism across all skills. Does NOT weaken skill discipline."
 ---
 
 # Burn Rate
 
 **Announce at start:** "I'm setting the burn rate for this session."
 
-Session-level setting that controls how aggressively skills spend tokens. Affects model selection, number of subagents, review depth, and parallelism across all jk-skills.
+Session-level setting that controls how aggressively skills spend tokens. Affects model selection, parallelism, and ambition on discretionary work.
+
+<HARD-GATE>
+Burn rate is an optimization knob, NOT an escape hatch. It NEVER weakens core skill discipline. Required reviews still happen. Hard gates still apply. Interview criteria still matter. The burn rate controls HOW EXPENSIVE the work is, not WHETHER the work happens.
+</HARD-GATE>
 
 ## Levels
 
-| Level | Models | Parallelism | When |
-|-------|--------|-------------|------|
-| **Max** | Opus for everything. Haiku only for file listing. | Maximum — parallelize aggressively, full review panels, deep audits. | End of usage period, complex critical work, "go all out" |
-| **Standard** | Opus for reasoning and orchestration. Sonnet for focused work (reviews, implementation of clear specs). | Normal — parallelize where it helps, scale review to task complexity. | Default. Good balance. |
-| **Light** | Sonnet for most work. Opus only when reasoning genuinely demands it. Haiku for mechanical tasks. | Conservative — fewer parallel agents, skip optional reviews for trivial tasks. | Budget-conscious, simple work, early in usage period. |
+| Level | Models | Discretionary work | When |
+|-------|--------|-------------------|------|
+| **Max** | Opus for everything. Haiku only for file listing. | Go wide — more review agents, explore more alternatives, deeper audits, expand scope aggressively. | End of usage period, complex critical work, "go all out" |
+| **Standard** | Opus for reasoning and orchestration. Sonnet for focused work. | Balanced — follow skill defaults. | Default if not set. |
+| **Light** | Sonnet for most work. Opus when reasoning genuinely demands it. Haiku for mechanical tasks. | Be efficient on optional work — fewer parallel agents for discretionary tasks, leaner audits. Core reviews and gates are unchanged. | Budget-conscious, early in usage period. |
+
+**What "light" does NOT mean:**
+- Skip required reviews
+- Reduce interview depth below what the task needs
+- Bypass hard gates or review panels
+- Lower quality standards
+
+Light means: choose cheaper models where quality won't suffer, and be less aggressive on discretionary extras (scope expansion, optional audits, deep remember). The prescribed workflow stays intact.
 
 ## How to Set
 
-User says it directly: "burn rate max", "go light", "standard tokens". Or infer from context — "it's the end of my billing cycle, let's clean up docs" implies max.
+User says it directly: "burn rate max", "go light", "standard tokens". Or infer from context.
 
-If the user hasn't set it and you're about to do expensive work (deep remember, full review panel, swarm execution), ask:
-
-> "This will use a lot of tokens. Max / standard / light?"
+If the user hasn't set it, the default is **standard**. Skills don't need to load this skill to function — they follow their own model selection guidance, which already assumes standard. Only load jk-burn-rate when the user explicitly sets a level.
 
 ## How Skills Use It
 
-Burn rate affects everything — model selection, effort, thoroughness, personality.
+When a skill is choosing models or deciding how much discretionary work to do, check whether a burn rate has been set this session:
 
-**Models:**
-- **Max**: upgrade sonnet→opus broadly
-- **Standard**: follow per-skill defaults
-- **Light**: downgrade opus→sonnet where reasoning doesn't strictly demand it
-
-**Effort and behavior:**
-- **Max**: explore more alternatives, ask more questions, deeper reviews, more thorough testing, expand scope aggressively. Agents should be ambitious and perfectionist.
-- **Standard**: balanced. Follow skill guidance as written.
-- **Light**: be efficient. Skip optional reviews for trivial tasks, fewer interview questions when the answer is clear, shorter review panels, get to the point. Agents should be focused and pragmatic.
-
-The burn rate is a preference, not a hard rule. If a task genuinely needs opus or deep effort even on light, do it.
+- **Models**: max upgrades sonnet→opus broadly, light downgrades opus→sonnet for non-critical reasoning. Always use opus when the task genuinely requires it regardless of burn rate.
+- **Discretionary effort**: max means more exploration, more alternatives, deeper optional audits. Light means focused and efficient on optional work. Required work is unaffected.
