@@ -39,22 +39,6 @@ If the user signals they're stepping away ("going to sleep", "run this while I'm
 
 If the user hasn't set a burn rate, skills follow their own model selection guidance using whatever model the user has selected in their harness. This skill only needs to be loaded when the user explicitly wants to override that default.
 
-## Usage-Aware Suggestions
-
-If `npx ccusage@latest` is available, check actual usage to inform burn rate suggestions:
-
-```bash
-npx ccusage@latest daily --since YYYYMMDD --json > /tmp/ccusage.json
-```
-
-This is slow — save to a temp file, don't pipe. Reports token counts and estimated cost from local session data.
-
-What matters is **usage relative to the reset period.** Near the end of a billing period with low usage = blast off. Early in the period with heavy spend = conserve. The agent doesn't know the user's quota or reset date — so report the trajectory and ask:
-
-> "You've spent ~$125 this week. When does your usage reset? If it's soon and you have room, we could go max."
-
-Don't check usage on every skill invocation. Check when: the user asks, burn rate is being set, or at natural pause points (plan presentation, end of execution).
-
 ## How Skills Use It
 
 When a skill is choosing models or deciding how much discretionary work to do, check whether a burn rate has been set this session:
