@@ -1,107 +1,115 @@
 ---
 name: jk-remember
-description: "Use when the user says 'remember this', wants to persist a learning, or at the end of significant work — smart routing to CLAUDE.md, docs/, or auto memory based on what the knowledge is."
+description: "Use when the user says 'remember this', wants to persist a learning, or at the end of significant work — reflects on how to make things better for future sessions, routes knowledge to CLAUDE.md, docs/, or auto memory."
 ---
 
 # Remember
 
-**Announce at start:** "I'm using the jk-remember skill to persist what we've learned."
+**Announce at start:** "I'm using the jk-remember skill to reflect on what we've learned."
 
-Persist knowledge to the right place. Not everything is worth saving, and different knowledge belongs in different places. Reflects on all available context — not just the last message.
+Step back and reflect on how to make future sessions better. Persist knowledge to the right place, fix stale documentation, flag process improvements. Can be invoked mid-session with specific context, or on a blank session for a general audit.
 
 ## When to Use
 
-- User explicitly says "remember this" or "save this"
+- User says "remember this" or "save this"
 - End of a significant work session
-- After discovering something non-obvious about the project
-- When the user asks "what have we learned?"
+- After discovering something non-obvious
+- On a blank session: general documentation audit and improvement
+- When invoked by jk-execute at persistence checkpoints
 
 ## The Three Destinations
 
-| Destination | What belongs here | Bar | Examples |
-|-------------|------------------|-----|----------|
-| **CLAUDE.md** | Commands, conventions, gotchas that shape how every agent works in this codebase. Every line costs context window. | **Highest.** Must be concise, project-specific, actionable, and not derivable from the code. Would a wrong assumption here cause real damage? Then it earns a line. | `just test-unit` requires Docker / Auth: JWT with HS256 |
-| **docs/** | Domain knowledge, technical decisions, reference material. Can be long, detailed, organized by topic. | **Medium.** Worth writing if it would save a future agent or human significant time. | API pagination patterns / why we chose Postgres / deployment quirks |
-| **Auto memory** | User preferences, collaboration style — things about the person, not the project | **Low.** Save freely. Private, no context window cost. | User prefers Swarm mode / wants terse responses |
+| Destination | What belongs here | Examples |
+|-------------|------------------|----------|
+| **CLAUDE.md** | Conventions, commands, gotchas, references to docs/. Every line costs context window, but multi-line entries and sections are fine when justified. | `just test-unit` requires Docker / See docs/api.md for pagination patterns |
+| **docs/** | Domain knowledge, decisions, reference material. Can be long and detailed, organized by topic. | API pagination patterns / why we chose Postgres / deployment quirks |
+| **Auto memory** | User preferences, collaboration style — about the person, not the project | User prefers Swarm mode / wants terse responses |
 
-**Decision test:** "Would a different person working on this project need to know this?"
+**Routing test:** Would a different person working on this project need this?
 - Yes → CLAUDE.md or docs/
 - No → auto memory
 
-"Does this earn a line in every future session's context window?"
-- Yes, and it's concise → CLAUDE.md
-- It needs explanation or depth → docs/
+Does it need depth or is a line enough?
+- One-liner or reference → CLAUDE.md
+- Needs explanation → docs/
 
 ### CLAUDE.md Rules
 
-CLAUDE.md is part of every prompt — every line has a context window cost. But it's not off-limits. Multi-line entries, references to docs/, even short sections are fine when justified.
+CLAUDE.md is part of every prompt. Not off-limits, but every addition should be justified.
 
-**What belongs in CLAUDE.md:**
-- Project-specific conventions, commands, gotchas
-- References to docs/ files as an index ("see docs/api.md for API patterns")
-- Anything where a wrong assumption would cause real problems
-- Things not derivable from reading the code
+**Belongs:** project-specific conventions, commands, gotchas, doc references, things where a wrong assumption causes real problems, things not derivable from the code.
 
-**What doesn't:**
-- Generic advice ("write tests", "use meaningful names")
-- Things obvious from the code or `just --list`
-- Deep explanations better suited to docs/
-- Anything already covered
+**Doesn't belong:** generic advice, things obvious from the code or `just --list`, deep explanations better in docs/, anything already covered.
 
-Use judgment. A three-line section about a critical gotcha is fine. A page of API documentation is not — put that in docs/ and add a one-line reference in CLAUDE.md.
+Use judgment. A three-line gotcha section is fine. A page of API docs is not — put that in docs/ and reference it.
 
 ## Process
 
 ### 1. Gather Context
 
-Reflect on the full conversation:
-- What context was missing at the start that would have made this work faster or better?
+**If mid-session** — reflect on the full conversation:
+- What context was missing at the start that would have made this work faster?
 - What was surprising or non-obvious?
 - What conventions or patterns emerged?
 - What decisions were made and why?
-- Are any documented commands, paths, or conventions now stale because of this work?
+
+**If blank session** — audit the project's documentation health:
+- Read CLAUDE.md. Is anything stale, wrong, or missing?
+- Run `tree docs/`. Is knowledge organized well? Any obvious gaps?
+- Check recent git history. Were there recent changes that should be documented?
+- Look for red flags: commands that would fail, references to deleted files, outdated paths, TODOs never completed, generic advice that wastes context window.
+
+**In either case**, also check:
+- Did any tool calls fail during this session? Each failed tool call is a signal:
+  - Missing documentation (command wasn't documented, path was wrong)
+  - Missing tooling (a better CLI command or API would prevent this class of failure)
+  - Stale docs (documented command no longer works)
+
+  Surface these to the user — sometimes the fix is better docs, sometimes it's a better tool or script.
 
 ### 2. Filter
 
 Skip:
-- Things obvious from reading the code
+- Things obvious from the code
 - One-off fixes unlikely to recur
 - Generic best practices
 - Transient state
-- Things already documented
+- Things already well-documented
+
+Saving nothing is a valid outcome. Don't save things just because the skill was invoked.
 
 ### 3. Route
 
 **Check existing structure first.** Run `tree docs/` and read CLAUDE.md.
 
-For docs/ updates: **read the target file and integrate the learning into the existing structure.** Don't just stick it at the end. If the document would benefit from reorganization to accommodate the new knowledge, rewrite the relevant sections. The goal is a coherent document, not an append log.
+For docs/ updates: read the target file and **integrate the learning into the existing structure.** If the document would benefit from reorganization, rewrite the relevant sections. The goal is a coherent document, not an append log.
 
-For CLAUDE.md updates: find the right section, add a single concise line. If no section fits, consider whether it really belongs in CLAUDE.md.
+For CLAUDE.md updates: find the right section. Add concise, justified content.
 
-For new doc files: only if the topic is substantial enough to warrant one and doesn't fit in an existing file.
+For new doc files: only if the topic is substantial and doesn't fit in an existing file.
 
 ### 4. Present
 
-Show the user what you want to save and where, with diffs and reasoning:
+Show the user what you want to change and where, with diffs and reasoning:
 
 ```
 ### CLAUDE.md
-**Why:** Missing convention caused a 10-minute debugging detour.
+**Why:** Missing convention caused a debugging detour.
  ## Testing
 +`just test-unit` — requires Docker running (DB tests hit real Postgres)
 
-### docs/api-patterns.md (update)
-**Why:** Pagination pattern not documented, discovered during debugging.
-[Show the rewritten section, not just an append]
+### docs/api-patterns.md (rewritten section)
+**Why:** Pagination pattern undocumented.
+[Show the integrated section]
 
 ### Auto Memory
 - User prefers opus for code review agents
+
+### Process Suggestions
+- Tool call `just deploy-staging` failed — command doesn't exist.
+  Consider adding a deploy script or documenting the actual deploy process.
 ```
 
 ### 5. Apply
 
 Only after user approval.
-
-## Deciding to Save Nothing
-
-Valid and often correct. If the work was routine with no surprises, say so and move on. Don't save things just because the skill was invoked.
