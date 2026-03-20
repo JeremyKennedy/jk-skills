@@ -131,20 +131,28 @@ Do NOT stop, pause, or ask "should I continue?" between tasks. Execute ALL tasks
 
 For each task:
 
-1. **Dispatch implementer subagent** with full task text + context + accumulated wisdom
-2. Answer any questions the implementer has (before AND during work)
-3. Implementer implements with TDD, commits, self-reviews
-4. **Dispatch spec compliance reviewer** — does code match the plan?
-5. If spec fails → implementer fixes → re-review (max 3 cycles)
-6. **Dispatch code quality reviewer** — is the code clean?
-7. If quality fails → implementer fixes → re-review (max 3 cycles)
-8. **Extract wisdom** from this task and append to `.jk-work/wisdom.md`:
+1. **Dispatch implementer subagent** with full task text + context + accumulated wisdom. Construct exactly what they need — never pass session history or context they don't need.
+2. **Handle implementer status:**
+   - **DONE** → proceed to review (step 3)
+   - **DONE_WITH_CONCERNS** → read concerns. If about correctness/scope, address before review. If observational ("this file is getting large"), note and proceed.
+   - **NEEDS_CONTEXT** → provide the missing context and re-dispatch
+   - **BLOCKED** → assess the blocker:
+     1. Context problem → provide more context, re-dispatch
+     2. Task too hard for the model → re-dispatch with `opus`
+     3. Task too large → break into smaller pieces
+     4. Plan itself is wrong → escalate to the user
+   - **Never** ignore an escalation or force the same agent to retry without changes
+3. **Dispatch spec compliance reviewer** — does code match the plan?
+4. If spec fails → implementer fixes → re-review (max 3 cycles)
+5. **Dispatch code quality reviewer** — is the code clean?
+6. If quality fails → implementer fixes → re-review (max 3 cycles)
+7. **Extract wisdom** from this task and append to `.jk-work/wisdom.md`:
    - Conventions discovered
    - Gotchas hit
    - Commands that worked
    - Patterns to follow
    - Mistakes to avoid
-9. Mark task complete
+8. Mark task complete
 
 ### Wisdom Accumulation
 
@@ -339,6 +347,41 @@ Same panel as Deep mode if accepted.
 
 ## Subagent Prompt Templates
 
+**All implementer prompts** (both standard and swarm) must include the Escalation and Report sections below, appended after the task-specific sections.
+
+### Shared: Escalation & Report (append to all implementer prompts)
+
+```
+## When You're in Over Your Head
+
+It is always OK to stop and say "this is too hard for me." Bad work is worse than
+no work. You will not be penalized for escalating.
+
+**STOP and escalate when:**
+- The task requires architectural decisions with multiple valid approaches
+- You need to understand code beyond what was provided and can't find clarity
+- You feel uncertain about whether your approach is correct
+- The task involves restructuring existing code in ways the plan didn't anticipate
+- You've been reading file after file trying to understand the system without progress
+
+**How to escalate:** Report back with status BLOCKED or NEEDS_CONTEXT. Describe
+specifically what you're stuck on, what you've tried, and what kind of help you need.
+The orchestrator can provide more context, re-dispatch with a more capable model,
+or break the task into smaller pieces.
+
+## Report Format
+- **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
+- What you implemented (or what you attempted, if blocked)
+- What you tested and results
+- Files changed
+- Self-review findings
+- Wisdom learned (conventions, gotchas, patterns discovered)
+
+Use DONE_WITH_CONCERNS if you completed the work but have doubts about correctness.
+Use BLOCKED if you cannot complete the task. Use NEEDS_CONTEXT if you need
+information that wasn't provided. Never silently produce work you're unsure about.
+```
+
 ### Implementer
 
 ```
@@ -364,12 +407,7 @@ If you have questions about requirements, approach, dependencies, or anything un
 5. Self-review: completeness, quality, discipline, testing
 6. If you find issues during self-review, fix them before reporting
 
-## Report Format
-- What you implemented
-- What you tested and results
-- Files changed
-- Self-review findings
-- Wisdom learned (conventions, gotchas, patterns discovered)
+[APPEND: Escalation & Report section]
 ```
 
 ### Swarm Implementer
@@ -411,12 +449,7 @@ You may ONLY create or modify these files:
 5. Self-review: completeness, quality, discipline, testing
 6. If you find issues during self-review, fix them before reporting
 
-## Report Format
-- What you implemented
-- What you tested and results
-- Files changed (should match your assigned files)
-- Self-review findings
-- Wisdom learned (conventions, gotchas, patterns discovered)
+[APPEND: Escalation & Report section]
 ```
 
 ### Spec Compliance Reviewer

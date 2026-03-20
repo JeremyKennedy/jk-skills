@@ -3,7 +3,7 @@ name: jk-brainstorm
 description: "Use when exploring ideas before committing to a direction — lightweight conversational ideation, no code, no design docs."
 ---
 
-<!-- Derived from superpowers v4.3.1: brainstorming -->
+<!-- Derived from superpowers v4.3.1: brainstorming, visual companion from v5.0.5 -->
 
 # Brainstorm
 
@@ -33,6 +33,18 @@ Collaborative ideation mode. Chat, explore, refine ideas. No structure, no gates
 3. **Explore approaches** — When you have enough context, propose 2-3 approaches with tradeoffs. Lead with your recommendation.
 4. **Iterate** — The user will push back, refine, redirect. Go with it. Ask follow-ups. Probe edge cases.
 5. **Crystallize** — When an approach solidifies, summarize it clearly: what we're building, how, and why.
+
+## Visual Companion
+
+When upcoming questions involve visual content (mockups, layouts, diagrams), offer the browser companion:
+
+> "Some of what we're working on might be easier to show visually in a browser — mockups, diagrams, layout comparisons. Want to try it? (Requires opening a local URL)"
+
+**This offer must be its own message.** Don't combine it with other questions. If they decline, continue text-only.
+
+After acceptance, decide **per question** whether to use the browser or terminal. The test: would the user understand this better by **seeing** it than reading it? Use the browser for visual content (wireframes, layout comparisons, architecture diagrams). Use the terminal for text content (requirements, tradeoffs, scope decisions).
+
+See `references/visual-companion.md` for the full setup, CSS classes, and interaction loop.
 
 ## Rules
 
