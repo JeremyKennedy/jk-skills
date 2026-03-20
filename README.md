@@ -82,7 +82,6 @@ Run `/plugin-check` to detect conflicts automatically.
 |-------|-------------|
 | `jk-reflect` | Step back, challenge assumptions, optionally dispatch fresh subagent for outside perspective |
 | `jk-burn-rate` | Session-level token spending control: max / standard / light |
-| `plugin-check` | Detect installed plugins that jk-skills supersedes |
 
 ### Development Discipline
 
@@ -109,6 +108,7 @@ Run `/plugin-check` to detect conflicts automatically.
 |-------|-------------|
 | `using-jk-skills` | Auto-loaded via SessionStart hook. Skill discovery and routing. |
 | `jk-philosophy` | Foundational philosophy: code is free, expand scope, refactor always, heavyweight autonomy |
+| `plugin-check` | Detect installed plugins that jk-skills supersedes |
 
 ## Agents
 
