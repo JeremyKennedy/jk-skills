@@ -126,7 +126,7 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
    **Bottom (what the user sees first — self-contained, target ~10-15 lines):**
    - Literal `## TL;DR: [plan title]` heading, then 4-6 sentences covering: what gets built, the approach/architecture at a high level, how many tasks, which mode and why, key decisions worth flagging. Scale to plan complexity — simple plans get a few sentences, complex plans can have several short paragraphs with bullets. Prefer bullets over prose. Give the user enough to catch problems without scrolling up.
    - **Mode**: recommendation + one-line reasoning
-   - **Context note**: can they `/clear` or not
+   - **Context note**: Based on step 3's analysis, tell the user whether they can safely `/clear`. Only recommend clearing if you have verified that ALL conversation context needed for execution is captured in the plan docs on disk. If there is ANY uncaptured context (decisions, constraints, clarifications from the interview that didn't make it into the docs), say so and recommend against clearing. Do not say "you can clear" as a default — earn it by checking.
 
    Then `ExitPlanMode`. One decision point.
 
