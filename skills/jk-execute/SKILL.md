@@ -22,48 +22,14 @@ Execute an implementation plan using one of four execution topologies. Each mode
 
 **Wisdom** compounds across tasks — task 5 benefits from what task 1 learned. It's transient to the execution.
 
-**Memory checkpoints** (save to auto memory, not wisdom):
-- **Before presenting the plan** — last chance before the user might `/clear`. Save project decisions, user preferences, constraints from the planning conversation.
-- **After all tasks complete, before jk-prove-it** — promote any wisdom that's broadly useful to memory (e.g., "this project's test runner is X" is worth remembering). Leave execution-specific gotchas in wisdom.
-- **After jk-prove-it completes** — save verification learnings, anything about the codebase worth knowing next time.
+**Persistence checkpoints** — invoke `jk-skills:jk-remember` at these points:
+- **Before presenting the plan** — last chance before the user might `/clear`
+- **After all tasks complete, before jk-prove-it** — feed it the wisdom file as additional context
+- **After jk-prove-it completes**
 
-**After execution completes**, archive the wisdom file alongside the plan: copy `.jk-work/<plan-slug>/wisdom.md` to `docs/plans/<plan-slug>-wisdom.md` and commit. This preserves execution context with the plan for reference.
+jk-remember handles routing (CLAUDE.md vs docs/ vs auto memory), the CLAUDE.md gate, and user approval. Don't reimplement its logic here.
 
-### Knowledge Promotion (runs once, before jk-prove-it)
-
-After all tasks complete, promote project-level learnings from wisdom to docs. This is how cross-plan knowledge compounds — future planning sessions benefit from what past executions discovered.
-
-1. **Gather candidates.** Read the wisdom file. Filter for entries that are about the *project* (not about this specific execution). "The API paginates at 100" is project knowledge. "Task 3 needed a retry" is not.
-2. **Map the doc structure.** Run `tree docs/` (or `ls docs/` if no tree). Read `CLAUDE.md`. This gives you the project's documentation topology and current CLAUDE.md content.
-3. **Dispatch a sonnet subagent** with the wisdom candidates + the doc tree + CLAUDE.md content. Prompt:
-
-   ```
-   You have project learnings from a completed plan execution, the project's doc structure, and its CLAUDE.md.
-
-   Learnings to place:
-   [filtered wisdom entries]
-
-   Doc structure:
-   [tree output]
-
-   Current CLAUDE.md:
-   [content]
-
-   For each learning, decide:
-   - CLAUDE_MD: belongs in CLAUDE.md. Highest bar — must be concise, project-specific, actionable, not derivable from the code, and worth the context window cost in every future session. Very few learnings qualify.
-   - EXISTING: belongs in [specific doc file] — integrate into the existing structure
-   - NEW: important enough for a new doc file — suggest filename and location
-   - GENERAL: no specific doc fits — goes in docs/project-knowledge.md
-   - SKIP: not worth persisting (too specific to this execution)
-
-   Output a routing table: one line per learning with the decision and target.
-   ```
-
-4. **Apply the routing.** For CLAUDE.md, find the right section and add a single concise line. For docs/, **read the target file and weave the learning into the existing structure** — don't just stick it at the end. If the document needs reorganization to accommodate the new knowledge, rewrite the relevant sections. The goal is a coherent document. For `docs/project-knowledge.md`, create if it doesn't exist, organized by topic headings.
-5. **Present changes to the user** before committing — show diffs and reasoning, especially for CLAUDE.md (every line costs context window).
-6. **Commit** the approved doc updates.
-
-This is lightweight — the subagent only reads the tree and wisdom, not every doc file. The orchestrator reads individual docs only when appending.
+**After execution completes**, archive the wisdom file alongside the plan: copy `.jk-work/<plan-slug>/wisdom.md` to `docs/plans/<plan-slug>-wisdom.md` and commit.
 
 > **REQUIRED SUB-SKILL:** Use jk-skills:jk-philosophy
 
@@ -157,7 +123,7 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 2. Extract all tasks with full text (provide text to subagents — do not make them read the file)
 3. **Check for outstanding context.** Is anything from the conversation not captured in the plan files? Decisions, design choices, context that only exists in the conversation.
 4. **Determine execution mode.** If the user specified a mode, use it. Otherwise, analyze the plan and recommend one (see Mode Selection above). If recommending Swarm, work out the wave breakdown.
-5. **Save to memory.** Before presenting, save any important context from the planning conversation that would be useful in future sessions — user preferences, project decisions, constraints learned. This is the last chance before the user might `/clear`.
+5. **Persist learnings.** Invoke `jk-skills:jk-remember` — last chance before the user might `/clear`.
 6. **Present the plan to the user** using `EnterPlanMode`.
 
    <HARD-GATE>
