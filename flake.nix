@@ -26,6 +26,7 @@
           "writing-skills"
           "jk-brainstorm"
           "jk-converse"
+          "plugin-check"
         ];
       in {
         options.programs.jk-skills = {

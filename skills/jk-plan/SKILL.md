@@ -84,6 +84,12 @@ Before interviewing, classify the work type. This changes how you interview:
 
 State the classification to the user and confirm before proceeding. If ambiguous (e.g., "fix this by rewriting it"), ask which lens to use.
 
+### Phase 2.5: Scope Check
+
+Before interviewing in detail, assess scope. If the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend interview questions refining details of a project that needs decomposition first.
+
+If the project is too large for a single plan, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then plan the first sub-project through the normal flow. Each sub-project gets its own design → plan → implementation cycle.
+
 ### Phase 3: Interview
 
 Interview the user until ALL FIVE clearance criteria pass:
@@ -197,7 +203,16 @@ Issues found and resolved:
 
 ### Phase 6: Implementation Plan
 
-Write the implementation plan:
+**File structure first.** Before defining tasks, map out which files will be created or modified and what each one is responsible for. This is where decomposition decisions get locked in:
+
+- Design units with clear boundaries and well-defined interfaces. Each file should have one clear responsibility.
+- Prefer smaller, focused files over large ones. Agents reason better about code they can hold in context, and edits are more reliable when files are focused.
+- Files that change together should live together. Split by responsibility, not by technical layer.
+- In existing codebases, follow established patterns. If a file has grown unwieldy, including a split in the plan is reasonable.
+
+This structure informs the task decomposition — each task should produce self-contained changes that make sense independently.
+
+**Then write tasks:**
 
 - Bite-sized tasks (2-5 min each)
 - Exact file paths, complete code, exact commands with expected output
@@ -206,6 +221,30 @@ Write the implementation plan:
 
 **Save to:** `docs/plans/YYYY-MM-DD-<topic>.md`
 **Commit** the plan.
+
+**Plan review loop:** After writing the plan, dispatch a single plan reviewer (model: `sonnet` — clear criteria, checkable against the design doc):
+
+```
+You are a plan document reviewer. Verify this plan is complete and ready for execution.
+
+**Plan to review:** [PLAN_FILE_PATH]
+**Design doc:** [DESIGN_FILE_PATH]
+
+Check for:
+| Category | What to look for |
+|----------|-----------------|
+| Completeness | TODOs, placeholders, missing steps, gaps between design and plan |
+| Consistency | Plan contradicts design doc, steps reference non-existent files |
+| Executability | Steps too vague to execute, missing verification commands, unclear expected output |
+| File coverage | Design specifies files/components not covered by any task |
+| Task ordering | Dependencies between tasks not reflected in ordering |
+
+Only flag issues that would cause real problems during execution. Approve unless there are serious gaps.
+
+Output: **Status:** Approved | Issues Found, then issues list if any.
+```
+
+If issues found → fix and re-dispatch (max 3 iterations). If the reviewer keeps failing, surface to user.
 
 ### Phase 6.5: Pre-Presentation Checkpoint
 
