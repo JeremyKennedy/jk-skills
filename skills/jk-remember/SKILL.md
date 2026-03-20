@@ -32,17 +32,23 @@ Persist knowledge to the right place. Not everything is worth saving, and differ
 - Yes, and it's concise → CLAUDE.md
 - It needs explanation or depth → docs/
 
-### CLAUDE.md Gate
+### CLAUDE.md Rules
 
-CLAUDE.md is part of every prompt. Adding a line has a real cost. Before adding anything, verify:
+CLAUDE.md is part of every prompt — every line has a context window cost. But it's not off-limits. Multi-line entries, references to docs/, even short sections are fine when justified.
 
-- [ ] It's project-specific (not generic advice)
-- [ ] It's not derivable from reading the code or running `just --list`
-- [ ] A wrong assumption here would cause real problems
-- [ ] It can be expressed in one line
-- [ ] It's not already covered
+**What belongs in CLAUDE.md:**
+- Project-specific conventions, commands, gotchas
+- References to docs/ files as an index ("see docs/api.md for API patterns")
+- Anything where a wrong assumption would cause real problems
+- Things not derivable from reading the code
 
-If any check fails, route to docs/ instead.
+**What doesn't:**
+- Generic advice ("write tests", "use meaningful names")
+- Things obvious from the code or `just --list`
+- Deep explanations better suited to docs/
+- Anything already covered
+
+Use judgment. A three-line section about a critical gotcha is fine. A page of API documentation is not — put that in docs/ and add a one-line reference in CLAUDE.md.
 
 ## Process
 
