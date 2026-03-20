@@ -99,9 +99,13 @@ All review agents must use a consistent per-issue format:
 
 Claude Code caches plugins locally. Users only get updates when the `version` in `.claude-plugin/plugin.json` changes — same version = skip, even if code changed.
 
+**Version bump is MANDATORY.** Every commit that changes shipped content (`skills/`, `agents/`, `hooks/`, `.claude-plugin/`) MUST include a version bump in `.claude-plugin/plugin.json`. Semver: patch for fixes, minor for new/changed skills, major for breaking changes. If you're about to commit and haven't bumped the version, bump it now.
+
+Changes to repo-local files (`.claude/skills/`, `scripts/`, `CLAUDE.md`, `docs/`, `upstream/`) do NOT require a version bump.
+
 **Release flow:**
 1. Make changes, `just check`
-2. Bump `version` in `.claude-plugin/plugin.json` (semver: patch for fixes, minor for new/changed skills, major for breaking changes)
+2. Bump `version` in `.claude-plugin/plugin.json` (see above)
 3. Commit and push: `git push` (GitHub mirror is synced automatically)
 
 Nix flake users get updates on next `flake lock --update-input jk-skills`. Marketplace users get updates via `/plugin update` or auto-update (disabled by default for third-party marketplaces).
