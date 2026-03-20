@@ -57,14 +57,32 @@ Save `screen_dir` from the response. Tell user to open the URL.
    - Use Write tool — **never use cat/heredoc** (dumps noise into terminal)
    - Server automatically serves the newest file
 
-2. **Tell user what to expect and end your turn:**
+2. **Tell user what to expect**, then **watch for their interaction:**
    - Remind them of the URL (every step, not just first)
-   - Give a brief text summary of what's on screen
-   - Ask them to respond in the terminal: "Take a look and let me know what you think. Click to select an option if you'd like."
+   - Give a brief text summary of what's on screen (e.g., "Showing 3 layout options")
+   - Tell them: "Click an option in the browser, or type your thoughts here."
+   - **Immediately start watching** the `.events` file for clicks. Do NOT end your turn and wait for terminal input — the user may interact only via the browser. Use a blocking watch command:
+     ```bash
+     # Watch for browser clicks (timeout after 5 minutes)
+     inotifywait -t 300 -e modify "$SCREEN_DIR/.events" 2>/dev/null && cat "$SCREEN_DIR/.events"
+     ```
+     If `inotifywait` is not available, poll:
+     ```bash
+     # Poll for .events file changes (check every 2s, timeout 5min)
+     for i in $(seq 1 150); do
+       if [ -f "$SCREEN_DIR/.events" ] && [ -s "$SCREEN_DIR/.events" ]; then
+         cat "$SCREEN_DIR/.events"; exit 0
+       fi
+       sleep 2
+     done
+     echo "timeout"
+     ```
+   - Run this as a **background task** (`run_in_background: true`) so the user can also type in the terminal. Whichever comes first — a browser click or terminal input — drives the next step.
 
-3. **On your next turn** — after the user responds in the terminal:
-   - Read `$SCREEN_DIR/.events` if it exists — this contains the user's browser interactions (clicks, selections) as JSON lines
-   - Merge with the user's terminal text to get the full picture
+3. **Process the interaction:**
+   - If the background watcher triggered, read the `.events` output for click data
+   - If the user typed in the terminal, also check `.events` for any browser clicks
+   - Merge both sources to get the full picture
 
 4. **Iterate or advance** — if feedback changes current screen, write a new file (e.g., `layout-v2.html`). Only move to the next question when the current step is validated.
 
