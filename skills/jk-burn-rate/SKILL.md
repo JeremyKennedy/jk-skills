@@ -37,6 +37,8 @@ If the user signals they're stepping away ("going to sleep", "run this while I'm
 
 > "Since you're stepping away, want me to increase the burn rate? Standard (keep current), high (opus for more things), or max (burn it all)?"
 
+If a CLI usage tool is available (e.g., `ccstatusline`), the agent can check quota remaining and factor that into burn rate suggestions. The `/usage` command shows data in a UI dialog the agent can't read — the user would need to share the numbers.
+
 If the user hasn't set a burn rate, skills follow their own model selection guidance using whatever model the user has selected in their harness. This skill only needs to be loaded when the user explicitly wants to override that default.
 
 ## How Skills Use It
