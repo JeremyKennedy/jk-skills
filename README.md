@@ -100,7 +100,6 @@ Run `/plugin-check` to detect conflicts automatically.
 | `dispatching-parallel-agents` | Parallel subagent coordination with context isolation |
 | `using-git-worktrees` | Isolated workspace setup with safety verification |
 | `jk-converse` | Structured async conversation between two agents via shared markdown file |
-| `writing-skills` | Skill authoring and verification |
 
 ### Meta
 
@@ -109,6 +108,7 @@ Run `/plugin-check` to detect conflicts automatically.
 | `using-jk-skills` | Auto-loaded via SessionStart hook. Skill discovery and routing. |
 | `jk-philosophy` | Foundational philosophy: code is free, expand scope, refactor always, heavyweight autonomy |
 | `plugin-check` | Detect installed plugins that jk-skills supersedes |
+| `writing-skills` | Skill authoring and verification |
 
 ## Agents
 
