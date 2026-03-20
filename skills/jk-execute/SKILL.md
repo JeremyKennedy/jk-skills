@@ -359,7 +359,24 @@ Same panel as Deep mode if accepted.
 
 ## Subagent Prompt Templates
 
-**All implementer prompts** (both standard and swarm) must include the Escalation and Report sections below, appended after the task-specific sections.
+**All implementer prompts** (both standard and swarm) must include the Plan Context and Escalation & Report sections below.
+
+### Shared: Plan Context (include in all implementer prompts)
+
+Give each implementer situational awareness without dumping the full plan. The orchestrator constructs this section from the plan:
+
+```
+## Plan Context
+**Goal:** [one-sentence goal from plan header]
+**Architecture:** [2-3 sentences: key components, how they relate, tech stack]
+**File structure:** [list of files being created/modified across the whole plan, with one-line purpose each]
+**Your task:** Task N of M
+**Before you:** [what tasks already completed and what they produced — or "first task"]
+**After you:** [what tasks come next and what they need from you — or "last task"]
+**Cross-task conventions:** [naming patterns, shared types, import conventions discovered so far]
+```
+
+This is NOT the full plan text — it's a summary the orchestrator writes. Keep it tight. The implementer gets full detail for their own task but only situational awareness of the rest.
 
 ### Shared: Escalation & Report (append to all implementer prompts)
 
@@ -402,8 +419,7 @@ You are implementing Task N: [task name]
 ## Task Description
 [FULL TEXT of task from plan]
 
-## Context
-[Where this fits, dependencies, architectural context]
+[INSERT: Plan Context section]
 
 ## Accumulated Wisdom
 [All wisdom from previous tasks — conventions, gotchas, patterns]
@@ -444,8 +460,7 @@ You are ONE OF SEVERAL agents working in the SAME worktree simultaneously. Other
 You may ONLY create or modify these files:
 [explicit file list]
 
-## Context
-[Where this fits, dependencies, architectural context]
+[INSERT: Plan Context section]
 
 ## Accumulated Wisdom
 [All wisdom from previous tasks — conventions, gotchas, patterns]
