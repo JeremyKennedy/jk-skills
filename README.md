@@ -25,6 +25,12 @@ This is opinionated. It expands scope aggressively, demands TDD, runs adversaria
 
 **Burn Rate** — `jk-burn-rate` lets you control token spending: max (opus everything, go wide), standard (balanced), or light (efficient, cheaper models where quality won't suffer). Never weakens core discipline — just controls how aggressively to spend on discretionary work.
 
+## Philosophy
+
+Code is free. Expand scope relentlessly. Refactor always. Ask more questions. Build on what's already known. Run autonomously — blocking must be conscious and explicit. Every task is an opportunity to leave the codebase better.
+
+Full text: invoke `/jk-philosophy` in a session.
+
 ## Installation
 
 ### Claude Code Marketplace
@@ -120,12 +126,6 @@ Run `/jk-plugin-check` to detect conflicts automatically.
 | `silent-failure-hunter` | jk-execute round table | Audit error handling for silent failures |
 | `test-analyzer` | jk-execute round table | Behavioral test coverage analysis |
 | `doc-analyzer` | jk-execute round table | Documentation accuracy and staleness detection |
-
-## Philosophy
-
-Code is free. Expand scope relentlessly. Refactor always. Ask more questions. Build on what's already known. Run autonomously — blocking must be conscious and explicit. Every task is an opportunity to leave the codebase better.
-
-Full text: invoke `/jk-philosophy` in a session.
 
 ## License
 
