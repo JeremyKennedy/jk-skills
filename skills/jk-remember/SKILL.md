@@ -55,7 +55,7 @@ jk-remember scales from a quick checkpoint to a full documentation audit. Match 
 
 **Background execution:** Standard and deep modes can run as background tasks when they shouldn't block the main work. If invoked from jk-plan or jk-execute at a checkpoint, dispatch the doc review work in the background and continue with execution. Present results when the background task completes. Quick mode is fast enough to run inline.
 
-**How to decide:** If the context is clear (jk-execute checkpoint → quick, user says "remember X" → standard), just go. If ambiguous — the user invoked `/remember` without context at the end of a long session — ask:
+**How to decide:** Use judgment based on the scope of work. A small bugfix might warrant quick. A complex multi-file execution might warrant standard or even deep. If you're unsure, ask:
 
 > "How thorough do you want me to be? Quick save of what we learned, standard review of docs, or deep audit of all project documentation?"
 
