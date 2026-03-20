@@ -290,4 +290,6 @@ jk-plan ends here. Save all documents to disk, verify they exist, commit them.
 
 Statuses: `planned` → `in-progress` → `complete` / `abandoned`. jk-execute updates status during execution.
 
+**Persist learnings.** Invoke `jk-skills:jk-remember` (quick depth) — planning sessions generate project knowledge from the interview (decisions, constraints, domain context). This can run in the background while handing off to execution.
+
 Then invoke `jk-skills:jk-execute` with the plan file path. jk-execute handles everything from here — evaluating context, choosing execution mode, presenting the plan to the user, and executing.

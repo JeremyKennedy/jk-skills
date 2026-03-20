@@ -53,6 +53,8 @@ jk-remember scales from a quick checkpoint to a full documentation audit. Match 
 
 **Deep** — user explicitly wants a thorough review, or it's the end of a major effort. Dispatch subagents to audit CLAUDE.md quality, review docs/ coverage, check for stale commands, scan recent git history. Can take a while.
 
+**Background execution:** Standard and deep modes can run as background tasks when they shouldn't block the main work. If invoked from jk-plan or jk-execute at a checkpoint, dispatch the doc review work in the background and continue with execution. Present results when the background task completes. Quick mode is fast enough to run inline.
+
 **How to decide:** If the context is clear (jk-execute checkpoint → quick, user says "remember X" → standard), just go. If ambiguous — the user invoked `/remember` without context at the end of a long session — ask:
 
 > "How thorough do you want me to be? Quick save of what we learned, standard review of docs, or deep audit of all project documentation?"
