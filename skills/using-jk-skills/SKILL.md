@@ -61,7 +61,7 @@ These thoughts mean STOP — you're rationalizing:
 | "Step back" / "Are we on track?" / "Reflect" | jk-reflect |
 | "Go light" / "Max tokens" / "Burn rate" | jk-burn-rate |
 | "Remember this" / "Save this" / "What did we learn?" | jk-remember |
-| "Check for redundant plugins" | plugin-check |
+| "Check for redundant plugins" | jk-plugin-check |
 | "Set up a conversation between agents" | jk-converse |
 | "Clean up docs" / "Audit documentation" | jk-remember (deep/overhaul) |
 

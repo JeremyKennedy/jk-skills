@@ -29,7 +29,7 @@
           "jk-converse"
           "jk-reflect"
           "jk-remember"
-          "plugin-check"
+          "jk-plugin-check"
         ];
       in {
         options.programs.jk-skills = {

@@ -1,5 +1,5 @@
 ---
-name: plugin-check
+name: jk-plugin-check
 description: "Use when a user installs jk-skills or asks about plugin conflicts — checks for installed plugins that jk-skills supersedes and recommends uninstalling them."
 ---
 

@@ -61,7 +61,7 @@ If you have any of these installed, **uninstall them** — jk-skills absorbs and
 - **[code-simplifier](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/code-simplifier)** — overlaps with built-in review
 - **[claude-md-management](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-md-management)** — jk-remember handles CLAUDE.md + docs/ + memory routing
 
-Run `/plugin-check` to detect conflicts automatically.
+Run `/jk-plugin-check` to detect conflicts automatically.
 
 ## All Skills
 
@@ -107,7 +107,7 @@ Run `/plugin-check` to detect conflicts automatically.
 |-------|-------------|
 | `using-jk-skills` | Auto-loaded via SessionStart hook. Skill discovery and routing. |
 | `jk-philosophy` | Foundational philosophy: code is free, expand scope, refactor always, heavyweight autonomy |
-| `plugin-check` | Detect installed plugins that jk-skills supersedes |
+| `jk-plugin-check` | Detect installed plugins that jk-skills supersedes |
 | `writing-skills` | Skill authoring and verification |
 
 ## Agents
