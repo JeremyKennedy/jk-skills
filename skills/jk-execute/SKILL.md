@@ -9,6 +9,13 @@ description: "Use when executing an implementation plan — four modes: Deep (su
 
 Execute an implementation plan using one of four execution topologies. Each mode uses per-task review (spec compliance + code quality) and ends with jk-prove-it.
 
+**Memory checkpoints:** Save to memory at these points:
+- **Before presenting the plan** (step 5 in Setup) — last chance before the user might `/clear`
+- **After all tasks complete, before jk-prove-it** — save wisdom, conventions discovered, gotchas hit during execution
+- **After jk-prove-it completes** — save verification results, anything learned about the codebase
+
+Save things useful in future sessions: project decisions, user preferences, constraints, patterns. Don't save ephemeral task state.
+
 > **REQUIRED SUB-SKILL:** Use jk-skills:jk-philosophy
 
 If you cannot load jk-skills:jk-philosophy, STOP and tell the user the plugin is misconfigured.
@@ -102,7 +109,8 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 2. Extract all tasks with full text (provide text to subagents — do not make them read the file)
 3. **Check for outstanding context.** Is anything from the conversation not captured in the plan files? Decisions, design choices, context that only exists in the conversation.
 4. **Determine execution mode.** If the user specified a mode, use it. Otherwise, analyze the plan and recommend one (see Mode Selection above). If recommending Swarm, work out the wave breakdown.
-5. **Present the plan to the user** using `EnterPlanMode`.
+5. **Save to memory.** Before presenting, save any important context from the planning conversation that would be useful in future sessions — user preferences, project decisions, constraints learned. This is the last chance before the user might `/clear`.
+6. **Present the plan to the user** using `EnterPlanMode`.
 
    <HARD-GATE>
    Write a FRESH presentation to the plan mode tool. Do NOT edit the plan doc file on disk. Do NOT copy-paste from the plan doc. The plan doc is an agent-facing reference — detailed, verbose, exact code. The presentation is a separate artifact you write from scratch for a human audience.
