@@ -27,10 +27,16 @@ If the user hasn't set it and you're about to do expensive work (deep remember, 
 
 ## How Skills Use It
 
-Skills with model selection guidance (jk-plan, jk-execute, jk-remember) should check the burn rate before choosing models. The burn rate overrides the per-skill defaults:
+Burn rate affects everything — model selection, effort, thoroughness, personality.
 
-- **Max**: upgrade sonnet→opus where the skill would normally use sonnet for reviewers/implementers
-- **Standard**: follow the skill's own model selection guidance as written
-- **Light**: downgrade opus→sonnet where the task doesn't strictly require opus-level reasoning
+**Models:**
+- **Max**: upgrade sonnet→opus broadly
+- **Standard**: follow per-skill defaults
+- **Light**: downgrade opus→sonnet where reasoning doesn't strictly demand it
 
-The burn rate is a preference, not a hard rule. If a task genuinely needs opus even on light (e.g., complex architectural decision), use opus.
+**Effort and behavior:**
+- **Max**: explore more alternatives, ask more questions, deeper reviews, more thorough testing, expand scope aggressively. Agents should be ambitious and perfectionist.
+- **Standard**: balanced. Follow skill guidance as written.
+- **Light**: be efficient. Skip optional reviews for trivial tasks, fewer interview questions when the answer is clear, shorter review panels, get to the point. Agents should be focused and pragmatic.
+
+The burn rate is a preference, not a hard rule. If a task genuinely needs opus or deep effort even on light, do it.
