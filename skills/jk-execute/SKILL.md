@@ -188,10 +188,11 @@ For each task:
      3. Task too large → break into smaller pieces
      4. Plan itself is wrong → escalate to the user
    - **Never** ignore an escalation or force the same agent to retry without changes
-3. **Dispatch spec compliance reviewer** — does code match the plan?
-4. If spec fails → implementer fixes → re-review (max 3 cycles)
-5. **Dispatch code quality reviewer** — is the code clean?
-6. If quality fails → implementer fixes → re-review (max 3 cycles)
+3. **Review the work.** Scale review depth to task complexity:
+   - **Trivial tasks** (config change, markdown file, boilerplate): self-review from the implementer is enough. Skip external reviewers.
+   - **Standard tasks**: dispatch spec compliance reviewer. If it passes, skip code quality unless the implementer flagged concerns.
+   - **Complex tasks** (cross-cutting, novel architecture, high-risk): dispatch both spec compliance and code quality reviewers.
+   - If any reviewer fails → implementer fixes → re-review (max 3 cycles)
 7. **Extract wisdom** from this task and append to `.jk-work/<plan-slug>/wisdom.md`:
    - **Plan diversions**: anything the implementer did differently from the plan — changed approach, skipped a step, added something unplanned, discovered the plan was wrong
    - **Plan revisions**: if the plan needs updating for future tasks based on what was learned

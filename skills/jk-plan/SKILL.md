@@ -93,7 +93,7 @@ If the project is too large for a single plan, help the user decompose into sub-
 
 ### Phase 3: Interview
 
-Interview the user until ALL FIVE clearance criteria pass:
+Interview the user until you have enough clarity to design. These criteria guide the interview — not every plan needs all five at the same depth. A focused refactor might not need a test strategy discussion if the existing tests are clear. A new feature definitely does. Use judgment, but don't skip criteria without a reason.
 
 | # | Criterion | What "pass" means |
 |---|-----------|-------------------|
@@ -184,11 +184,11 @@ After fixing issues, run three categories of reviewers:
 2. **Delta agent** — A new reviewer focused on second-order effects. Prompt: "Here is the design doc diff since last cycle and a summary of what was flagged and fixed. What new issues do these changes introduce? Look for second-order effects: a fix in one area creating problems in another, shifted assumptions, new gaps, new complexity." Give it the diff AND a short summary of each fix (issue → resolution).
 3. **Free agent** — A new reviewer with no assigned domain and no access to previous reviewer outputs. Prompt: "You are a fresh reviewer with no assigned domain. Review this design for any issues — correctness, completeness, consistency, elegance, anything. You are specifically valuable because the dedicated reviewers each have a narrow lens. Find what they missed." Give it only the current design doc and project CLAUDE.md. Do NOT show it previous cycle results — avoid anchoring.
 
-This means round 2+ always has at least 3 agents even if only one dedicated agent failed.
+Scale the re-cycle to the severity of what was found. If only one dedicated agent failed on a minor point, re-running just that agent may be enough. If major issues were found across multiple domains, the full three-category re-cycle is warranted. Use judgment.
 
 **Stop condition:** A cycle produces no Critical/Important issues. Minor-only means the design is solid.
 
-**Maximum:** 3 cycles. If still failing after 3, escalate to user — the design may need fundamental rethinking.
+**Maximum:** 3 cycles. If still failing after 3, escalate to the user.
 
 #### Evidence
 
