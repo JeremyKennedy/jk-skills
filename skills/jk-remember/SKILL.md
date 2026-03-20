@@ -85,12 +85,13 @@ For deep/overhaul, check the session's burn rate (see `jk-skills:jk-burn-rate`) 
 - **Missing docs**: scan the codebase for undocumented areas — modules with no README, complex code with no explanation in docs/, conventions followed in code but not written down anywhere.
 
 **In either case**, also check:
-- Did any tool calls fail during this session? Each failed tool call is a signal:
+- Did any tool calls fail or require excessive retries? Each is a signal:
   - Missing documentation (command wasn't documented, path was wrong)
   - Missing tooling (a better CLI command or API would prevent this class of failure)
   - Stale docs (documented command no longer works)
+  - **Missing skill** — if you spent multiple tool calls figuring out a workflow that could be codified, that's a skill waiting to be written
 
-  Surface these to the user — sometimes the fix is better docs, sometimes it's a better tool or script.
+  Surface these to the user — sometimes the fix is better docs, sometimes it's a better tool, sometimes it's a new skill.
 
 - Did you follow a recurring workflow pattern that isn't captured in a skill? Did you work around a skill's limitations? Did you wish a skill existed? Suggest:
   - **New skill**: if a workflow was repeated or improvised that would benefit from structure. Ask: should this be committed to the repo (`.claude/skills/` — shared with the team) or personal (`~/.claude/skills/` — just for you)?
