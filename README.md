@@ -6,9 +6,9 @@ This is opinionated. It expands scope aggressively, demands TDD, runs adversaria
 
 ## What It Does
 
-**Planning** — Before writing code, jk-plan runs deep codebase research with parallel explorer agents, interviews you to understand the problem, has multiple architects independently design solutions, then runs a 6-reviewer adversarial panel to tear the design apart. It cycles until no critical issues remain.
+**Planning** — Before writing code, `jk-plan` runs deep codebase research with parallel explorer agents, interviews you to understand the problem, has multiple architects independently design solutions, then runs a 6-reviewer adversarial panel to tear the design apart. It cycles until no critical issues remain.
 
-**Execution** — jk-execute takes the plan and runs it in one of four modes:
+**Execution** — `jk-execute` takes the plan and runs it in one of four modes:
 
 | Mode | How it works | Best for |
 |------|-------------|----------|
@@ -17,13 +17,13 @@ This is opinionated. It expands scope aggressively, demands TDD, runs adversaria
 | **Swarm** | Parallel subagents on independent files simultaneously | Bulk changes, 3+ independent tasks |
 | **Care** | Like Deep but pauses at meaningful checkpoints for your review | High-stakes changes, unfamiliar codebases |
 
-**Verification** — jk-prove-it mechanically verifies the work before you ship. Runs tests, checks the diff, generates a ship report. No "I think it works" — evidence or it didn't happen.
+**Verification** — `jk-prove-it` mechanically verifies the work before you ship. Runs tests, checks the diff, generates a ship report. No "I think it works" — evidence or it didn't happen.
 
-**Knowledge** — jk-remember persists what was learned to the right place: CLAUDE.md for project conventions, docs/ for deeper knowledge, auto memory for your preferences. Runs at the end of planning and execution so knowledge compounds across sessions.
+**Knowledge** — `jk-remember` persists what was learned to the right place: CLAUDE.md for project conventions, docs/ for deeper knowledge, auto memory for your preferences. Runs at the end of planning and execution so knowledge compounds across sessions.
 
-**Reflection** — jk-reflect steps back and challenges the current direction. Gut check first, then structured analysis. Can dispatch a fresh subagent for an unbiased perspective on complex decisions.
+**Reflection** — `jk-reflect` steps back and challenges the current direction. Gut check first, then structured analysis. Can dispatch a fresh subagent for an unbiased perspective on complex decisions.
 
-**Burn Rate** — jk-burn-rate lets you control token spending: max (opus everything, go wide), standard (balanced), or light (efficient, cheaper models where quality won't suffer). Never weakens core discipline — just controls how aggressively to spend on discretionary work.
+**Burn Rate** — `jk-burn-rate` lets you control token spending: max (opus everything, go wide), standard (balanced), or light (efficient, cheaper models where quality won't suffer). Never weakens core discipline — just controls how aggressively to spend on discretionary work.
 
 ## Installation
 
