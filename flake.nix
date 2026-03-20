@@ -25,6 +25,7 @@
           "dispatching-parallel-agents"
           "writing-skills"
           "jk-brainstorm"
+          "jk-burn-rate"
           "jk-converse"
           "jk-reflect"
           "jk-remember"

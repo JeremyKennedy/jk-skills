@@ -59,6 +59,7 @@ These thoughts mean STOP — you're rationalizing:
 | "Set up a worktree" | using-git-worktrees |
 | "Write a new skill" | writing-skills |
 | "Step back" / "Are we on track?" / "Reflect" | jk-reflect |
+| "Go light" / "Max tokens" / "Burn rate" | jk-burn-rate |
 | "Remember this" / "Save this" / "What did we learn?" | jk-remember |
 | "Check for redundant plugins" | plugin-check |
 

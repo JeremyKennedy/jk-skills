@@ -55,11 +55,13 @@ jk-remember scales from a quick checkpoint to a full documentation audit. Match 
 
 **Overhaul** — the project's documentation needs serious work. Invoke `jk-skills:jk-plan` to plan the documentation improvement as a proper project: research the current state, interview the user about what matters, design the doc structure, write an implementation plan, execute with jk-execute. Full planning rigor for doc debt.
 
+For deep/overhaul, check the session's burn rate (see `jk-skills:jk-burn-rate`) to guide model selection and parallelism.
+
 **Background execution:** Prefer non-blocking. Unless the user is waiting for results (e.g., they explicitly invoked `/remember` and want to see the output), run in the background so work can continue. Present results when done.
 
 **How to decide:** Use judgment based on the scope of work. A small bugfix might warrant quick. A complex multi-file execution might warrant standard or even deep. If you're unsure, ask:
 
-> "How thorough do you want me to be? Quick save of what we learned, standard review of docs, or deep audit of all project documentation?"
+> "How thorough? Quick / standard / deep / overhaul?"
 
 ## Process
 
