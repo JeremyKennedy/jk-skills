@@ -100,20 +100,29 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 
 1. Read the plan file
 2. Extract all tasks with full text (provide text to subagents — do not make them read the file)
-3. **Present the execution plan** — but only if the user hasn't already seen it:
-   - **If invoked from jk-plan** (plan was already presented): skip plan mode entirely, go straight to step 4. The user already reviewed the plan and chose the execution mode.
-   - **If invoked directly** (user pointed at an existing plan file): enter plan mode using `EnterPlanMode` and present:
-     - **Executing**: Plan name and file path
-     - **Mode**: Selected execution mode and why
-     - **Tasks** (numbered, with status markers): The full task list about to be executed
-     - **Waves** (Swarm only): Which tasks run in parallel, which are serialized, and why
-     - **Verification**: What "done" looks like (test commands, expected behavior)
-     - **TL;DR** (at the bottom): 2-3 sentence plain-English summary. NOT written to the plan file.
-     - **Context note**: "The plan on disk is self-contained. You can clear context (`/clear`) before execution to free up your full context window. [If conversation context isn't captured in the plan, note it and recommend against clearing.]"
-     Then call `ExitPlanMode` for user approval before any code is written.
-4. Create task list
-5. Record `BASE_SHA` (current HEAD before any implementation)
-6. Create `.jk-work/` directory if it doesn't exist
+3. **Check for outstanding context.** Is anything from the conversation not captured in the plan files? Decisions, design choices, context that only exists in the conversation.
+4. **Determine execution mode.** If the user specified a mode, use it. Otherwise, analyze the plan and recommend one (see Mode Selection above). If recommending Swarm, work out the wave breakdown.
+5. **Present the plan** using `EnterPlanMode`. The user is assumed to NOT have read the docs on disk — this presentation is their primary view of the plan. The plan mode UI shows the **bottom** of the content first, so structure accordingly:
+
+   **Top (detail — user scrolls up to see):**
+   - Full task list (numbered, with status markers)
+   - Waves (Swarm only): which tasks parallelize, which serialize, and why
+   - Verification: what "done" looks like
+   - Key architecture decisions and file structure
+
+   **Bottom (what the user actually sees first):**
+   - **Title**: what's being built
+   - **TL;DR**: 2-3 sentence self-contained summary — what gets built, how many tasks, which execution mode and why. This must make sense on its own without reading the detail above.
+   - **Execution mode**: your recommendation + all 4 options
+   - **Context note**:
+     - If self-contained: "The plan on disk has everything needed. You can `/clear` before execution to free up your full context window."
+     - If uncaptured context: "Important context from this conversation isn't in the plan: [list]. Recommend NOT clearing."
+
+   Then `ExitPlanMode`. One decision point — the user accepts and picks a mode.
+
+6. Create task list
+7. Record `BASE_SHA` (current HEAD before any implementation)
+8. Create `.jk-work/` directory if it doesn't exist
 
 ## Hard Directive (Deep, Direct, and Swarm)
 

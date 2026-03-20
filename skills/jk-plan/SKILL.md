@@ -246,27 +246,6 @@ Output: **Status:** Approved | Issues Found, then issues list if any.
 
 If issues found → fix and re-dispatch (max 3 iterations). If the reviewer keeps failing, surface to user.
 
-### Phase 7: Final Presentation & Execution Handoff
+### Phase 7: Execution Handoff
 
-This is the ONLY time the user sees the plan. Everything before this point was preparation — now present it all at once.
-
-**Before presenting:**
-
-1. **Save all documents to disk.** The design doc and implementation plan MUST be written to their files and committed. Verify the files exist on disk.
-2. **Check for outstanding context.** Is anything from this conversation not captured in the plan files? Decisions, design choices, context that only exists in the conversation.
-3. **Analyze the plan for execution mode.** Determine your recommended mode using the heuristics from jk-execute (Swarm if 3+ independent tasks, Direct if risky, Care if high-stakes, Deep as default). If recommending Swarm, work out the wave breakdown.
-
-**Present everything in a single plan mode entry** using `EnterPlanMode`:
-
-- **Plan summary**: what gets built, key architecture decisions, task count
-- **Execution mode recommendation**: your pick + reasoning, with all 4 options
-- **Waves** (if Swarm): which tasks parallelize, which serialize, and why
-- **Verification**: what "done" looks like
-- **TL;DR** (at the bottom): 2-3 sentence plain-English summary of what's about to happen. NOT written to disk — this is for the user scanning before deciding.
-- **Context note**:
-  - If plan is self-contained: "The plan on disk has everything needed. I recommend clearing context (`/clear`) before execution to free up your full context window."
-  - If uncaptured context exists: "We have context in this conversation not in the plan: [list]. I recommend NOT clearing unless we capture these first."
-
-Then `ExitPlanMode`. The user accepts (or adjusts) and picks a mode — **one decision point, one presentation**.
-
-Once the user picks, invoke `jk-skills:jk-execute` with the chosen mode and plan file path. Since the user already reviewed the plan, pass `--skip-plan-presentation` context so jk-execute skips its own plan mode entry and goes straight to execution.
+jk-plan ends here. Save all documents to disk, verify they exist, commit them. Then invoke `jk-skills:jk-execute` with the plan file path. jk-execute handles everything from here — evaluating context, choosing execution mode, presenting the plan to the user, and executing.
