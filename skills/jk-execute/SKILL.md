@@ -50,19 +50,17 @@ After all tasks complete, promote project-level learnings from wisdom to docs. T
    [content]
 
    For each learning, decide:
-   - CLAUDE_MD: belongs in CLAUDE.md — one-liner, essential for every future session (commands, conventions, gotchas). Only if it earns its place in the context window.
-   - EXISTING: belongs in [specific doc file] — append under [section]
+   - CLAUDE_MD: belongs in CLAUDE.md. Highest bar — must be concise, project-specific, actionable, not derivable from the code, and worth the context window cost in every future session. Very few learnings qualify.
+   - EXISTING: belongs in [specific doc file] — integrate into the existing structure
    - NEW: important enough for a new doc file — suggest filename and location
    - GENERAL: no specific doc fits — goes in docs/project-knowledge.md
    - SKIP: not worth persisting (too specific to this execution)
 
-   CLAUDE.md additions must be concise — one line per concept, copy-paste ready, project-specific only. Don't duplicate what's already there.
-
    Output a routing table: one line per learning with the decision and target.
    ```
 
-4. **Apply the routing.** For CLAUDE.md, use targeted edits under the appropriate section. For docs/, read each target doc and append in context. For `docs/project-knowledge.md`, create if it doesn't exist — organized by topic headings, append-only.
-5. **Present changes to the user** before committing — show diffs and reasoning for each update, especially CLAUDE.md changes (context window is precious).
+4. **Apply the routing.** For CLAUDE.md, find the right section and add a single concise line. For docs/, **read the target file and weave the learning into the existing structure** — don't just stick it at the end. If the document needs reorganization to accommodate the new knowledge, rewrite the relevant sections. The goal is a coherent document. For `docs/project-knowledge.md`, create if it doesn't exist, organized by topic headings.
+5. **Present changes to the user** before committing — show diffs and reasoning, especially for CLAUDE.md (every line costs context window).
 6. **Commit** the approved doc updates.
 
 This is lightweight — the subagent only reads the tree and wisdom, not every doc file. The orchestrator reads individual docs only when appending.

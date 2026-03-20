@@ -7,16 +7,16 @@ description: "Use when needing to step back from the current work — gain objec
 
 **Announce at start:** "I'm using the jk-reflect skill to step back and think clearly."
 
-Pause the current work and gain objectivity. Challenge your own assumptions, evaluate the approach, consider what you might be missing. This is the "am I even doing the right thing?" check.
+Pause. Challenge assumptions. Evaluate whether the current direction is right.
 
 ## When to Use
 
-- You've been deep in implementation and lost the forest for the trees
-- A decision feels off but you can't articulate why
-- The user asks you to step back, reflect, or reconsider
+- You've lost sight of the original goal
+- A decision feels wrong but you can't articulate why
+- The user asks you to step back or reconsider
 - You're about to commit to a direction and want a sanity check
-- Something is more complex than expected and you need to reassess
-- You're in a brainstorm or planning session and want to challenge the emerging direction
+- Something is more complex than expected
+- You want to challenge the emerging direction in a brainstorm or plan
 
 ## How It Works
 

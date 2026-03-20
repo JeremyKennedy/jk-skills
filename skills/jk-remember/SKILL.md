@@ -7,88 +7,86 @@ description: "Use when the user says 'remember this', wants to persist a learnin
 
 **Announce at start:** "I'm using the jk-remember skill to persist what we've learned."
 
-Intelligently persist knowledge to the right place. Not everything is worth saving, and different knowledge belongs in different places. This skill reflects on all available context — not just the last message — and routes accordingly.
+Persist knowledge to the right place. Not everything is worth saving, and different knowledge belongs in different places. Reflects on all available context — not just the last message.
 
 ## When to Use
 
 - User explicitly says "remember this" or "save this"
-- End of a significant work session (planning, debugging, building)
+- End of a significant work session
 - After discovering something non-obvious about the project
 - When the user asks "what have we learned?"
 
 ## The Three Destinations
 
-| Destination | What belongs here | Audience | Examples |
-|-------------|------------------|----------|----------|
-| **CLAUDE.md** | Project conventions, commands, architecture, gotchas — things that shape how ANY agent works in this codebase | Every future session | "Tests must run with `--runInBand`" / "Auth uses JWT with HS256" |
-| **docs/** | Domain knowledge, technical decisions, reference material — deeper than CLAUDE.md, organized by topic | Agents and humans who need depth | "The API paginates at 100, loop with cursor" / "We chose Postgres over SQLite because..." |
-| **Auto memory** | User preferences, collaboration style, personal context — things about the PERSON, not the project | This user's future sessions only | "User prefers Swarm mode" / "User wants terse responses" |
+| Destination | What belongs here | Bar | Examples |
+|-------------|------------------|-----|----------|
+| **CLAUDE.md** | Commands, conventions, gotchas that shape how every agent works in this codebase. Every line costs context window. | **Highest.** Must be concise, project-specific, actionable, and not derivable from the code. Would a wrong assumption here cause real damage? Then it earns a line. | `just test-unit` requires Docker / Auth: JWT with HS256 |
+| **docs/** | Domain knowledge, technical decisions, reference material. Can be long, detailed, organized by topic. | **Medium.** Worth writing if it would save a future agent or human significant time. | API pagination patterns / why we chose Postgres / deployment quirks |
+| **Auto memory** | User preferences, collaboration style — things about the person, not the project | **Low.** Save freely. Private, no context window cost. | User prefers Swarm mode / wants terse responses |
 
 **Decision test:** "Would a different person working on this project need to know this?"
-- Yes → CLAUDE.md or docs/ (project knowledge)
-- No → auto memory (user knowledge)
+- Yes → CLAUDE.md or docs/
+- No → auto memory
 
-"Is this a one-liner or does it need context/depth?"
-- One-liner → CLAUDE.md
-- Needs explanation → docs/
+"Does this earn a line in every future session's context window?"
+- Yes, and it's concise → CLAUDE.md
+- It needs explanation or depth → docs/
+
+### CLAUDE.md Gate
+
+CLAUDE.md is part of every prompt. Adding a line has a real cost. Before adding anything, verify:
+
+- [ ] It's project-specific (not generic advice)
+- [ ] It's not derivable from reading the code or running `just --list`
+- [ ] A wrong assumption here would cause real problems
+- [ ] It can be expressed in one line
+- [ ] It's not already covered
+
+If any check fails, route to docs/ instead.
 
 ## Process
 
 ### 1. Gather Context
 
-Don't just look at the last message. Reflect on the full conversation:
-- What was discovered during this work?
+Reflect on the full conversation:
+- What context was missing at the start that would have made this work faster or better?
 - What was surprising or non-obvious?
-- What would have saved time if we'd known it at the start?
 - What conventions or patterns emerged?
 - What decisions were made and why?
+- Are any documented commands, paths, or conventions now stale because of this work?
 
 ### 2. Filter
 
-Not everything is worth saving. Skip:
+Skip:
 - Things obvious from reading the code
 - One-off fixes unlikely to recur
-- Generic best practices (not project-specific)
-- Transient state (current branch, WIP status)
+- Generic best practices
+- Transient state
 - Things already documented
 
 ### 3. Route
 
-For each item worth saving, decide the destination:
+**Check existing structure first.** Run `tree docs/` and read CLAUDE.md.
 
-**Check existing docs first.** Run `tree docs/` and read CLAUDE.md. Does a relevant file already exist?
-- If CLAUDE.md already has a section for this topic → update that section
-- If a doc file covers this topic → append there
-- If nothing fits and it's substantial → consider a new doc file
-- If nothing fits and it's a one-liner → CLAUDE.md
+For docs/ updates: **read the target file and integrate the learning into the existing structure.** Don't just stick it at the end. If the document would benefit from reorganization to accommodate the new knowledge, rewrite the relevant sections. The goal is a coherent document, not an append log.
 
-For CLAUDE.md updates, follow the claude-md-improver principles:
-- Keep it concise — one line per concept
-- Make commands copy-paste ready
-- Only project-specific info, never generic advice
-- Every line must earn its place in the context window
+For CLAUDE.md updates: find the right section, add a single concise line. If no section fits, consider whether it really belongs in CLAUDE.md.
+
+For new doc files: only if the topic is substantial enough to warrant one and doesn't fit in an existing file.
 
 ### 4. Present
 
-Show the user what you want to save and where, with diffs:
+Show the user what you want to save and where, with diffs and reasoning:
 
 ```
-## Knowledge to Persist
-
 ### CLAUDE.md
-**Why:** Build command wasn't documented, caused confusion.
-```diff
- ## Commands
-+`just test-unit` — Run unit tests (requires Docker for DB)
-```
+**Why:** Missing convention caused a 10-minute debugging detour.
+ ## Testing
++`just test-unit` — requires Docker running (DB tests hit real Postgres)
 
-### docs/api-patterns.md (existing file)
-**Why:** Pagination pattern discovered during debugging.
-```diff
-+## Pagination
-+The API returns max 100 items. Use `cursor` param to paginate:
-+`GET /api/items?cursor=<last_id>`
-```
+### docs/api-patterns.md (update)
+**Why:** Pagination pattern not documented, discovered during debugging.
+[Show the rewritten section, not just an append]
 
 ### Auto Memory
 - User prefers opus for code review agents
@@ -96,19 +94,8 @@ Show the user what you want to save and where, with diffs:
 
 ### 5. Apply
 
-Only after user approval. Use Edit tool for CLAUDE.md and docs/, auto memory system for user preferences.
+Only after user approval.
 
 ## Deciding to Save Nothing
 
-It's valid — and often correct — to decide nothing is worth persisting. If the session was routine work with no surprises, say so:
-
-> "I reviewed the session and don't see anything worth persisting. The work was straightforward and the relevant context is already in the code and docs."
-
-Don't save things just because the skill was invoked.
-
-## Integration with Other Skills
-
-- **jk-execute** runs knowledge promotion automatically after execution — that handles the bulk of post-execution persistence
-- **jk-remember** is for explicit, user-triggered persistence or mid-session saves
-- **jk-reflect** pairs well — reflect first, then remember what was learned
-- **claude-md-management:revise-claude-md** does session-end CLAUDE.md updates — jk-remember is broader (routes to all three destinations) and can be used mid-session
+Valid and often correct. If the work was routine with no surprises, say so and move on. Don't save things just because the skill was invoked.
