@@ -100,15 +100,17 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 
 1. Read the plan file
 2. Extract all tasks with full text (provide text to subagents — do not make them read the file)
-3. **Enter plan mode** using `EnterPlanMode`, then write an execution-focused summary to the plan file:
-   - **Executing**: Plan name and file path
-   - **Mode**: Selected execution mode and why
-   - **Tasks** (numbered, with status markers): The full task list about to be executed
-   - **Waves** (Swarm only): Which tasks run in parallel, which are serialized, and why
-   - **Verification**: What "done" looks like (test commands, expected behavior)
-   - **TL;DR** (at the bottom): A 2-3 sentence plain-English summary of what's about to happen — what gets built, how many tasks/waves, what the user should expect. This is for the user scanning the plan presentation, NOT written to the plan file on disk.
-   - **Context note** (after the TL;DR): "The plan on disk is self-contained. You can clear context (`/clear`) before execution to free up your full context window — execution will pick up from the plan file. [If there is conversation context not captured in the plan, note it and recommend against clearing.]"
-   Then call `ExitPlanMode` for final user approval before any code is written. This names the session to reflect the execution work.
+3. **Present the execution plan** — but only if the user hasn't already seen it:
+   - **If invoked from jk-plan** (plan was already presented): skip plan mode entirely, go straight to step 4. The user already reviewed the plan and chose the execution mode.
+   - **If invoked directly** (user pointed at an existing plan file): enter plan mode using `EnterPlanMode` and present:
+     - **Executing**: Plan name and file path
+     - **Mode**: Selected execution mode and why
+     - **Tasks** (numbered, with status markers): The full task list about to be executed
+     - **Waves** (Swarm only): Which tasks run in parallel, which are serialized, and why
+     - **Verification**: What "done" looks like (test commands, expected behavior)
+     - **TL;DR** (at the bottom): 2-3 sentence plain-English summary. NOT written to the plan file.
+     - **Context note**: "The plan on disk is self-contained. You can clear context (`/clear`) before execution to free up your full context window. [If conversation context isn't captured in the plan, note it and recommend against clearing.]"
+     Then call `ExitPlanMode` for user approval before any code is written.
 4. Create task list
 5. Record `BASE_SHA` (current HEAD before any implementation)
 6. Create `.jk-work/` directory if it doesn't exist

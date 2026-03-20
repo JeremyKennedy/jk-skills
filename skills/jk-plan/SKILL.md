@@ -246,43 +246,27 @@ Output: **Status:** Approved | Issues Found, then issues list if any.
 
 If issues found → fix and re-dispatch (max 3 iterations). If the reviewer keeps failing, surface to user.
 
-### Phase 6.5: Pre-Presentation Checkpoint
+### Phase 7: Final Presentation & Execution Handoff
 
-Before presenting the plan to the user, STOP and do the following:
+This is the ONLY time the user sees the plan. Everything before this point was preparation — now present it all at once.
 
-1. **Save all documents to disk.** The design doc and implementation plan MUST be written to their files and committed before proceeding. Verify the files exist on disk — do not rely on in-memory state.
-2. **Check for outstanding work.** Think about whether anything from this conversation is not yet captured in the plan files — decisions made during interview, design choices from the review panel, context that only exists in the conversation.
-3. **Present a readiness check to the user:**
+**Before presenting:**
 
-```
-I'm about to present the plan for review.
+1. **Save all documents to disk.** The design doc and implementation plan MUST be written to their files and committed. Verify the files exist on disk.
+2. **Check for outstanding context.** Is anything from this conversation not captured in the plan files? Decisions, design choices, context that only exists in the conversation.
+3. **Analyze the plan for execution mode.** Determine your recommended mode using the heuristics from jk-execute (Swarm if 3+ independent tasks, Direct if risky, Care if high-stakes, Deep as default). If recommending Swarm, work out the wave breakdown.
 
-[If everything is captured in the plan files]:
-All decisions and context from our discussion are captured in the plan documents. I recommend clearing context after reviewing the plan — the plan is self-contained and execution can start fresh.
+**Present everything in a single plan mode entry** using `EnterPlanMode`:
 
-[If there is important context NOT in the plan files]:
-Note: We still have important context in this conversation that isn't fully captured in the plan:
-- [list what's not captured]
-I recommend NOT clearing context if you accept the plan, unless we capture these items first.
-```
+- **Plan summary**: what gets built, key architecture decisions, task count
+- **Execution mode recommendation**: your pick + reasoning, with all 4 options
+- **Waves** (if Swarm): which tasks parallelize, which serialize, and why
+- **Verification**: what "done" looks like
+- **TL;DR** (at the bottom): 2-3 sentence plain-English summary of what's about to happen. NOT written to disk — this is for the user scanning before deciding.
+- **Context note**:
+  - If plan is self-contained: "The plan on disk has everything needed. I recommend clearing context (`/clear`) before execution to free up your full context window."
+  - If uncaptured context exists: "We have context in this conversation not in the plan: [list]. I recommend NOT clearing unless we capture these first."
 
-4. **Include a TL;DR** at the bottom of the plan presentation (NOT in the files on disk): a 2-3 sentence plain-English summary of what was designed, how many tasks, and what executing looks like. This is for the user scanning before deciding to accept.
+Then `ExitPlanMode`. The user accepts (or adjusts) and picks a mode — **one decision point, one presentation**.
 
-Then ask: **"Ready to review the plan?"** — wait for confirmation before entering plan mode.
-
-### Phase 7: Execution Handoff
-
-Offer execution choice:
-
-```
-Choose execution mode:
-1. Deep    — Subagent per task, sequential. Orchestrator stays clean, reviews between tasks.
-2. Direct  — Main thread, sequential. You see everything in real time. No subagents for implementation.
-3. Swarm   — Parallel subagents on independent files. Maximum speed, atomic commits.
-4. Care    — Subagent per task with human checkpoints. Structured pauses between phases.
-
-You may also clear context before execution — the plan on disk has everything needed
-to continue in a fresh conversation. This frees up your full context window for implementation.
-```
-
-Once the user picks, invoke `jk-skills:jk-execute` with the chosen mode and plan file path.
+Once the user picks, invoke `jk-skills:jk-execute` with the chosen mode and plan file path. Since the user already reviewed the plan, pass `--skip-plan-presentation` context so jk-execute skips its own plan mode entry and goes straight to execution.
