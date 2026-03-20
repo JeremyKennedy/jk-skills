@@ -124,8 +124,7 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
    Think dashboard, not document. The user should be able to scan it in 30 seconds and understand what's happening.
 
    **Bottom (what the user sees first — self-contained, target ~10-15 lines):**
-   - **Title**: what's being built
-   - Literal `## TL;DR` heading, then 4-6 sentences covering: what gets built, the approach/architecture at a high level, how many tasks, which mode and why, key decisions worth flagging. More than a tweet, less than a paragraph — give the user enough to catch problems without scrolling up.
+   - Literal `## TL;DR: [what's being built]` heading (e.g., `## TL;DR: MCP Safety Guardrails`), then 4-6 sentences covering: what gets built, the approach/architecture at a high level, how many tasks, which mode and why, key decisions worth flagging. More than a tweet, less than a paragraph — give the user enough to catch problems without scrolling up.
    - **Mode**: recommendation + one-line reasoning
    - **Context note**: can they `/clear` or not
 
