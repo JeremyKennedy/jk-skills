@@ -266,6 +266,8 @@ Note: We still have important context in this conversation that isn't fully capt
 I recommend NOT clearing context if you accept the plan, unless we capture these items first.
 ```
 
+4. **Include a TL;DR** at the bottom of the plan presentation (NOT in the files on disk): a 2-3 sentence plain-English summary of what was designed, how many tasks, and what executing looks like. This is for the user scanning before deciding to accept.
+
 Then ask: **"Ready to review the plan?"** — wait for confirmation before entering plan mode.
 
 ### Phase 7: Execution Handoff
