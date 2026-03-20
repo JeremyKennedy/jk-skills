@@ -74,6 +74,7 @@ jk-remember scales from a quick checkpoint to a full documentation audit. Match 
 - Run `tree docs/`. Is knowledge organized well? Any obvious gaps?
 - Check recent git history. Were there recent changes that should be documented?
 - Look for red flags: commands that would fail, references to deleted files, outdated paths, TODOs never completed, generic advice that wastes context window.
+- **Check for doc sprawl.** If `docs/plans/` has many files: is there an index? Are plans marked with status (planned/in-progress/complete/abandoned)? Are there undated legacy files mixed with dated ones? Are completed plans still unmarked? Suggest: create/update the plan index, add status headers to unmarked plans, archive or consolidate where appropriate.
 
 **In either case**, also check:
 - Did any tool calls fail during this session? Each failed tool call is a signal:

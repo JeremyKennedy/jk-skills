@@ -228,7 +228,9 @@ This structure informs the task decomposition — each task should produce self-
 - Bite-sized tasks (2-5 min each)
 - Exact file paths, complete code, exact commands with expected output
 - TDD: write test → verify fail → implement → verify pass → commit
-- Plan header with Goal / Architecture / Tech Stack
+- Plan header with Status / Goal / Architecture / Tech Stack
+
+**Status header:** Every plan and design doc must start with a status line: `**Status: planned**`. jk-execute updates this to `in-progress` at start and `complete` or `abandoned` at end. This way an agent that finds the file directly (not via the index) immediately knows whether it's current.
 
 **Save to:** `docs/plans/YYYY-MM-DD-<topic>.md`
 **Commit** the plan.
