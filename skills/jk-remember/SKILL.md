@@ -43,6 +43,20 @@ CLAUDE.md is part of every prompt. Not off-limits, but every addition should be 
 
 Use judgment. A three-line gotcha section is fine. A page of API docs is not — put that in docs/ and reference it.
 
+## Depth
+
+jk-remember scales from a quick checkpoint to a full documentation audit. Match the depth to the situation.
+
+**Quick** — invoked by jk-execute at a persistence checkpoint, or user wants to save one specific thing. Skim conversation context, route the obvious stuff, done in under a minute. No subagents.
+
+**Standard** — end of a work session. Reflect on the full conversation, check CLAUDE.md and docs/ for staleness, present changes. A few minutes.
+
+**Deep** — user explicitly wants a thorough review, or it's the end of a major effort. Dispatch subagents to audit CLAUDE.md quality, review docs/ coverage, check for stale commands, scan recent git history. Can take a while.
+
+**How to decide:** If the context is clear (jk-execute checkpoint → quick, user says "remember X" → standard), just go. If ambiguous — the user invoked `/remember` without context at the end of a long session — ask:
+
+> "How thorough do you want me to be? Quick save of what we learned, standard review of docs, or deep audit of all project documentation?"
+
 ## Process
 
 ### 1. Gather Context
