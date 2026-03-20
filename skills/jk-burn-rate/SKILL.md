@@ -37,9 +37,23 @@ If the user signals they're stepping away ("going to sleep", "run this while I'm
 
 > "Since you're stepping away, want me to increase the burn rate? Standard (keep current), high (opus for more things), or max (burn it all)?"
 
-To check current usage, try `npx ccusage@latest daily --since YYYYMMDD --json`. This reads local session data and reports token counts and estimated cost. If ccusage isn't available, the user needs to share their usage level or set the burn rate explicitly.
-
 If the user hasn't set a burn rate, skills follow their own model selection guidance using whatever model the user has selected in their harness. This skill only needs to be loaded when the user explicitly wants to override that default.
+
+## Usage-Aware Suggestions
+
+If `npx ccusage@latest` is available, check actual usage to inform burn rate suggestions:
+
+```bash
+npx ccusage@latest daily --since YYYYMMDD --json > /tmp/ccusage.json
+```
+
+This is slow — save to a temp file, don't pipe. Reports token counts and estimated cost from local session data.
+
+What matters is **usage relative to the reset period.** Near the end of a billing period with low usage = blast off. Early in the period with heavy spend = conserve. The agent doesn't know the user's quota or reset date — so report the trajectory and ask:
+
+> "You've spent ~$125 this week. When does your usage reset? If it's soon and you have room, we could go max."
+
+Don't check usage on every skill invocation. Check when: the user asks, burn rate is being set, or at natural pause points (plan presentation, end of execution).
 
 ## How Skills Use It
 

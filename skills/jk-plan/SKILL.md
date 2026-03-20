@@ -294,4 +294,6 @@ Statuses: `planned` → `in-progress` → `complete` / `abandoned`. jk-execute u
 
 **Persist learnings.** Invoke `jk-skills:jk-remember` (quick depth) — planning sessions generate project knowledge from the interview (decisions, constraints, domain context). This can run in the background while handing off to execution.
 
+**Suggest clearing context.** Planning is token-heavy — research, interview, design, review panel. The plan docs on disk have everything needed for execution. Suggest `/clear` before invoking jk-execute so the full context window is available for implementation. Only hold back if there's genuinely uncaptured context (check jk-remember's output).
+
 Then invoke `jk-skills:jk-execute` with the plan file path. jk-execute handles everything from here — evaluating context, choosing execution mode, presenting the plan to the user, and executing.
