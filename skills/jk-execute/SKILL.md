@@ -111,14 +111,13 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
    The plan mode UI shows the **bottom** first. Structure accordingly:
 
    **Top (main content — user scrolls up to read):**
-   Write a human-readable summary of what's being built and how. Paragraphs and bullet points, not tables of every file. Cover:
-   - What the plan accomplishes (the "why" and "what", not the code-level "how")
-   - Key architectural decisions worth knowing
+   Skimmable. Bullets, short tables, and brief elaboration — not essays or walls of text. Cover:
+   - What the plan accomplishes and key decisions
    - Task list: one line per task (number + short name)
-   - Waves (Swarm only): which tasks run together, one line per wave
+   - Waves (Swarm only): which tasks run together
    - Verification: the commands to run
 
-   This can be multiple paragraphs — it's the user's primary view of the plan. But it should read like a briefing, not a spec.
+   Think dashboard, not document. The user should be able to scan it in 30 seconds and understand what's happening.
 
    **Bottom (what the user sees first — self-contained):**
    - **Title**: what's being built
