@@ -258,6 +258,23 @@ Output: **Status:** Approved | Issues Found, then issues list if any.
 
 If issues found → fix and re-dispatch (max 3 iterations). If the reviewer keeps failing, surface to user.
 
+### Phase 6.5: Diversion Report
+
+If any diversions from user decisions were recorded during the review panel (see Phase 5 Triage), present them to the user now — before handing off to execution. This is their last chance to catch changes they didn't explicitly approve.
+
+```
+### Changes from what we discussed
+
+During the review panel, the design was adjusted in ways that differ from what you originally asked for:
+
+- **[Topic]**: You said [X], but the review found [Y], so the design now does [Z].
+- ...
+
+These are already in the design doc. Let me know if any of these should be reverted before we proceed.
+```
+
+If there are no diversions, skip this phase. Do not present an empty report.
+
 ### Phase 7: Execution Handoff
 
 jk-plan ends here. Save all documents to disk, verify they exist, commit them. Then invoke `jk-skills:jk-execute` with the plan file path. jk-execute handles everything from here — evaluating context, choosing execution mode, presenting the plan to the user, and executing.

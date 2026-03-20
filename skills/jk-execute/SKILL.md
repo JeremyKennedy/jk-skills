@@ -138,7 +138,6 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
    - What the plan accomplishes
    - How it's done (approach, architecture, key patterns)
    - Key decisions made during planning — surface these explicitly so the user can catch anything they've had second thoughts about since the interview
-   - **Plan diversions** (if any): anything that changed from what the user originally said they wanted — review panel findings that altered the design, tradeoffs that were resolved differently than discussed. These MUST be visible, not buried. If there are diversions, use a dedicated `### Diversions from Original Discussion` section so they stand out.
    - Task list: one line per task (number + short name)
    - Waves (Swarm only): which tasks run together
    - Verification: the commands to run
