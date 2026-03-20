@@ -105,21 +105,24 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 5. **Present the plan to the user** using `EnterPlanMode`.
 
    <HARD-GATE>
-   This is a SHORT, user-facing summary — NOT the plan doc. Do NOT dump the plan doc contents into the presentation. The plan doc is for agents. This presentation is for a human who wants to understand what's about to happen and approve it.
-
-   **Maximum length:** The entire presentation should fit on one screen (~30 lines). If you're writing tables of API endpoints, file-by-file descriptions, interface definitions, or test case lists, you are doing it wrong. Those belong in the plan doc on disk.
+   This is a user-facing summary — NOT the plan doc. Do NOT dump the plan doc into the presentation. No interface definitions, no full API endpoint tables, no exact code snippets, no test case lists. Those are for agents and live in the plan doc on disk. This presentation is for a human — write it like you're explaining the plan to a person, not feeding it to a machine.
    </HARD-GATE>
 
    The plan mode UI shows the **bottom** first. Structure accordingly:
 
-   **Top (user scrolls up if curious):**
-   - Task list: one line per task, just the number and a short name (e.g., "1. Create safety.ts")
+   **Top (main content — user scrolls up to read):**
+   Write a human-readable summary of what's being built and how. Paragraphs and bullet points, not tables of every file. Cover:
+   - What the plan accomplishes (the "why" and "what", not the code-level "how")
+   - Key architectural decisions worth knowing
+   - Task list: one line per task (number + short name)
    - Waves (Swarm only): which tasks run together, one line per wave
-   - Verification: the commands to run (e.g., `just check`)
+   - Verification: the commands to run
+
+   This can be multiple paragraphs — it's the user's primary view of the plan. But it should read like a briefing, not a spec.
 
    **Bottom (what the user sees first — self-contained):**
    - **Title**: what's being built
-   - **TL;DR**: 2-3 sentences. What gets built, how many tasks, which mode. Must stand alone.
+   - **TL;DR**: 2-3 sentences. What gets built, how many tasks, which mode. Must stand alone without scrolling up.
    - **Mode**: recommendation + one-line reasoning
    - **Context note**: can they `/clear` or not
 
