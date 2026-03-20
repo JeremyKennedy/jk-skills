@@ -31,7 +31,11 @@ Light means: choose cheaper models where quality won't suffer, and be less aggre
 
 ## How to Set
 
-User says it directly: "burn rate max", "go light", "standard tokens". Or infer from context.
+User says it directly: "burn rate max", "go light", "standard tokens".
+
+If the user signals they're stepping away ("going to sleep", "run this while I'm gone", "back in a few hours"), **offer** to increase burn rate — don't auto-increase. The user may still want budget-conscious work. Something like:
+
+> "Since you're stepping away, want me to increase the burn rate? Standard (keep current), high (opus for more things), or max (burn it all)?"
 
 If the user hasn't set a burn rate, skills follow their own model selection guidance using whatever model the user has selected in their harness. This skill only needs to be loaded when the user explicitly wants to override that default.
 
