@@ -135,6 +135,8 @@ Cover: architecture, components, data flow, error handling, testing approach, fi
 **Save to:** `docs/plans/YYYY-MM-DD-<topic>-design.md`
 **Commit** the design doc.
 
+**Audience:** The design doc is for agents. Be thorough — exact file paths, data flow, error handling, integration points. Agents will read this to understand what to build. The user participates during the interview and sees the plan presentation later; they are not expected to read the doc on disk.
+
 ### Phase 5: Review Panel
 
 Launch 4-6 reviewer subagents **in parallel** to tear apart the design. Each reviewer is a fresh agent with no sunk cost in the plan.
@@ -221,6 +223,8 @@ This structure informs the task decomposition — each task should produce self-
 
 **Save to:** `docs/plans/YYYY-MM-DD-<topic>.md`
 **Commit** the plan.
+
+**Audience:** The implementation plan is for agents. Be maximally detailed — exact code, exact commands, exact expected output. Agents executing tasks will read this verbatim. The user sees a summarized version in the CC plan presentation (handled by jk-execute), not this document.
 
 **Plan review loop:** After writing the plan, dispatch a single plan reviewer (model: `sonnet` — clear criteria, checkable against the design doc):
 

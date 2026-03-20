@@ -102,23 +102,22 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 2. Extract all tasks with full text (provide text to subagents — do not make them read the file)
 3. **Check for outstanding context.** Is anything from the conversation not captured in the plan files? Decisions, design choices, context that only exists in the conversation.
 4. **Determine execution mode.** If the user specified a mode, use it. Otherwise, analyze the plan and recommend one (see Mode Selection above). If recommending Swarm, work out the wave breakdown.
-5. **Present the plan** using `EnterPlanMode`. The user is assumed to NOT have read the docs on disk — this presentation is their primary view of the plan. The plan mode UI shows the **bottom** of the content first, so structure accordingly:
+5. **Present the plan to the user** using `EnterPlanMode`. This is user-facing — keep it concise. The detailed docs on disk are for agents; this presentation is for the human to understand and approve. The plan mode UI shows the **bottom** first, so structure accordingly:
 
-   **Top (detail — user scrolls up to see):**
-   - Full task list (numbered, with status markers)
-   - Waves (Swarm only): which tasks parallelize, which serialize, and why
-   - Verification: what "done" looks like
-   - Key architecture decisions and file structure
+   **Top (detail the user can scroll up to see if curious):**
+   - Task list (numbered, short descriptions — NOT the full verbose task text from the plan doc)
+   - Waves (Swarm only): which tasks parallelize, which serialize
+   - What "done" looks like (test commands, expected behavior)
 
-   **Bottom (what the user actually sees first):**
+   **Bottom (what the user actually sees first — must be self-contained):**
    - **Title**: what's being built
-   - **TL;DR**: 2-3 sentence self-contained summary — what gets built, how many tasks, which execution mode and why. This must make sense on its own without reading the detail above.
-   - **Execution mode**: your recommendation + all 4 options
+   - **TL;DR**: 2-3 sentences covering: what gets built, how (N tasks, execution mode), key decisions. Must make complete sense without scrolling up.
+   - **Execution mode**: your recommendation with one-line reasoning + all 4 options listed
    - **Context note**:
-     - If self-contained: "The plan on disk has everything needed. You can `/clear` before execution to free up your full context window."
-     - If uncaptured context: "Important context from this conversation isn't in the plan: [list]. Recommend NOT clearing."
+     - If self-contained: "Plan docs have everything needed. You can `/clear` before execution to free up context."
+     - If uncaptured context: "This conversation has context not in the plan: [list]. Recommend NOT clearing."
 
-   Then `ExitPlanMode`. One decision point — the user accepts and picks a mode.
+   Then `ExitPlanMode`. One decision point — user accepts and picks a mode.
 
 6. Create task list
 7. Record `BASE_SHA` (current HEAD before any implementation)
