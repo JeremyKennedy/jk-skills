@@ -9,12 +9,25 @@ description: "Use when executing an implementation plan — four modes: Deep (su
 
 Execute an implementation plan using one of four execution topologies. Each mode uses per-task review (spec compliance + code quality) and ends with jk-prove-it.
 
-**Memory checkpoints:** Save to memory at these points:
-- **Before presenting the plan** (step 5 in Setup) — last chance before the user might `/clear`
-- **After all tasks complete, before jk-prove-it** — save wisdom, conventions discovered, gotchas hit during execution
-- **After jk-prove-it completes** — save verification results, anything learned about the codebase
+**Wisdom vs Memory — two different persistence systems:**
 
-Save things useful in future sessions: project decisions, user preferences, constraints, patterns. Don't save ephemeral task state.
+| | Wisdom | Memory |
+|---|--------|--------|
+| **Scope** | This plan execution only | Cross-session, long-lived |
+| **Audience** | Subagents executing later tasks in this plan | Future you, working on this project next month |
+| **Content** | Conventions discovered, gotchas hit, commands that worked, patterns to follow | Project decisions, user preferences, architectural constraints, domain knowledge |
+| **Path** | `.jk-work/<plan-slug>/wisdom.md` (derived from plan filename) | Auto memory system (`~/.claude/projects/.../memory/`) |
+| **Lifecycle** | Created during execution, archived with plan docs when done | Persists indefinitely |
+| **Example** | "This codebase uses vitest not jest" / "Import from ./types not ./index" | "User prefers Swarm mode" / "Imports are highest-risk — always verify target client" |
+
+**Wisdom** compounds across tasks — task 5 benefits from what task 1 learned. It's transient to the execution.
+
+**Memory checkpoints** (save to auto memory, not wisdom):
+- **Before presenting the plan** — last chance before the user might `/clear`. Save project decisions, user preferences, constraints from the planning conversation.
+- **After all tasks complete, before jk-prove-it** — promote any wisdom that's broadly useful to memory (e.g., "this project's test runner is X" is worth remembering). Leave execution-specific gotchas in wisdom.
+- **After jk-prove-it completes** — save verification learnings, anything about the codebase worth knowing next time.
+
+**After execution completes**, archive the wisdom file alongside the plan: copy `.jk-work/<plan-slug>/wisdom.md` to `docs/plans/<plan-slug>-wisdom.md` and commit. This preserves execution context with the plan for reference.
 
 > **REQUIRED SUB-SKILL:** Use jk-skills:jk-philosophy
 
@@ -140,7 +153,7 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 
 6. Create task list
 7. Record `BASE_SHA` (current HEAD before any implementation)
-8. Create `.jk-work/` directory if it doesn't exist
+8. Derive `<plan-slug>` from the plan filename (e.g., `2026-03-20-mcp-safety` from `2026-03-20-mcp-safety.md`). Create `.jk-work/<plan-slug>/` directory.
 
 ## Hard Directive (Deep, Direct, and Swarm)
 
@@ -177,7 +190,7 @@ For each task:
 4. If spec fails → implementer fixes → re-review (max 3 cycles)
 5. **Dispatch code quality reviewer** — is the code clean?
 6. If quality fails → implementer fixes → re-review (max 3 cycles)
-7. **Extract wisdom** from this task and append to `.jk-work/wisdom.md`:
+7. **Extract wisdom** from this task and append to `.jk-work/<plan-slug>/wisdom.md`:
    - Conventions discovered
    - Gotchas hit
    - Commands that worked
@@ -189,7 +202,7 @@ For each task:
 
 Each task's implementer receives all accumulated wisdom from previous tasks. This compounds — later tasks benefit from everything learned earlier.
 
-Write wisdom to `.jk-work/wisdom.md` after each task. Read it before dispatching the next implementer.
+Write wisdom to `.jk-work/<plan-slug>/wisdom.md` after each task. Read it before dispatching the next implementer.
 
 ### Round Table
 
@@ -242,7 +255,7 @@ For each task, execute directly in the main thread — no implementer subagent:
 6. If spec fails → fix directly → re-review (max 3 cycles)
 7. **Dispatch code quality reviewer** (subagent) — is the code clean?
 8. If quality fails → fix directly → re-review (max 3 cycles)
-9. **Extract wisdom** and append to `.jk-work/wisdom.md`
+9. **Extract wisdom** and append to `.jk-work/<plan-slug>/wisdom.md`
 10. Mark task complete
 
 Reviewers still run as subagents — the point of Direct mode is that *implementation* happens in the main thread, not that everything does.
@@ -309,9 +322,9 @@ For each wave:
 
 ### Per-Agent Wisdom
 
-Each agent writes its learnings to `.jk-work/wisdom-task-N.md` (where N is the task number). No shared file — no race conditions.
+Each agent writes its learnings to `.jk-work/<plan-slug>/wisdom-task-N.md` (where N is the task number). No shared file — no race conditions.
 
-Later waves read all existing `wisdom-task-*.md` files before beginning.
+Later waves read all existing `.jk-work/<plan-slug>/wisdom-task-*.md` files before beginning.
 
 ### Per-Task Review
 
@@ -324,7 +337,7 @@ After each implementer completes:
 ### Coordinator
 
 After all waves complete:
-1. Merge all `wisdom-task-*.md` files into `.jk-work/wisdom.md`
+1. Merge all `.jk-work/<plan-slug>/wisdom-task-*.md` files into `.jk-work/<plan-slug>/wisdom.md`
 2. Report completion status for all tasks
 3. Report any failures or issues
 
@@ -340,7 +353,7 @@ After all waves complete:
 
 ### Per-Task Execution
 
-Same as Deep mode: subagent per task, sequential, per-task review pipeline, wisdom accumulation in `.jk-work/wisdom.md`.
+Same as Deep mode: subagent per task, sequential, per-task review pipeline, wisdom accumulation in `.jk-work/<plan-slug>/wisdom.md`.
 
 ### Human Checkpoints
 
