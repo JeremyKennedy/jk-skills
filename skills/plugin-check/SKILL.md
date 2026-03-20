@@ -22,6 +22,7 @@ Read `~/.claude/plugins/installed_plugins.json` and check for the plugins listed
 | `pr-review-toolkit@*` | jk-execute (round table), jk-code-review | silent-failure-hunter, test-analyzer, and doc-analyzer agents absorbed. Confidence scoring adopted in jk-execute. |
 | `code-review@*` | jk-code-review | jk-code-review dispatches code-reviewer with the same pattern plus integration with jk-execute's per-task review pipeline. |
 | `code-simplifier@*` | simplify (repo-local skill) | Overlapping purpose — simplify reviews changed code for reuse, quality, and efficiency. |
+| `claude-md-management@*` | jk-remember, jk-execute (knowledge promotion) | jk-remember routes knowledge to CLAUDE.md, docs/, or memory. jk-execute's knowledge promotion updates CLAUDE.md and docs/ after execution. The revise-claude-md command is subsumed by jk-remember's broader routing. |
 
 ## Complementary Plugins (keep these)
 
@@ -31,7 +32,6 @@ These plugins provide capabilities jk-skills does NOT cover. Do not recommend un
 - `playwright@*` — browser automation
 - `frontend-design@*` — UI/component design
 - `commit-commands@*` — git commit/PR workflow
-- `claude-md-management@*` — CLAUDE.md maintenance
 - `hookify@*` — hook management
 - `*-lsp@*` — language server plugins
 - `telegram@*` — messaging channel

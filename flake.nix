@@ -26,6 +26,8 @@
           "writing-skills"
           "jk-brainstorm"
           "jk-converse"
+          "jk-reflect"
+          "jk-remember"
           "plugin-check"
         ];
       in {

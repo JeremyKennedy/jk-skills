@@ -72,6 +72,21 @@
       },
       "status": "absorbed",
       "notes": "code-explorer and code-architect agents absorbed into jk-plan Phase 1 and Phase 4. Workflow superseded by jk-plan + jk-execute. code-reviewer overlaps with jk-skills."
+    },
+    {
+      "name": "claude-md-management",
+      "repo": "anthropics/claude-plugins-official",
+      "path": "plugins/claude-md-management",
+      "last_checked_sha": "55b58ec6e5649104f926ba7558b567dc8d33c5ff",
+      "last_checked_date": "2026-03-20",
+      "absorbed": {
+        "skills": [
+          "claude-md-improver"
+        ],
+        "agents": []
+      },
+      "status": "absorbed",
+      "notes": "Quality criteria, update guidelines, and routing patterns absorbed into jk-remember and jk-execute knowledge promotion. revise-claude-md command subsumed by jk-remember's broader routing (CLAUDE.md + docs/ + memory)."
     }
   ]
 }

@@ -34,11 +34,11 @@ Execute an implementation plan using one of four execution topologies. Each mode
 After all tasks complete, promote project-level learnings from wisdom to docs. This is how cross-plan knowledge compounds — future planning sessions benefit from what past executions discovered.
 
 1. **Gather candidates.** Read the wisdom file. Filter for entries that are about the *project* (not about this specific execution). "The API paginates at 100" is project knowledge. "Task 3 needed a retry" is not.
-2. **Map the doc structure.** Run `tree docs/` (or `ls docs/` if no tree). Read `CLAUDE.md` references section if it exists. This gives you the project's documentation topology.
-3. **Dispatch a sonnet subagent** with the wisdom candidates + the doc tree. Prompt:
+2. **Map the doc structure.** Run `tree docs/` (or `ls docs/` if no tree). Read `CLAUDE.md`. This gives you the project's documentation topology and current CLAUDE.md content.
+3. **Dispatch a sonnet subagent** with the wisdom candidates + the doc tree + CLAUDE.md content. Prompt:
 
    ```
-   You have project learnings from a completed plan execution and the project's doc structure.
+   You have project learnings from a completed plan execution, the project's doc structure, and its CLAUDE.md.
 
    Learnings to place:
    [filtered wisdom entries]
@@ -46,17 +46,24 @@ After all tasks complete, promote project-level learnings from wisdom to docs. T
    Doc structure:
    [tree output]
 
+   Current CLAUDE.md:
+   [content]
+
    For each learning, decide:
+   - CLAUDE_MD: belongs in CLAUDE.md — one-liner, essential for every future session (commands, conventions, gotchas). Only if it earns its place in the context window.
    - EXISTING: belongs in [specific doc file] — append under [section]
    - NEW: important enough for a new doc file — suggest filename and location
    - GENERAL: no specific doc fits — goes in docs/project-knowledge.md
    - SKIP: not worth persisting (too specific to this execution)
 
+   CLAUDE.md additions must be concise — one line per concept, copy-paste ready, project-specific only. Don't duplicate what's already there.
+
    Output a routing table: one line per learning with the decision and target.
    ```
 
-4. **Apply the routing.** Read each target doc, append the learning in context. For `docs/project-knowledge.md`, create it if it doesn't exist — organized by topic headings, append-only.
-5. **Commit** the doc updates.
+4. **Apply the routing.** For CLAUDE.md, use targeted edits under the appropriate section. For docs/, read each target doc and append in context. For `docs/project-knowledge.md`, create if it doesn't exist — organized by topic headings, append-only.
+5. **Present changes to the user** before committing — show diffs and reasoning for each update, especially CLAUDE.md changes (context window is precious).
+6. **Commit** the approved doc updates.
 
 This is lightweight — the subagent only reads the tree and wisdom, not every doc file. The orchestrator reads individual docs only when appending.
 
