@@ -64,6 +64,18 @@ Each agent gets:
 - **Constraints:** Don't change other code
 - **Expected output:** Summary of what you found and fixed
 
+### 2.5. Choose the Right Model
+
+Match agent model to task type — wrong model selection is a common source of subtle bugs:
+
+| Task type | Model | Why |
+|-----------|-------|-----|
+| Read-only investigation, exploration, summarization | `sonnet` | No design decisions, clear criteria |
+| Code modifications requiring type awareness (TypeScript, Rust, Go) | `opus` | Type-level reasoning, API awareness, catches subtle errors |
+| Mechanical changes (rename, formatting, imports) | `sonnet` or `haiku` | Trivially verifiable output |
+
+**Common failure mode:** Dispatching `sonnet` agents for TypeScript code changes. They produce code that looks correct but uses APIs that don't exist in the runtime (e.g., `Array.toSorted()` in Node 18), breaks type narrowing with incorrect patterns (e.g., `if (r.error)` vs `'error' in r`), or misses generic constraints. Use `opus` for any code change that requires understanding type relationships.
+
 ### 3. Dispatch in Parallel
 
 ```typescript
@@ -79,6 +91,7 @@ Task("Fix tool-approval-race-conditions.test.ts failures")
 When agents return:
 - Read each summary
 - Verify fixes don't conflict
+- **Run the project's CI/type-check locally before pushing.** Agents can produce code that compiles in isolation but has subtle type errors, uses unavailable APIs, or breaks downstream consumers. Never push agent output without verification.
 - Run full test suite
 - Integrate all changes
 
