@@ -16,7 +16,7 @@ Execute an implementation plan using one of four execution topologies. Each mode
 | **Scope** | This plan execution only | Cross-session, long-lived |
 | **Audience** | Subagents executing later tasks in this plan | Future you, working on this project next month |
 | **Content** | Conventions discovered, gotchas hit, commands that worked, patterns to follow | Project decisions, user preferences, architectural constraints, domain knowledge |
-| **Path** | `.jk-work/<plan-slug>/wisdom.md` (derived from plan filename) | Auto memory system (`~/.claude/projects/.../memory/`) |
+| **Path** | `.jk-work/<plan-slug>/wisdom.md` (derived from plan filename) | Agent memory system, if available (Claude Code: `~/.claude/projects/.../memory/`) |
 | **Lifecycle** | Created during execution, archived with plan docs when done | Persists indefinitely |
 | **Example** | "This codebase uses vitest not jest" / "Import from ./types not ./index" | "User prefers Swarm mode" / "Imports are highest-risk — always verify target client" |
 
@@ -27,7 +27,7 @@ Execute an implementation plan using one of four execution topologies. Each mode
 - **After all tasks complete, before jk-prove-it** — feed it the wisdom file as additional context
 - **After jk-prove-it completes**
 
-jk-remember handles routing (CLAUDE.md vs docs/ vs auto memory), the CLAUDE.md gate, and user approval. Don't reimplement its logic here.
+jk-remember handles routing (agent instructions vs docs/ vs auto memory), the agent-instructions gate, and user approval. Don't reimplement its logic here.
 
 **After execution completes**, archive the wisdom file alongside the plan: copy `.jk-work/<plan-slug>/wisdom.md` to `docs/plans/<plan-slug>-wisdom.md` and commit.
 

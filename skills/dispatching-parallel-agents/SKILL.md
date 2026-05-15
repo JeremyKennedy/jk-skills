@@ -68,12 +68,11 @@ Each agent gets:
 
 ### 3. Dispatch in Parallel
 
-```typescript
-// In Claude Code / AI environment
-Task("Fix agent-tool-abort.test.ts failures")
-Task("Fix batch-completion-behavior.test.ts failures")
-Task("Fix tool-approval-race-conditions.test.ts failures")
-// All three run concurrently
+```text
+Use your environment's subagent/delegation mechanism:
+Claude Code: Task("Fix agent-tool-abort.test.ts failures")
+OpenCode: task(description="Fix abort tests", subagent_type="general", prompt="Fix agent-tool-abort.test.ts failures")
+Dispatch one task each for batch completion and tool approval too; all three run concurrently.
 ```
 
 ### 4. Review and Integrate

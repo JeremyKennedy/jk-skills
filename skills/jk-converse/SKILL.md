@@ -7,7 +7,7 @@ description: "Set up a structured async conversation between two agents via a sh
 
 **Announce at start:** "I'm using the jk-converse skill to set up a structured conversation with another agent."
 
-Structured async conversation between two Claude Code sessions via a shared markdown file. One agent initiates, the other responds, the user bridges them.
+Structured async conversation between two agent sessions via a shared markdown file. One agent initiates, the other responds, the user bridges them.
 
 ## Roles
 
@@ -29,7 +29,7 @@ You own the file. You write first. You watch for changes.
 
 The user bridges the two sessions. Their job:
 
-1. Go to the other Claude Code session
+1. Go to the other agent session
 2. Paste the instructions you give them (file path + protocol)
 3. That's it — they don't mediate content, just connect the sessions
 
@@ -37,7 +37,7 @@ Give the user a **copy-pasteable block** they can drop into the other session. D
 
 ### The other agent
 
-The other agent is in a separate Claude Code session. It does NOT have this skill loaded. It gets its instructions from the copy-pasteable block the user pastes in. Its job:
+The other agent is in a separate agent session. It does NOT have this skill loaded. It gets its instructions from the copy-pasteable block the user pastes in. Its job:
 
 1. Read the conversation file
 2. Append a response following the message format
@@ -71,7 +71,7 @@ After creating the file and writing your opening, give the user a single copy-pa
 Example — adapt this to your actual file path and topic:
 
 ````
-Paste this into the other Claude Code session:
+Paste this into the other agent session:
 
 ```
 Read /absolute/path/to/conversation.md — it contains a conversation about <topic>.

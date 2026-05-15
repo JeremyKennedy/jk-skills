@@ -1,6 +1,6 @@
 ---
 name: jk-remember
-description: "Use when the user says 'remember this', wants to persist a learning, or at the end of significant work — reflects on how to make things better for future sessions, routes knowledge to CLAUDE.md, docs/, or auto memory."
+description: "Use when the user says 'remember this', wants to persist a learning, or at the end of significant work — reflects on how to make things better for future sessions, routes knowledge to agent instructions, docs/, or auto memory."
 ---
 
 # Remember
@@ -21,21 +21,21 @@ Step back and reflect on how to make future sessions better. Persist knowledge t
 
 | Destination | What belongs here | Examples |
 |-------------|------------------|----------|
-| **CLAUDE.md** | Conventions, commands, gotchas, references to docs/. Every line costs context window, but multi-line entries and sections are fine when justified. | `just test-unit` requires Docker / See docs/api.md for pagination patterns |
+| **Agent instructions** | Conventions, commands, gotchas, references to docs/. Every line costs context window, but multi-line entries and sections are fine when justified. Examples: `CLAUDE.md`, `AGENTS.md`, or equivalent. | `just test-unit` requires Docker / See docs/api.md for pagination patterns |
 | **docs/** | Domain knowledge, decisions, reference material. Can be long and detailed, organized by topic. | API pagination patterns / why we chose Postgres / deployment quirks |
 | **Auto memory** | User preferences, collaboration style — about the person, not the project | User prefers Swarm mode / wants terse responses |
 
 **Routing test:** Would a different person working on this project need this?
-- Yes → CLAUDE.md or docs/
+- Yes → agent instructions or docs/
 - No → auto memory
 
 Does it need depth or is a line enough?
-- One-liner or reference → CLAUDE.md
+- One-liner or reference → agent instructions
 - Needs explanation → docs/
 
-### CLAUDE.md Rules
+### Agent Instructions Rules
 
-CLAUDE.md is part of every prompt. Not off-limits, but every addition should be justified.
+Agent instructions files are part of every prompt. Not off-limits, but every addition should be justified.
 
 **Belongs:** project-specific conventions, commands, gotchas, doc references, things where a wrong assumption causes real problems, things not derivable from the code.
 
@@ -49,7 +49,7 @@ jk-remember scales from a quick checkpoint to a full documentation audit. Match 
 
 **Quick** — invoked by jk-execute at a persistence checkpoint, or user wants to save one specific thing. Skim conversation context, route the obvious stuff, done in under a minute. No subagents.
 
-**Standard** — end of a work session. Reflect on the full conversation, check CLAUDE.md and docs/ for staleness, present changes. A few minutes.
+**Standard** — end of a work session. Reflect on the full conversation, check agent instructions and docs/ for staleness, present changes. A few minutes.
 
 **Deep** — end of a major effort. Dispatch parallel subagents to audit different areas (CLAUDE.md quality, docs/ coverage, stale commands, plan index health), synthesize findings, present improvements.
 
@@ -74,7 +74,7 @@ For deep/overhaul, check the session's burn rate (see `jk-skills:jk-burn-rate`) 
 - What decisions were made and why?
 
 **If blank session** — audit the project's documentation health:
-- Read CLAUDE.md. Is anything stale, wrong, or missing?
+- Read the project agent instructions file (`CLAUDE.md`, `AGENTS.md`, or equivalent). Is anything stale, wrong, or missing?
 - Run `tree docs/`. Is knowledge organized well? Any obvious gaps?
 - Check recent git history. Were there recent changes that should be documented?
 - Look for red flags: commands that would fail, references to deleted files, outdated paths, TODOs never completed, generic advice that wastes context window.
@@ -94,7 +94,7 @@ For deep/overhaul, check the session's burn rate (see `jk-skills:jk-burn-rate`) 
   Surface these to the user — sometimes the fix is better docs, sometimes it's a better tool, sometimes it's a new skill.
 
 - Did you follow a recurring workflow pattern that isn't captured in a skill? Did you work around a skill's limitations? Did you wish a skill existed? Suggest:
-  - **New skill**: if a workflow was repeated or improvised that would benefit from structure. Ask: should this be committed to the repo (`.claude/skills/` — shared with the team) or personal (`~/.claude/skills/` — just for you)?
+  - **New skill**: if a workflow was repeated or improvised that would benefit from structure. Ask: should this be committed to the repo-local skills/runbooks directory (shared with the team) or the agent's personal skills directory (just for you)?
   - **Skill update**: if an existing skill was missing a step, had stale advice, or didn't cover an edge case you hit
 
 ### 2. Filter
@@ -110,11 +110,11 @@ Saving nothing is a valid outcome. Don't save things just because the skill was 
 
 ### 3. Route
 
-**Check existing structure first.** Run `tree docs/` and read CLAUDE.md.
+**Check existing structure first.** Run `tree docs/` and read the project agent instructions file.
 
 For docs/ updates: read the target file and **integrate the learning into the existing structure.** If the document would benefit from reorganization, rewrite the relevant sections. The goal is a coherent document, not an append log.
 
-For CLAUDE.md updates: find the right section. Add concise, justified content.
+For agent-instructions updates: find the right section. Add concise, justified content.
 
 For new doc files: only if the topic is substantial and doesn't fit in an existing file.
 
@@ -123,7 +123,7 @@ For new doc files: only if the topic is substantial and doesn't fit in an existi
 Show the user what you want to change and where, with diffs and reasoning:
 
 ```
-### CLAUDE.md
+### Agent instructions
 **Why:** Missing convention caused a debugging detour.
  ## Testing
 +`just test-unit` — requires Docker running (DB tests hit real Postgres)

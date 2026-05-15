@@ -1,6 +1,6 @@
 ---
 name: using-jk-skills
-description: Use when starting any conversation — establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions
+description: Use when starting any conversation — establishes how to find and use skills, requiring native skill loading/invocation before ANY response including clarifying questions
 ---
 
 <EXTREMELY-IMPORTANT>
@@ -13,7 +13,7 @@ This is not negotiable. This is not optional. You cannot rationalize your way ou
 
 ## How to Access Skills
 
-**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you — follow it directly. Never use the Read tool on skill files.
+Use the host environment's native skill-loading mechanism. Claude Code: use the `Skill` tool. OpenCode: use the `skill` tool when available. When you invoke a skill, its content is loaded and presented to you — follow it directly. Do not manually read skill files when a native skill loader is available.
 
 **In other environments:** Check your platform's documentation for how skills are loaded.
 

@@ -66,7 +66,7 @@ Launch **2-3 code-explorer agents in parallel** (model: `sonnet` — exploration
 
 After agents return:
 - **Read all key files they identified** — build deep context, not just summaries
-- Read project CLAUDE.md, docs/, and recent git history
+- Read project agent instructions (`CLAUDE.md`, `AGENTS.md`, or equivalent), docs/, and recent git history
 - If external technologies are involved, research them (web search, Context7)
 - Identify: what exists, what's adjacent, what conventions apply, what could break
 
@@ -144,8 +144,8 @@ Launch 4-6 reviewer subagents **in parallel** to tear apart the design. Each rev
 
 **All reviewers:**
 - Type: `general-purpose`
-- Tools: Read, Grep, Glob (read-only)
-- Must read the design doc AND the project CLAUDE.md
+- Tools: read-only file reading and search tools (for example Read/Grep/Glob)
+- Must read the design doc AND the project agent instructions file (`CLAUDE.md`, `AGENTS.md`, or equivalent)
 - Must explore relevant codebase areas
 - Output: verdict (PASS/FAIL) + issues list, each with severity (Critical/Important/Minor) and a suggested fix
 
@@ -156,11 +156,11 @@ Launch 4-6 reviewer subagents **in parallel** to tear apart the design. Each rev
 | **Gaps** | `opus` | What's missing? Requirements implied but not addressed? Error cases not handled? Features mentioned but not designed? |
 | **Assumptions** | `opus` | What does the plan assume that might not be true? What's fragile? What could change? What external dependencies could break? |
 | **Edge Cases** | `opus` | Empty input, concurrent access, partial failure, network errors, scale (10x and 0.1x), race conditions, data corruption |
-| **Conventions** | `sonnet` | Does the plan follow project CLAUDE.md? Correct file locations, naming patterns, config patterns, error handling, testing patterns? |
+| **Conventions** | `sonnet` | Does the plan follow project agent instructions? Correct file locations, naming patterns, config patterns, error handling, testing patterns? |
 | **Security** | `opus` | Injection vectors, auth gaps, secret handling, unsafe defaults, OWASP top 10, supply chain concerns |
 | **Simplicity** | `sonnet` | Is any part over-engineered? Could anything be done more simply? Are there unnecessary abstractions? YAGNI violations? |
 
-Model rationale: Gaps, Assumptions, Edge Cases, and Security require deep judgment about what *could* go wrong — hard to verify if the reviewer misses something. Conventions and Simplicity have clear, checkable criteria against the CLAUDE.md and codebase.
+Model rationale: Gaps, Assumptions, Edge Cases, and Security require deep judgment about what *could* go wrong — hard to verify if the reviewer misses something. Conventions and Simplicity have clear, checkable criteria against the agent instructions and codebase.
 
 #### Triage
 
@@ -182,7 +182,7 @@ After fixing issues, run three categories of reviewers:
 
 1. **Failed dedicated agents** — Re-run the reviewers that found Critical/Important issues, to verify fixes.
 2. **Delta agent** — A new reviewer focused on second-order effects. Prompt: "Here is the design doc diff since last cycle and a summary of what was flagged and fixed. What new issues do these changes introduce? Look for second-order effects: a fix in one area creating problems in another, shifted assumptions, new gaps, new complexity." Give it the diff AND a short summary of each fix (issue → resolution).
-3. **Free agent** — A new reviewer with no assigned domain and no access to previous reviewer outputs. Prompt: "You are a fresh reviewer with no assigned domain. Review this design for any issues — correctness, completeness, consistency, elegance, anything. You are specifically valuable because the dedicated reviewers each have a narrow lens. Find what they missed." Give it only the current design doc and project CLAUDE.md. Do NOT show it previous cycle results — avoid anchoring.
+3. **Free agent** — A new reviewer with no assigned domain and no access to previous reviewer outputs. Prompt: "You are a fresh reviewer with no assigned domain. Review this design for any issues — correctness, completeness, consistency, elegance, anything. You are specifically valuable because the dedicated reviewers each have a narrow lens. Find what they missed." Give it only the current design doc and project agent instructions. Do NOT show it previous cycle results — avoid anchoring.
 
 Scale the re-cycle to the severity of what was found. If only one dedicated agent failed on a minor point, re-running just that agent may be enough. If major issues were found across multiple domains, the full three-category re-cycle is warranted. Use judgment.
 
