@@ -54,7 +54,7 @@ The test: after you're done, is the system **actually better**, or did you just 
 ## No Dead Code, No Compromises
 
 - Delete what's broken. Don't comment it out.
-- No backwards-compatibility shims for things nobody uses.
+- No backwards-compatibility shims for renamed or retired internal surfaces. If nothing external depends on the old shape, delete it outright: no aliases, hidden commands, fallback fields, compatibility routes, or read-side normalizers.
 - No `// TODO: clean this up later` — clean it up now.
 - No feature flags for incomplete work that will never ship.
 - If something exists in the codebase, it must earn its place. If it doesn't pull its weight, remove it.
