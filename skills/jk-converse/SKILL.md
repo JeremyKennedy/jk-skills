@@ -18,10 +18,11 @@ There are exactly three participants. Each has a clear contract.
 You invoked this skill. Your job:
 
 1. **Create the conversation file** with context and your opening position
-2. **Start `inotifywait`** to watch the file for the other agent's response
-3. **Read and respond** when the file changes
-4. **Repeat** until convergence
-5. **Tell the user** the file path and what to paste into the other session
+2. **Check whether the other agent already replied** before waiting
+3. **Start `inotifywait`** only after recording the current file position
+4. **Read and respond** when the file changes
+5. **Repeat** until convergence
+6. **Tell the user** the file path and what to paste into the other session
 
 You own the file. You write first. You watch for changes.
 
@@ -105,25 +106,36 @@ Convergence: we iterate until we reach agreement. When you're satisfied, write "
 
 This is the contract. The other agent gets everything it needs from this block — no skill loading required.
 
-## Step 3: Watch for Responses
+## Step 3: Read Current Tail, Then Watch
 
-After the user confirms they've pasted the handoff block, start watching:
+After the user confirms they've pasted the handoff block, **first check whether the other agent already responded**. The user may have pasted the handoff, the other agent may have appended a reply, and only then told you to listen. If you blindly start `inotifywait`, you'll wait forever on a response that is already in the file.
+
+Use this order:
 
 ```bash
-inotifywait -e modify /path/to/conversation.md
+file=/path/to/conversation.md
+start_lines=$(wc -l < "$file")
+# Read from the last line you previously saw + 1. If you have no saved offset,
+# inspect the tail for any Agent-2 message before deciding to wait.
+tail -n 80 "$file"
+inotifywait -e modify "$file"
 ```
 
-Run this with `run_in_background: true`. When notified, read the new content (use offset to skip what you already read) and append your response.
+If the tail already contains a new message from the other agent, read it and respond immediately — do **not** wait for another modification. If there is no new message, record `start_lines`, then watch. When notified, read from `start_lines + 1` and append your response.
+
+Run background watches only in harnesses with real async monitor support. In synchronous harnesses, use a foreground blocking wait as the final action of the turn so the notification returns to you.
 
 ## Turn Loop
 
 ```
 1. Write your message (append to file)
-2. Start inotifywait in background
-3. Wait for notification
-4. Read the new content (offset past what you've already seen)
-5. Write your response
-6. Repeat from step 2
+2. Save the current line count / offset
+3. Before waiting, inspect the tail for an already-appended response
+4. If no response is present, start `inotifywait`
+5. Wait for notification
+6. Read the new content (offset past what you've already seen)
+7. Write your response
+8. Repeat from step 2
 ```
 
 The critical mistake is **not waiting**. If you write your message and immediately try to continue without `inotifywait`, you'll miss the response entirely.
@@ -173,7 +185,8 @@ Most conversations converge in 2-4 rounds. If you're past 4 rounds without agree
 
 | Mistake | Fix |
 |---------|-----|
-| Not waiting for response (no `inotifywait`) | Always watch the file before expecting a reply |
+| Not waiting for response (no `inotifywait`) | Watch the file after recording your current offset |
+| Waiting even though the response is already in the file | Read the current tail before starting `inotifywait`; respond immediately if Agent-2 already wrote |
 | Handoff block missing file path or format rules | Other agent can't participate without the full contract |
 | Messages too long and unfocused | Lead with your position, then supporting evidence |
 | No explicit questions at the end | Every message should drive toward a decision |
