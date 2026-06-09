@@ -69,10 +69,12 @@ Each agent gets:
 ### 3. Dispatch in Parallel
 
 ```text
-Use your environment's subagent/delegation mechanism:
-Claude Code: Task("Fix agent-tool-abort.test.ts failures")
-OpenCode: task(description="Fix abort tests", subagent_type="general", prompt="Fix agent-tool-abort.test.ts failures")
-Dispatch one task each for batch completion and tool approval too; all three run concurrently.
+Use your environment's subagent/delegation mechanism (see `using-jk-skills/references/host-adapters.md`):
+- Claude Code: `Task("Fix agent-tool-abort.test.ts failures")`
+- Pi: `subagent({ tasks: [{ agent: "worker", task: "Fix agent-tool-abort.test.ts failures" }], async: true })`
+- OpenCode: `task(description="Fix abort tests", subagent_type="general", prompt="Fix agent-tool-abort.test.ts failures")`
+
+Dispatch one task each for batch completion and tool approval too; all three run concurrently. Prefer async/no foreground timeout for productive agents; use status/control to monitor.
 ```
 
 ### 4. Review and Integrate

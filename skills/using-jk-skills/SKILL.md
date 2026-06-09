@@ -13,9 +13,21 @@ This is not negotiable. This is not optional. You cannot rationalize your way ou
 
 ## How to Access Skills
 
-Use the host environment's native skill-loading mechanism. Claude Code: use the `Skill` tool. OpenCode: use the `skill` tool when available. When you invoke a skill, its content is loaded and presented to you — follow it directly. Do not manually read skill files when a native skill loader is available.
+Use the host environment's native skill-loading mechanism. Claude Code: use the `Skill` tool. Pi may inject skill text directly or expose files to read. OpenCode: use the `skill` tool when available. When you invoke a skill, its content is loaded and presented to you — follow it directly. Do not manually read skill files when a native skill loader is available.
 
 **In other environments:** Check your platform's documentation for how skills are loaded.
+
+## Host Adapter Rule
+
+Skills in this plugin are written for multiple agent hosts. When a skill names a host-specific tool, model, subagent type, plan UI, or memory location, adapt it to the current host before acting. If the current host lacks that exact tool, use the closest native equivalent and say which adaptation you made.
+
+Read `references/host-adapters.md` when:
+- a skill mentions Claude-specific tools (`Task`, `TodoWrite`, `AskUserQuestion`, `EnterPlanMode`)
+- a skill mentions Claude model aliases (`haiku`, `sonnet`, `opus`) or Anthropic model IDs
+- using Pi `subagent(...)`, OpenCode agents, or any non-Claude host
+- deciding whether to set a subagent timeout
+
+**Critical:** Never hardcode unavailable model aliases. Prefer the host default model when unsure. For productive subagents, prefer async/status control over foreground timeouts; a timeout is a kill/interrupt budget, not a progress signal.
 
 # Using Skills
 

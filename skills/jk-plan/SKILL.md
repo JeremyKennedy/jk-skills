@@ -18,20 +18,20 @@ For small/quick changes, skip this skill — use jk-skills:jk-brainstorm or just
 
 ## Model Selection
 
-Choose `haiku`, `sonnet`, or `opus` for subagents based on what the task demands:
+Choose a **capability tier**, then map it to a model that is actually enabled in the current host. Read `using-jk-skills/references/host-adapters.md` when the host/model mapping is unclear.
 
-| Signal | Haiku | Sonnet | Opus |
-|--------|-------|--------|------|
+| Signal | Mechanical | Focused | Deep |
+|--------|------------|---------|------|
 | **Reasoning** | None — mechanical, no judgment | Some — following patterns, clear criteria | Deep — novel design, ambiguous tradeoffs |
 | **Risk** | Zero — output is trivially verifiable | Low — reviewer can catch it, easily re-run | High — wrong answer cascades, hard to detect |
 | **Task type** | File listing, formatting, grep-and-summarize | Exploration, convention checking, focused review | Design, root-cause analysis, adversarial review |
 
 **In this skill:**
-- **Phase 1 research agents** → `sonnet` — exploration and summarization, no design decisions
-- **Phase 4 design architects** → `opus` — creative design work with real tradeoffs
+- **Phase 1 research agents** → focused tier — exploration and summarization, no design decisions
+- **Phase 4 design architects** → deep tier — creative design work with real tradeoffs
 - **Phase 5 review panel** → mixed per reviewer (see table below)
 
-**Default:** Lean towards heavier models — this is heavyweight planning where getting it right matters more than token cost. Use `opus` unless the task is clearly mechanical. `sonnet` for focused work with clear criteria. `haiku` only for truly mechanical subtasks (file listing, formatting).
+**Default:** Lean towards heavier models, but only with enabled models. Prefer the host default model when unsure. Never hardcode Claude aliases (`haiku`, `sonnet`, `opus`) or Anthropic model IDs unless that provider is configured.
 
 ## Hard Gates
 
@@ -54,7 +54,7 @@ No exceptions. Not for "simple" tasks. Not for "obvious" changes. If it's simple
 
 Before asking the user a single question, understand the landscape from multiple angles. **Start by reading what's already known** — check auto memory, `docs/plans/` for archived wisdom from past executions in this area, and `docs/` for project knowledge. Don't rediscover what past sessions already learned.
 
-Launch **2-3 code-explorer agents in parallel** (model: `sonnet` — exploration, no decisions), each with a different focus. Each agent should trace through code comprehensively and return a list of 5-10 key files to read.
+Launch **2-3 explorer/scout agents in parallel** (focused tier — exploration, no decisions), each with a different focus. Use the host's available code-explorer/scout/context-builder equivalent. Each agent should trace through code comprehensively and return a list of 5-10 key files to read.
 
 **Example agent focuses** (adapt to the task):
 
@@ -115,7 +115,7 @@ Interview the user until you have enough clarity to design. These criteria guide
 
 ### Phase 4: Design Doc
 
-For non-obvious architectural decisions, launch **2-3 code-architect agents in parallel** (model: `opus`) with different design philosophies. Each agent independently designs a full approach without seeing the others — this avoids anchoring bias.
+For non-obvious architectural decisions, launch **2-3 architect/planner agents in parallel** (deep tier) with different design philosophies. Use the host's available code-architect/planner/oracle equivalent. Each agent independently designs a full approach without seeing the others — this avoids anchoring bias.
 
 | Architect | Philosophy |
 |-----------|-----------|
@@ -143,7 +143,7 @@ Cover: architecture, components, data flow, error handling, testing approach, fi
 Launch 4-6 reviewer subagents **in parallel** to tear apart the design. Each reviewer is a fresh agent with no sunk cost in the plan.
 
 **All reviewers:**
-- Type: `general-purpose`
+- Type: host reviewer/general-purpose equivalent
 - Tools: read-only file reading and search tools (for example Read/Grep/Glob)
 - Must read the design doc AND the project agent instructions file (`CLAUDE.md`, `AGENTS.md`, or equivalent)
 - Must explore relevant codebase areas
@@ -151,14 +151,14 @@ Launch 4-6 reviewer subagents **in parallel** to tear apart the design. Each rev
 
 **The panel:**
 
-| Reviewer | Model | Prompt focus |
-|----------|-------|-------------|
-| **Gaps** | `opus` | What's missing? Requirements implied but not addressed? Error cases not handled? Features mentioned but not designed? |
-| **Assumptions** | `opus` | What does the plan assume that might not be true? What's fragile? What could change? What external dependencies could break? |
-| **Edge Cases** | `opus` | Empty input, concurrent access, partial failure, network errors, scale (10x and 0.1x), race conditions, data corruption |
-| **Conventions** | `sonnet` | Does the plan follow project agent instructions? Correct file locations, naming patterns, config patterns, error handling, testing patterns? |
-| **Security** | `opus` | Injection vectors, auth gaps, secret handling, unsafe defaults, OWASP top 10, supply chain concerns |
-| **Simplicity** | `sonnet` | Is any part over-engineered? Could anything be done more simply? Are there unnecessary abstractions? YAGNI violations? |
+| Reviewer | Tier | Prompt focus |
+|----------|------|-------------|
+| **Gaps** | Deep | What's missing? Requirements implied but not addressed? Error cases not handled? Features mentioned but not designed? |
+| **Assumptions** | Deep | What does the plan assume that might not be true? What's fragile? What could change? What external dependencies could break? |
+| **Edge Cases** | Deep | Empty input, concurrent access, partial failure, network errors, scale (10x and 0.1x), race conditions, data corruption |
+| **Conventions** | Focused | Does the plan follow project agent instructions? Correct file locations, naming patterns, config patterns, error handling, testing patterns? |
+| **Security** | Deep | Injection vectors, auth gaps, secret handling, unsafe defaults, OWASP top 10, supply chain concerns |
+| **Simplicity** | Focused | Is any part over-engineered? Could anything be done more simply? Are there unnecessary abstractions? YAGNI violations? |
 
 Model rationale: Gaps, Assumptions, Edge Cases, and Security require deep judgment about what *could* go wrong — hard to verify if the reviewer misses something. Conventions and Simplicity have clear, checkable criteria against the agent instructions and codebase.
 
@@ -235,9 +235,9 @@ This structure informs the task decomposition — each task should produce self-
 **Save to:** `docs/plans/YYYY-MM-DD-<topic>.md`
 **Commit** the plan.
 
-**Audience:** The implementation plan is for agents. Be maximally detailed — exact code, exact commands, exact expected output. Agents executing tasks will read this verbatim. The user sees a summarized version in the CC plan presentation (handled by jk-execute), not this document.
+**Audience:** The implementation plan is for agents. Be maximally detailed — exact code, exact commands, exact expected output. Agents executing tasks will read this verbatim. The user sees a summarized version in the plan presentation (handled by jk-execute), not this document.
 
-**Plan review loop:** After writing the plan, dispatch a single plan reviewer (model: `sonnet` — clear criteria, checkable against the design doc):
+**Plan review loop:** After writing the plan, dispatch a single plan reviewer (focused tier — clear criteria, checkable against the design doc):
 
 ```
 You are a plan document reviewer. Verify this plan is complete and ready for execution.

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Claude Code plugin marketplace: planning, execution, TDD, debugging, and code review skills.
+Agent-skill package for planning, execution, TDD, debugging, and code review. It ships through Claude Code today, but shipped skill bodies must stay host-neutral and adapt to Pi/OpenCode/Claude Code.
 
 ## Architecture
 
@@ -41,6 +41,10 @@ description: Use when [trigger condition] — [what it does]
 ```
 
 Descriptions must start with "Use when" to clearly indicate when the skill applies.
+
+### Host-neutral skill text
+
+Shipped skills must not assume Claude Code-only tooling or Anthropic-only models. Prefer harness-agnostic wording when possible. If a workflow needs host-specific tools, reference `skills/using-jk-skills/references/host-adapters.md` and cover Claude Code, Pi, and OpenCode equivalents (`Task` / Pi `subagent` / OpenCode agents, `TodoWrite` / Pi `todo`, `AskUserQuestion` / Pi `ask_user_question`). Use capability tiers (`mechanical`, `focused`, `deep`) instead of literal model aliases (`haiku`, `sonnet`, `opus`) unless the text is explicitly warning not to hardcode them. Productive subagents should prefer async/status control over foreground timeouts; timeouts are kill budgets, not progress signals. Do not mention private user names or personal-machine-specific defaults in shipped skills.
 
 ### Announcements
 

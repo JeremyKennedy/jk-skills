@@ -31,6 +31,57 @@ if grep -r 'superpowers:' skills/ agents/ 2>/dev/null; then
     errors=$((errors + 1))
 fi
 
+# Shipped skills must be host/model neutral. Literal Claude model aliases are
+# allowed only in warnings that explicitly say not to hardcode them.
+model_alias_refs=$(grep -RInwE '(haiku|sonnet|opus|Haiku|Sonnet|Opus)' skills/*/SKILL.md 2>/dev/null | grep -v 'Never hardcode Claude aliases' | grep -v 'skill mentions Claude model aliases' || true)
+if [[ -n "$model_alias_refs" ]]; then
+    echo "ERROR: Found provider-specific Claude model aliases in shipped skills"
+    echo "$model_alias_refs"
+    errors=$((errors + 1))
+fi
+
+# Shipped skills must not assume CLAUDE.md is the only project instruction file.
+claude_md_refs=$(grep -RInE '\bCLAUDE\.md\b' skills/*/SKILL.md 2>/dev/null | grep -vE 'CLAUDE\.md.*AGENTS\.md|AGENTS\.md.*CLAUDE\.md' || true)
+if [[ -n "$claude_md_refs" ]]; then
+    echo "ERROR: Found bare CLAUDE.md references in shipped skills"
+    echo "$claude_md_refs"
+    errors=$((errors + 1))
+fi
+
+# Shipped skills/references must not contain private personal names.
+personal_refs=$(grep -RInE 'Jeremy|jeremy|Kennedy|Jibbs' skills/*/SKILL.md skills/*/references 2>/dev/null || true)
+if [[ -n "$personal_refs" ]]; then
+    echo "ERROR: Found personal-name references in shipped skills"
+    echo "$personal_refs"
+    errors=$((errors + 1))
+fi
+
+# Pi DeepSeek policy: flash is only for mechanical/no-reasoning tasks; pro is
+# only for explicit user requests. Enforce this where model IDs are mentioned in
+# shipped skill bodies/references so examples cannot drift into defaults.
+deepseek_flash_refs=$(grep -RInE 'deepseek/deepseek-v4-flash|dsv4f' skills/*/SKILL.md skills/*/references 2>/dev/null | grep -viE 'mechanical|no real reasoning|no judgment|purely mechanical' || true)
+if [[ -n "$deepseek_flash_refs" ]]; then
+    echo "ERROR: Found deepseek-v4-flash references outside mechanical/no-reasoning guidance"
+    echo "$deepseek_flash_refs"
+    errors=$((errors + 1))
+fi
+
+deepseek_pro_refs=$(grep -RInE 'deepseek/deepseek-v4-pro|dsv4p' skills/*/SKILL.md skills/*/references 2>/dev/null | grep -viE 'explicit.*user|user.*explicit' || true)
+if [[ -n "$deepseek_pro_refs" ]]; then
+    echo "ERROR: Found deepseek-v4-pro references outside explicit-user-request guidance"
+    echo "$deepseek_pro_refs"
+    errors=$((errors + 1))
+fi
+
+# A timeout is a kill/interrupt budget, not a progress signal. Do not bake
+# concrete foreground timeout knobs into shipped skill workflows.
+timeout_refs=$(grep -RInE 'timeoutMs|maxRuntimeMs' skills/*/SKILL.md 2>/dev/null || true)
+if [[ -n "$timeout_refs" ]]; then
+    echo "ERROR: Found concrete subagent timeout fields in shipped skills"
+    echo "$timeout_refs"
+    errors=$((errors + 1))
+fi
+
 # Check agent frontmatter has name and description
 for agent in agents/*.md; do
     if ! head -10 "$agent" | grep -q '^name:'; then

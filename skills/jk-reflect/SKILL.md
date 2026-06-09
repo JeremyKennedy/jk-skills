@@ -44,7 +44,7 @@ Now step back properly:
 
 ### Deep Reflection (for complex/high-stakes topics)
 
-When the topic is complex enough that your own biases might cloud judgment, dispatch a **fresh subagent** (model: `opus`) with no sunk cost in the current approach:
+When the topic is complex enough that your own biases might cloud judgment, dispatch a **fresh subagent** using a deep-tier enabled model (or the host default) with no sunk cost in the current approach. Prefer async/background execution when the host supports it (Claude Code background task, Pi `subagent(async:true)`, OpenCode equivalent) and inspect status/control events rather than killing the run:
 
 ```
 You are a fresh set of eyes reviewing an approach in progress. You have NO investment in the current direction — your job is to be honestly critical.

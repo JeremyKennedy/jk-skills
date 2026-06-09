@@ -9,9 +9,11 @@ description: "Use when a user installs jk-skills or asks about plugin conflicts 
 
 Check for installed plugins that jk-skills supersedes. jk-skills absorbs and improves on several upstream plugins — running both wastes context and causes skill conflicts.
 
+This skill is only actionable on hosts that use Claude Code plugin manifests. On Pi, OpenCode, or another host without Claude Code plugins, say that the plugin-conflict check does not apply and stop.
+
 ## How to Check
 
-Read `~/.claude/plugins/installed_plugins.json` and check for the plugins listed below.
+On Claude Code, read `~/.claude/plugins/installed_plugins.json` and check for the plugins listed below.
 
 ## Superseded Plugins
 

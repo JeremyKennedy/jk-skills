@@ -51,7 +51,7 @@ jk-remember scales from a quick checkpoint to a full documentation audit. Match 
 
 **Standard** — end of a work session. Reflect on the full conversation, check agent instructions and docs/ for staleness, present changes. A few minutes.
 
-**Deep** — end of a major effort. Dispatch parallel subagents to audit different areas (CLAUDE.md quality, docs/ coverage, stale commands, plan index health), synthesize findings, present improvements.
+**Deep** — end of a major effort. Dispatch parallel subagents to audit different areas (agent-instructions quality, docs/ coverage, stale commands, plan index health), synthesize findings, present improvements.
 
 **Overhaul** — the project's documentation needs serious work. Invoke `jk-skills:jk-plan` to plan the documentation improvement as a proper project: research the current state, interview the user about what matters, design the doc structure, write an implementation plan, execute with jk-execute. Full planning rigor for doc debt.
 
@@ -133,7 +133,7 @@ Show the user what you want to change and where, with diffs and reasoning:
 [Show the integrated section]
 
 ### Auto Memory
-- User prefers opus for code review agents
+- User prefers deep-tier models for code review agents
 
 ### Process Suggestions
 - Tool call `just deploy-staging` failed — command doesn't exist.

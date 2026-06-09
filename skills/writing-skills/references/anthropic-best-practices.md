@@ -1,3 +1,5 @@
+<!-- External Anthropic reference; Claude-specific terminology is expected here. Shipped SKILL.md bodies remain host-neutral. -->
+
 # Skill authoring best practices
 
 > Learn how to write effective Skills that Claude can discover and use successfully.

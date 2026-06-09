@@ -1,6 +1,6 @@
 # jk-skills
 
-A heavyweight Claude Code plugin for planning, executing, and shipping software. It replaces several plugins with an integrated system: research → interview → design → adversarial review → implementation plan → parallel execution → verification.
+A heavyweight agent-skill package for planning, executing, and shipping software. It ships as a Claude Code plugin today, and the skill instructions are written to adapt to other hosts such as Pi and OpenCode. It replaces several plugins with an integrated system: research → interview → design → adversarial review → implementation plan → parallel execution → verification.
 
 This is opinionated. It expands scope aggressively, demands TDD, runs adversarial review panels, and won't let you ship without proving the work is done. If you want something lighter, this isn't it.
 
@@ -23,7 +23,7 @@ This is opinionated. It expands scope aggressively, demands TDD, runs adversaria
 
 **Reflection** — `jk-reflect` steps back and challenges the current direction. Gut check first, then structured analysis. Can dispatch a fresh subagent for an unbiased perspective on complex decisions.
 
-**Burn Rate** — `jk-burn-rate` lets you control token spending: max (opus everything, go wide), standard (balanced), or light (efficient, cheaper models where quality won't suffer). Never weakens core discipline — just controls how aggressively to spend on discretionary work.
+**Burn Rate** — `jk-burn-rate` lets you control token spending: max (deep tier everywhere, go wide), standard (balanced), or light (efficient, cheaper enabled models where quality won't suffer). Never weakens core discipline — just controls how aggressively to spend on discretionary work.
 
 ## Philosophy
 

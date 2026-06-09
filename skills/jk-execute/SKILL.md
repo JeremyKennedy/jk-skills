@@ -16,7 +16,7 @@ Execute an implementation plan using one of four execution topologies. Each mode
 | **Scope** | This plan execution only | Cross-session, long-lived |
 | **Audience** | Subagents executing later tasks in this plan | Future you, working on this project next month |
 | **Content** | Conventions discovered, gotchas hit, commands that worked, patterns to follow | Project decisions, user preferences, architectural constraints, domain knowledge |
-| **Path** | `.jk-work/<plan-slug>/wisdom.md` (derived from plan filename) | Agent memory system, if available (Claude Code: `~/.claude/projects/.../memory/`) |
+| **Path** | `.jk-work/<plan-slug>/wisdom.md` (derived from plan filename) | Host memory system, if available (otherwise agent instructions/docs via jk-remember) |
 | **Lifecycle** | Created during execution, archived with plan docs when done | Persists indefinitely |
 | **Example** | "This codebase uses vitest not jest" / "Import from ./types not ./index" | "User prefers Swarm mode" / "Imports are highest-risk — always verify target client" |
 
@@ -36,21 +36,29 @@ jk-remember handles routing (agent instructions vs docs/ vs auto memory), the ag
 
 ## Model Selection
 
-Choose `haiku`, `sonnet`, or `opus` for subagents based on what the task demands:
+Choose a **capability tier**, then map it to a model that is actually enabled in the current host. Read `using-jk-skills/references/host-adapters.md` when the host/model mapping is unclear.
 
-| Signal | Haiku | Sonnet | Opus |
-|--------|-------|--------|------|
+| Signal | Mechanical | Focused | Deep |
+|--------|------------|---------|------|
 | **Reasoning** | None — mechanical, no judgment | Some — following patterns, clear criteria | Deep — novel design, ambiguous tradeoffs |
 | **Risk** | Zero — output is trivially verifiable | Low — reviewer can catch it, easily re-run | High — wrong answer cascades, hard to detect |
 | **Task type** | File listing, formatting, grep-and-summarize | Exploration, convention checking, focused review | Design, root-cause analysis, adversarial review |
 
 **In this skill:**
-- **Implementers** → `opus` by default. `sonnet` only for truly straightforward tasks (clear spec, known patterns, no judgment calls)
-- **Per-task reviewers** (spec compliance, code quality) → `sonnet` — narrow scope, clear criteria
-- **Round table reviewers** → `sonnet` for generic reviewers (already specified), specialized agents use their own model
-- **Haiku** → mechanical subtasks only: generating boilerplate, formatting, file scaffolding
+- **Implementers** → deep tier by default. Focused tier only for truly straightforward tasks (clear spec, known patterns, no judgment calls).
+- **Per-task reviewers** (spec compliance, code quality) → focused tier — narrow scope, clear criteria.
+- **Round table reviewers** → focused tier for generic reviewers; specialized agents use their own configured model.
+- **Mechanical tier** → mechanical subtasks only: generating boilerplate, formatting, file scaffolding.
 
-**Default:** Lean towards heavier models — this plugin values correctness over token cost. Use `opus` unless the task is clearly mechanical. `sonnet` for focused work with clear criteria. `haiku` only for truly mechanical subtasks (file listing, formatting, boilerplate).
+**Default:** Lean towards heavier models, but only with enabled models. Prefer the host default model when unsure. Never hardcode Claude aliases (`haiku`, `sonnet`, `opus`) or Anthropic model IDs unless that provider is configured.
+
+## Subagent Runtime Rules
+
+- Use the host's native subagent/delegation tool (`Task`, Pi `subagent`, OpenCode agent tool, etc.). See `using-jk-skills/references/host-adapters.md` for mappings.
+- Productive subagents should run asynchronously when the host supports it (Pi `async: true`; Claude Code/OpenCode background task equivalents when available). Inspect status/control events when needed.
+- A timeout is a kill/interrupt budget, not a progress signal. Avoid foreground timeouts for productive implementation/review work. If foreground execution is unavoidable, choose a generous timeout longer than the expected work + validation window.
+- Short foreground timeouts are only for mechanical probes where killing loses no useful reasoning or edits.
+- If a subagent times out, do not retry by only changing the timeout. Decide whether to resume it, narrow the scope, switch to async, or replace it with a better-scoped task.
 
 ## Plan File Discovery
 
@@ -125,7 +133,7 @@ If recommending Swarm, include the proposed wave/phase breakdown showing which t
 3. **Check for outstanding context.** Is anything from the conversation not captured in the plan files? Decisions, design choices, context that only exists in the conversation.
 4. **Determine execution mode.** If the user specified a mode, use it. Otherwise, analyze the plan and recommend one (see Mode Selection above). If recommending Swarm, work out the wave breakdown.
 5. **Persist learnings.** Invoke `jk-skills:jk-remember` — last chance before the user might `/clear`.
-6. **Present the plan to the user** using `EnterPlanMode`.
+6. **Present the plan to the user** using the host's plan-approval UI (`EnterPlanMode` in Claude Code, Pi `ask_user_question` or chat approval, OpenCode `question`/plan equivalent).
 
    <HARD-GATE>
    Write a FRESH presentation to the plan mode tool. Do NOT edit the plan doc file on disk. Do NOT copy-paste from the plan doc. The plan doc is an agent-facing reference — detailed, verbose, exact code. The presentation is a separate artifact you write from scratch for a human audience.
@@ -185,7 +193,7 @@ For each task:
    - **NEEDS_CONTEXT** → provide the missing context and re-dispatch
    - **BLOCKED** → assess the blocker:
      1. Context problem → provide more context, re-dispatch
-     2. Task too hard for the model → re-dispatch with `opus`
+     2. Task too hard for the model → re-dispatch with a deep-tier enabled model or the host default
      3. Task too large → break into smaller pieces
      4. Plan itself is wrong → escalate to the user
    - **Never** ignore an escalation or force the same agent to retry without changes
@@ -218,17 +226,17 @@ After ALL tasks are complete, launch reviewers in parallel on the full diff (`gi
 
 | Reviewer | Type | Focus |
 |----------|------|-------|
-| **Spec Compliance** | general-purpose | Does the complete implementation match the plan holistically? |
-| **Code Quality** | general-purpose | Cross-cutting quality: consistency, duplication, naming coherence |
-| **Security** | general-purpose | Full attack surface: input validation, auth, secrets, injection |
-| **Convention Compliance** | general-purpose | Project CLAUDE.md adherence across all changes |
-| **Integration** | general-purpose | Do all pieces work together? Will this break existing code? |
-| **Error Handling** | `silent-failure-hunter` agent | Silent failures, swallowed errors, inadequate fallbacks |
-| **Test Coverage** | `test-analyzer` agent | Behavioral test gaps, criticality-rated |
-| **Documentation** | `doc-analyzer` agent | Doc accuracy, staleness, AI-generated drift |
+| **Spec Compliance** | generic reviewer | Does the complete implementation match the plan holistically? |
+| **Code Quality** | generic reviewer | Cross-cutting quality: consistency, duplication, naming coherence |
+| **Security** | generic reviewer | Full attack surface: input validation, auth, secrets, injection |
+| **Convention Compliance** | generic reviewer | Project agent-instruction adherence across all changes |
+| **Integration** | generic reviewer | Do all pieces work together? Will this break existing code? |
+| **Error Handling** | specialized or focused reviewer | Silent failures, swallowed errors, inadequate fallbacks |
+| **Test Coverage** | specialized or focused reviewer | Behavioral test gaps, criticality-rated |
+| **Documentation** | specialized or focused reviewer | Doc accuracy, staleness, AI-generated drift |
 
-**Generic reviewers:** Type `general-purpose`, model `sonnet`, read-only tools.
-**Specialized agents:** Use the named agent definitions directly.
+**Generic reviewers:** Use the host's reviewer/general-purpose agent with a focused-tier enabled model or the host default. Do not hardcode unavailable model aliases.
+**Specialized agents:** Use the named agent definitions directly when installed; otherwise use a generic reviewer with the same focus.
 
 **Confidence Scoring:**
 
