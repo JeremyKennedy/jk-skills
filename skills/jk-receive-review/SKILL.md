@@ -222,6 +222,8 @@ You understand 1,2,3,6. Unclear on 4,5.
 
 When replying to inline review comments on GitHub, reply in the comment thread (`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`), not as a top-level PR comment.
 
+This GitHub guidance does not apply to Azure DevOps. For CAIPAS ADO PRs, never read, write, edit, resolve, delete, count, or summarize ADO PR comments or threads. Review feedback must come from the user pasted into chat or from the local PR registry; responses go in chat/final summaries.
+
 ## The Bottom Line
 
 **External feedback = suggestions to evaluate, not orders to follow.**
