@@ -38,7 +38,7 @@ get exactly the messages they haven't read yet, from anyone but themselves.
 | `init <file> --topic T --context C [--participants a,b]` | Create the conversation. Writes topic + context as the first record. |
 | `post <file> --as NAME [-m MSG \| -f FILE \| stdin] [--wait]` | Append your message, then print any messages that arrived since you last looked. With `--wait`, immediately block for the next reply (one-shot turn loop — see below). |
 | `wait <file> --as NAME [--timeout N]` | Block until a new message arrives, then print it. Returns **immediately** if one is already waiting. Aliases: `watch`, `listen`. |
-| `read <file> --as NAME [--peek] [--wait]` | Print new messages without posting. `--peek` leaves them unread. With `--wait`, drain the backlog **then** block for the next message (one-shot catch-up-then-listen — replaces `read … && wait …`). |
+| `read <file> --as NAME [--peek]` | Print new messages without posting (for a non-committal catch-up). `--peek` leaves them unread. |
 | `last <file> --from NAME [--body]` | Print the most recent message from a specific agent (does not touch read cursors). `--body` prints just the message text. |
 | `log <file>` | Render the full transcript as readable markdown. |
 
@@ -54,6 +54,13 @@ Key behaviors:
   with status `2` after `N` seconds if nothing new arrived.
 - Bodies may be passed with `-m`, read from a file with `-f PATH`, or piped on
   stdin (use stdin for long multi-line messages).
+
+> **Do not chain `read … && wait …`.** `read` marks the backlog seen and
+> advances your cursor, so the following `wait` has nothing pending and blocks —
+> you've drained messages you should be *responding to* and then sat idle. Just
+> use `wait`: it returns the pending backlog immediately if there is one (and
+> only blocks when there's genuinely nothing to act on). The loop is
+> **`wait` → act → `post --wait` → act → …**, never drain-then-block.
 
 ## Roles
 
@@ -159,16 +166,23 @@ notified on completion. Either way, the rule is the same: after you `post`, you
 
 ## Turn Loop
 
+Use the combined `post --wait` so each turn is one call — say your piece, then
+listen for the reply:
+
 ```
-1. post your message            (also prints anything new since you looked)
-2. wait                         (blocks; returns the moment a reply lands,
-                                 or immediately if one already arrived)
-3. read the printed reply
-4. go to 1
+1. (act on the messages you just received)
+2. post --wait  your reply      (appends, then blocks for the next message)
+3. read the printed reply, go to 1
 ```
 
-You cannot "forget to wait" without ending your turn silently — make `wait`
-the last thing you do every turn until convergence.
+To enter the loop (or when you have nothing to say yet), start with a bare
+`wait` — it returns the current backlog immediately if there is one, otherwise
+blocks for the next message. Then act and switch to `post --wait`.
+
+You cannot "forget to wait" without ending your turn silently — make `wait` or
+`post --wait` the last thing you do every turn until convergence. Never
+`read … && wait …` (that drains the backlog, then blocks instead of letting you
+respond to it).
 
 ## Convergence
 

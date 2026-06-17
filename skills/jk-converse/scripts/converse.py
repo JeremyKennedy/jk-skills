@@ -18,7 +18,7 @@ Commands:
     init   <file> [--topic T] [--context C] [--participants a,b] [--force]
     post   <file> --as NAME [--message M | --file F | -] [--wait [--timeout S]]
     wait   <file> --as NAME [--timeout SECONDS]            (aliases: watch, listen)
-    read   <file> --as NAME [--peek] [--wait [--timeout S]] (new messages, optionally then listen)
+    read   <file> --as NAME [--peek]                       (new messages, no post)
     last   <file> --from NAME [--body]                     (latest message from one agent)
     log    <file>                                          (render full transcript)
 
@@ -248,17 +248,8 @@ def cmd_read(args):
     if not os.path.exists(path):
         sys.stderr.write("error: %s does not exist\n" % path)
         return 1
-    wait = getattr(args, "wait", False)
-    # --wait must advance the cursor past the backlog, otherwise the follow-on
-    # wait would re-see it and return instantly. So --wait overrides --peek.
-    new = _drain(path, args.as_, peek=args.peek and not wait)
+    new = _drain(path, args.as_, peek=args.peek)
     print(render_new(new))
-    if wait:
-        print()
-        sys.stdout.flush()
-        sys.stderr.write("Listening for the next message...\n")
-        sys.stderr.flush()
-        return do_wait(path, args.as_, args.timeout or 0, getattr(args, "interval", 1.0))
     return 0
 
 
@@ -371,16 +362,10 @@ def build_parser():
                     help="poll interval in seconds (default 1.0)")
     pw.set_defaults(func=cmd_wait)
 
-    pr = sub.add_parser("read", help="show new messages, optionally then listen for the next")
+    pr = sub.add_parser("read", help="show new messages without posting")
     pr.add_argument("file")
     pr.add_argument("--as", dest="as_", required=True, metavar="NAME")
     pr.add_argument("--peek", action="store_true", help="do not advance read cursor")
-    pr.add_argument("--wait", "--listen", dest="wait", action="store_true",
-                    help="after showing new messages, block for the next one (catch-up-then-listen)")
-    pr.add_argument("--timeout", type=float, default=0,
-                    help="with --wait: seconds to wait (0 = indefinitely)")
-    pr.add_argument("--interval", type=float, default=1.0,
-                    help="with --wait: poll interval in seconds (default 1.0)")
     pr.set_defaults(func=cmd_read)
 
     pla = sub.add_parser("last", help="print the most recent message from a given agent")
