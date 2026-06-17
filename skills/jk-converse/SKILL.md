@@ -36,11 +36,11 @@ get exactly the messages they haven't read yet, from anyone but themselves.
 | Command | What it does |
 |---------|--------------|
 | `init <file> --topic T --context C [--participants a,b]` | Create the conversation. Writes topic + context as the first record. |
-| `post <file> --as NAME [-m MSG \| -f FILE \| stdin] [--wait]` | Append your message, then print any messages that arrived since you last looked. With `--wait`, immediately block for the next reply (one-shot turn loop — see below). |
+| `post <file> --as NAME [--to A,B] [-m MSG \| -f FILE \| stdin] [--wait]` | Append your message, then print any messages addressed to you that arrived since you last looked. `--to` narrows recipients (default: broadcast). With `--wait`, immediately block for the next reply (one-shot turn loop — see below). |
 | `wait <file> --as NAME [--timeout N]` | Block until a new message arrives, then print it. Returns **immediately** if one is already waiting. Aliases: `watch`, `listen`. |
 | `read <file> --as NAME [--peek]` | Print new messages without posting (for a non-committal catch-up). `--peek` leaves them unread. |
-| `last <file> --from NAME [--body]` | Print the most recent message from a specific agent (does not touch read cursors). `--body` prints just the message text. |
-| `log <file>` | Render the full transcript as readable markdown. |
+| `last <file> --from NAME [--as VIEWER] [--body]` | Print the most recent message from a specific agent (does not touch read cursors). `--as` restricts to messages that viewer may see; `--body` prints just the message text. |
+| `log <file> [--as VIEWER]` | Render the full transcript as readable markdown. `--as` renders only what that viewer may see. |
 
 Key behaviors:
 
@@ -54,6 +54,11 @@ Key behaviors:
   with status `2` after `N` seconds if nothing new arrived.
 - Bodies may be passed with `-m`, read from a file with `-f PATH`, or piped on
   stdin (use stdin for long multi-line messages).
+- **Messages broadcast to everyone by default.** `--to a,b` sends a *directed*
+  message that only those agents (and the sender) can see — `read`, `wait`,
+  `post`, `last --as`, and `log --as` all filter to what each agent is allowed
+  to see. Prefer broadcasting; narrow only when the info genuinely needn't be
+  shared (e.g. a worker reporting status just to its parent).
 
 > **Do not chain `read … && wait …`.** `read` marks the backlog seen and
 > advances your cursor, so the following `wait` has nothing pending and blocks —
@@ -217,6 +222,12 @@ hand each additional session its own handoff block with its own `--as NAME`.
 Every participant's "what's new" is tracked independently, so a third agent
 joining mid-conversation still sees everything it hasn't read. For a panel,
 designate one participant to call convergence once all have confirmed.
+
+For a **parent/worker hierarchy**, workers can broadcast shared findings to all
+but report routine status with `--to parent` so they don't spam siblings — the
+parent sees every worker's directed reports, workers only see broadcasts and
+messages addressed to them. Default to broadcasting; reach for `--to` only when
+the information genuinely doesn't need sharing.
 
 ## Common Mistakes
 

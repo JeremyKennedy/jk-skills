@@ -16,11 +16,15 @@ Participants are arbitrary named strings (`--as <name>`); any number may join.
 
 Commands:
     init   <file> [--topic T] [--context C] [--participants a,b] [--force]
-    post   <file> --as NAME [--message M | --file F | -] [--wait [--timeout S]]
+    post   <file> --as NAME [--to A,B] [--message M | --file F | -] [--wait]
     wait   <file> --as NAME [--timeout SECONDS]            (aliases: watch, listen)
     read   <file> --as NAME [--peek]                       (new messages, no post)
-    last   <file> --from NAME [--body]                     (latest message from one agent)
-    log    <file>                                          (render full transcript)
+    last   <file> --from NAME [--as VIEWER] [--body]       (latest message from one agent)
+    log    <file> [--as VIEWER]                            (render full transcript)
+
+Messages broadcast to everyone by default. `post --to a,b` sends a directed
+message only those agents (and the sender) can see — e.g. a worker reporting
+just to its parent. Prefer broadcast; narrow only when the info needn't be shared.
 
 Exit codes: 0 ok / delivered, 2 wait timed out with nothing new, 1 error.
 """
@@ -109,12 +113,29 @@ def cursor_for(records, agent):
     return seen
 
 
+def recipients(m):
+    """The addressed recipients of a message, or None for a broadcast."""
+    to = m.get("to")
+    if not to or to == "all":
+        return None  # broadcast — visible to everyone
+    return to if isinstance(to, list) else [to]
+
+
+def visible_to(m, agent):
+    """Whether `agent` is allowed to see message `m`. Broadcasts are visible to
+    all; a directed message is visible only to its recipients and its sender."""
+    rcpts = recipients(m)
+    if rcpts is None:
+        return True
+    return agent in rcpts or agent == m.get("from")
+
+
 def new_for(records, agent):
-    """Messages from *other* participants that `agent` has not yet seen."""
+    """Messages addressed to `agent` (or broadcast), from others, not yet seen."""
     seen = cursor_for(records, agent)
     return [
         m for m in messages(records)
-        if m.get("seq", 0) > seen and m.get("from") != agent
+        if m.get("seq", 0) > seen and m.get("from") != agent and visible_to(m, agent)
     ]
 
 
@@ -125,8 +146,10 @@ def set_cursor(path, agent, seq):
 # ─── rendering ──────────────────────────────────────────────────────────────
 
 def render_msg_block(m):
-    return "─── [%s] seq %s · %s ───\n%s" % (
-        m.get("from", "?"), m.get("seq", "?"), m.get("ts", ""),
+    rcpts = recipients(m)
+    addr = (" → %s" % ",".join(rcpts)) if rcpts else ""
+    return "─── [%s%s] seq %s · %s ───\n%s" % (
+        m.get("from", "?"), addr, m.get("seq", "?"), m.get("ts", ""),
         m.get("body", "").rstrip("\n"),
     )
 
@@ -139,7 +162,7 @@ def render_new(msgs):
     return header + "\n\n" + "\n\n".join(render_msg_block(m) for m in msgs)
 
 
-def render_transcript(records):
+def render_transcript(records, viewer=None):
     meta = meta_of(records)
     out = []
     if meta:
@@ -151,10 +174,14 @@ def render_transcript(records):
             out.append("")
             out.append("Participants: %s" % ", ".join(meta["participants"]))
     for m in messages(records):
+        if viewer is not None and not visible_to(m, viewer):
+            continue
+        rcpts = recipients(m)
+        addr = (" → %s" % ",".join(rcpts)) if rcpts else ""
         out.append("")
         out.append("---")
         out.append("")
-        out.append("## %s (seq %s · %s)" % (m.get("from", "?"), m.get("seq", "?"), m.get("ts", "")))
+        out.append("## %s%s (seq %s · %s)" % (m.get("from", "?"), addr, m.get("seq", "?"), m.get("ts", "")))
         out.append("")
         out.append(m.get("body", "").rstrip("\n"))
     return "\n".join(out).strip() + "\n"
@@ -207,21 +234,26 @@ def cmd_post(args):
     if not body.strip():
         sys.stderr.write("error: empty message body\n")
         return 1
+    # Recipients default to broadcast ("all"); narrow with --to a,b to send a
+    # directed message only those agents (and the sender) can see.
+    to = [t.strip() for t in (args.to or "").split(",") if t.strip()] or "all"
     with FileLock(path):
         records = read_records(path)
         seen_before = cursor_for(records, args.as_)
         seq = max_seq(records) + 1
         append_record(path, {
-            "type": "msg", "seq": seq, "from": args.as_, "ts": now_iso(),
-            "body": body.rstrip("\n"),
+            "type": "msg", "seq": seq, "from": args.as_, "to": to,
+            "ts": now_iso(), "body": body.rstrip("\n"),
         })
-        # messages that arrived from others while we were composing
+        # messages addressed to us that arrived from others while we composed
         new = [
             m for m in messages(records)
             if m.get("seq", 0) > seen_before and m.get("from") != args.as_
+            and visible_to(m, args.as_)
         ]
         set_cursor(path, args.as_, seq)  # we've now seen everything through our own post
-    print("Posted as %s (seq %d)." % (args.as_, seq))
+    addr = "" if to == "all" else " → %s" % ",".join(to)
+    print("Posted as %s%s (seq %d)." % (args.as_, addr, seq))
     print()
     print(render_new(new))
     if getattr(args, "wait", False):
@@ -303,6 +335,8 @@ def cmd_last(args):
         sys.stderr.write("error: %s does not exist\n" % path)
         return 1
     msgs = [m for m in messages(read_records(path)) if m.get("from") == args.from_]
+    if args.as_:  # optional viewer — hide messages not addressed to them
+        msgs = [m for m in msgs if visible_to(m, args.as_)]
     if not msgs:
         sys.stderr.write("No messages from %s.\n" % args.from_)
         return 1
@@ -319,7 +353,7 @@ def cmd_log(args):
     if not os.path.exists(path):
         sys.stderr.write("error: %s does not exist\n" % path)
         return 1
-    sys.stdout.write(render_transcript(read_records(path)))
+    sys.stdout.write(render_transcript(read_records(path), getattr(args, "as_", None)))
     return 0
 
 
@@ -344,6 +378,9 @@ def build_parser():
     pp.add_argument("--message", "-m", default=None, help="message body (else --file or stdin)")
     pp.add_argument("--file", "-f", dest="body_file", default=None,
                     help="read body from this path ('-' for stdin)")
+    pp.add_argument("--to", default="", metavar="A,B",
+                    help="comma-separated recipients (default: all — a broadcast). "
+                         "Narrow to send a directed message only those agents see.")
     pp.add_argument("--wait", "--listen", dest="wait", action="store_true",
                     help="after posting, block until the next message arrives (one-shot turn loop)")
     pp.add_argument("--timeout", type=float, default=0,
@@ -372,11 +409,15 @@ def build_parser():
     pla.add_argument("file")
     pla.add_argument("--from", dest="from_", required=True, metavar="NAME",
                      help="agent whose latest message to print")
+    pla.add_argument("--as", dest="as_", default=None, metavar="VIEWER",
+                     help="optional: only consider messages this viewer is allowed to see")
     pla.add_argument("--body", action="store_true", help="print only the message body (no header)")
     pla.set_defaults(func=cmd_last)
 
     pl = sub.add_parser("log", help="render the full transcript as markdown")
     pl.add_argument("file")
+    pl.add_argument("--as", dest="as_", default=None, metavar="VIEWER",
+                    help="optional: render only the messages this viewer is allowed to see")
     pl.set_defaults(func=cmd_log)
 
     return p
