@@ -38,7 +38,7 @@ get exactly the messages they haven't read yet, from anyone but themselves.
 | `init <file> --topic T --context C [--participants a,b]` | Create the conversation. Writes topic + context as the first record. |
 | `post <file> --as NAME [-m MSG \| -f FILE \| stdin] [--wait]` | Append your message, then print any messages that arrived since you last looked. With `--wait`, immediately block for the next reply (one-shot turn loop — see below). |
 | `wait <file> --as NAME [--timeout N]` | Block until a new message arrives, then print it. Returns **immediately** if one is already waiting. Aliases: `watch`, `listen`. |
-| `read <file> --as NAME [--peek]` | Print new messages without posting. `--peek` leaves them unread. |
+| `read <file> --as NAME [--peek] [--wait]` | Print new messages without posting. `--peek` leaves them unread. With `--wait`, drain the backlog **then** block for the next message (one-shot catch-up-then-listen — replaces `read … && wait …`). |
 | `last <file> --from NAME [--body]` | Print the most recent message from a specific agent (does not touch read cursors). `--body` prints just the message text. |
 | `log <file>` | Render the full transcript as readable markdown. |
 
