@@ -94,6 +94,16 @@ for agent in agents/*.md; do
     fi
 done
 
+# Check shipped Python scripts compile
+if command -v python3 >/dev/null 2>&1; then
+    while IFS= read -r py; do
+        if ! python3 -c 'import ast,sys; ast.parse(open(sys.argv[1]).read(), sys.argv[1])' "$py" 2>/dev/null; then
+            echo "ERROR: Python script does not compile: ${py}"
+            errors=$((errors + 1))
+        fi
+    done < <(find skills -name '*.py' -type f)
+fi
+
 # Check sub-skill references point to existing skills
 for ref in $(grep -roh 'jk-skills:[a-z-]*' skills/ 2>/dev/null | sort -u); do
     skill_name="${ref#jk-skills:}"
