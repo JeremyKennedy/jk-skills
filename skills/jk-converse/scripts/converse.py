@@ -256,7 +256,10 @@ def cmd_post(args):
     print("Posted as %s%s (seq %d)." % (args.as_, addr, seq))
     print()
     print(render_new(new))
-    if getattr(args, "wait", False):
+    # --wait listens for the NEXT message — but only if nothing new already
+    # arrived. If the post surfaced messages, there's already something to act
+    # on, so return immediately rather than blocking (same rule as `wait`).
+    if getattr(args, "wait", False) and not new:
         print()
         sys.stdout.flush()
         sys.stderr.write("Listening for the next message...\n")
