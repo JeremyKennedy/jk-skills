@@ -16,9 +16,10 @@ Participants are arbitrary named strings (`--as <name>`); any number may join.
 
 Commands:
     init   <file> [--topic T] [--context C] [--participants a,b] [--force]
-    post   <file> --as NAME [--message M | --file F | -]   (body via stdin if omitted)
+    post   <file> --as NAME [--message M | --file F | -] [--wait [--timeout S]]
     wait   <file> --as NAME [--timeout SECONDS]            (aliases: watch, listen)
     read   <file> --as NAME [--peek]                       (new messages, no post)
+    last   <file> --from NAME [--body]                     (latest message from one agent)
     log    <file>                                          (render full transcript)
 
 Exit codes: 0 ok / delivered, 2 wait timed out with nothing new, 1 error.
@@ -51,7 +52,8 @@ class FileLock:
         fcntl.flock(self._fd, fcntl.LOCK_EX)
         return self
 
-    def __exit__(self, *_exc):
+    def __exit__(self, *exc):
+        del exc
         if self._fd is not None:
             fcntl.flock(self._fd, fcntl.LOCK_UN)
             self._fd.close()
@@ -122,16 +124,19 @@ def set_cursor(path, agent, seq):
 
 # ─── rendering ──────────────────────────────────────────────────────────────
 
+def render_msg_block(m):
+    return "─── [%s] seq %s · %s ───\n%s" % (
+        m.get("from", "?"), m.get("seq", "?"), m.get("ts", ""),
+        m.get("body", "").rstrip("\n"),
+    )
+
+
 def render_new(msgs):
     if not msgs:
         return "No new messages."
     n = len(msgs)
-    out = ["%d new message%s:" % (n, "" if n == 1 else "s"), ""]
-    for m in msgs:
-        out.append("─── [%s] seq %s · %s ───" % (m.get("from", "?"), m.get("seq", "?"), m.get("ts", "")))
-        out.append(m.get("body", "").rstrip("\n"))
-        out.append("")
-    return "\n".join(out).rstrip("\n")
+    header = "%d new message%s:" % (n, "" if n == 1 else "s")
+    return header + "\n\n" + "\n\n".join(render_msg_block(m) for m in msgs)
 
 
 def render_transcript(records):
@@ -219,6 +224,12 @@ def cmd_post(args):
     print("Posted as %s (seq %d)." % (args.as_, seq))
     print()
     print(render_new(new))
+    if getattr(args, "wait", False):
+        print()
+        sys.stdout.flush()
+        sys.stderr.write("Listening for the next message...\n")
+        sys.stderr.flush()
+        return do_wait(path, args.as_, args.timeout or 0, getattr(args, "interval", 1.0))
     return 0
 
 
@@ -242,22 +253,16 @@ def cmd_read(args):
     return 0
 
 
-def cmd_wait(args):
-    path = args.file
-    if not os.path.exists(path):
-        sys.stderr.write("error: %s does not exist\n" % path)
-        return 1
-
-    # Check first — a reply may already be waiting. This is the whole point:
-    # never block on a message that has already arrived.
-    new = _drain(path, args.as_, peek=False)
+def do_wait(path, agent, timeout, interval):
+    """Block until a new message for `agent` arrives. Returns 0 on delivery,
+    2 on timeout. Checks first so it never blocks on an already-present reply."""
+    new = _drain(path, agent, peek=False)
     if new:
         print(render_new(new))
         return 0
 
-    timeout = args.timeout or 0
     deadline = (time.monotonic() + timeout) if timeout > 0 else None
-    interval = max(0.1, min(args.interval, 5.0))
+    interval = max(0.1, min(interval, 5.0))
     last_mtime = os.path.getmtime(path)
 
     while True:
@@ -278,10 +283,35 @@ def cmd_wait(args):
         if mtime == last_mtime:
             continue
         last_mtime = mtime
-        new = _drain(path, args.as_, peek=False)
+        new = _drain(path, agent, peek=False)
         if new:
             print(render_new(new))
             return 0
+
+
+def cmd_wait(args):
+    path = args.file
+    if not os.path.exists(path):
+        sys.stderr.write("error: %s does not exist\n" % path)
+        return 1
+    return do_wait(path, args.as_, args.timeout or 0, args.interval)
+
+
+def cmd_last(args):
+    path = args.file
+    if not os.path.exists(path):
+        sys.stderr.write("error: %s does not exist\n" % path)
+        return 1
+    msgs = [m for m in messages(read_records(path)) if m.get("from") == args.from_]
+    if not msgs:
+        sys.stderr.write("No messages from %s.\n" % args.from_)
+        return 1
+    last = msgs[-1]  # messages() preserves file order; seq is monotonic
+    if args.body:
+        sys.stdout.write(last.get("body", "").rstrip("\n") + "\n")
+    else:
+        print(render_msg_block(last))
+    return 0
 
 
 def cmd_log(args):
@@ -314,6 +344,12 @@ def build_parser():
     pp.add_argument("--message", "-m", default=None, help="message body (else --file or stdin)")
     pp.add_argument("--file", "-f", dest="body_file", default=None,
                     help="read body from this path ('-' for stdin)")
+    pp.add_argument("--wait", "--listen", dest="wait", action="store_true",
+                    help="after posting, block until the next message arrives (one-shot turn loop)")
+    pp.add_argument("--timeout", type=float, default=0,
+                    help="with --wait: seconds to wait (0 = indefinitely)")
+    pp.add_argument("--interval", type=float, default=1.0,
+                    help="with --wait: poll interval in seconds (default 1.0)")
     pp.set_defaults(func=cmd_post)
 
     pw = sub.add_parser("wait", aliases=["watch", "listen"],
@@ -331,6 +367,13 @@ def build_parser():
     pr.add_argument("--as", dest="as_", required=True, metavar="NAME")
     pr.add_argument("--peek", action="store_true", help="do not advance read cursor")
     pr.set_defaults(func=cmd_read)
+
+    pla = sub.add_parser("last", help="print the most recent message from a given agent")
+    pla.add_argument("file")
+    pla.add_argument("--from", dest="from_", required=True, metavar="NAME",
+                     help="agent whose latest message to print")
+    pla.add_argument("--body", action="store_true", help="print only the message body (no header)")
+    pla.set_defaults(func=cmd_last)
 
     pl = sub.add_parser("log", help="render the full transcript as markdown")
     pl.add_argument("file")
