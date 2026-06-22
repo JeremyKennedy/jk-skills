@@ -40,6 +40,8 @@ get exactly the messages they haven't read yet, from anyone but themselves.
 | `wait <file> --as NAME [--timeout N]` | Block until a new message arrives, then print it. Returns **immediately** if one is already waiting. Aliases: `watch`, `listen`. |
 | `read <file> --as NAME [--peek]` | Print new messages without posting (for a non-committal catch-up). `--peek` leaves them unread. |
 | `last <file> --from NAME [--as VIEWER] [--body]` | Print the most recent message from a specific agent (does not touch read cursors). `--as` restricts to messages that viewer may see; `--body` prints just the message text. |
+| `digest <file> [--each N] [--as VIEWER] [--full]` | Last `N` messages from each agent (default 1), grouped by agent, most-recently-active first. Compact one-liners unless `--full`. Read-only — touches no cursors. A quick "where does everyone stand" view. |
+| `join <file> --as NAME [--digest N]` | Catch `NAME` up to now: set their cursor to the latest message so they receive **no backlog**, only messages posted afterward. `--digest N` prints the last N per agent first as a primer (default 0 = silent join). Also works as a "mark all read" for existing agents. |
 | `log <file> [--as VIEWER]` | Render the full transcript as readable markdown. `--as` renders only what that viewer may see. |
 
 Key behaviors:
@@ -227,7 +229,14 @@ For a **parent/worker hierarchy**, workers can broadcast shared findings to all
 but report routine status with `--to parent` so they don't spam siblings — the
 parent sees every worker's directed reports, workers only see broadcasts and
 messages addressed to them. Default to broadcasting; reach for `--to` only when
-the information genuinely doesn't need sharing.
+the information genuinely doesn't need sharing. (`all` is a reserved recipient
+meaning everyone, so `--to all` is just an explicit broadcast.)
+
+**Onboarding a new agent into a long thread:** have it `join` rather than
+`read`/`wait` first — otherwise its first call returns the entire backlog. A
+silent `join --as agent-N` starts it caught-up (future messages only); add
+`--digest 2` for a quick last-2-per-agent primer of where everyone stands. To
+review the whole history it can still `log` (or `log --as agent-N`).
 
 ## Common Mistakes
 

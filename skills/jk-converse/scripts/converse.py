@@ -20,7 +20,13 @@ Commands:
     wait   <file> --as NAME [--timeout SECONDS]            (aliases: watch, listen)
     read   <file> --as NAME [--peek]                       (new messages, no post)
     last   <file> --from NAME [--as VIEWER] [--body]       (latest message from one agent)
+    digest <file> [--each N] [--as VIEWER] [--full]        (last N per agent, grouped)
+    join   <file> --as NAME [--digest N]                   (catch up to now; future-only)
     log    <file> [--as VIEWER]                            (render full transcript)
+
+A new agent joins caught-up with `join` (cursor → latest, so no backlog flood);
+`--digest N` prints the last N from each agent first as a primer. `digest` alone
+is a read-only catch-up view that changes nothing.
 
 Messages broadcast to everyone by default. `post --to a,b` sends a directed
 message only those agents (and the sender) can see — e.g. a worker reporting
@@ -114,11 +120,15 @@ def cursor_for(records, agent):
 
 
 def recipients(m):
-    """The addressed recipients of a message, or None for a broadcast."""
+    """The addressed recipients of a message, or None for a broadcast.
+    'all' (in any position, any case) is the reserved broadcast keyword."""
     to = m.get("to")
-    if not to or to == "all":
+    if not to:
+        return None
+    lst = to if isinstance(to, list) else [to]
+    if any(str(t).strip().lower() == "all" for t in lst):
         return None  # broadcast — visible to everyone
-    return to if isinstance(to, list) else [to]
+    return lst
 
 
 def visible_to(m, agent):
@@ -187,6 +197,48 @@ def render_transcript(records, viewer=None):
     return "\n".join(out).strip() + "\n"
 
 
+def _first_line(body):
+    for ln in body.splitlines():
+        ln = ln.strip()
+        if ln:
+            ln = ln.replace("**", "").replace("__", "")  # drop bold markers
+            return ln.lstrip("#-*> ").strip()            # drop leading heading/bullet
+    return ""
+
+
+def _compact_line(m):
+    fl = _first_line(m.get("body", ""))
+    if len(fl) > 80:
+        fl = fl[:77] + "..."
+    rcpts = recipients(m)
+    addr = (" →%s" % ",".join(rcpts)) if rcpts else ""
+    return "[%s] %s%s" % (m.get("seq", "?"), fl, addr)
+
+
+def render_digest(records, each_n, viewer=None, full=False):
+    """Last `each_n` messages from each agent, grouped by agent (most recently
+    active first). Compact one-liners unless `full`. `each_n` 0 = roster only."""
+    msgs = messages(records)
+    if viewer is not None:
+        msgs = [m for m in msgs if visible_to(m, viewer)]
+    if not msgs:
+        return "No messages yet."
+    by = {}
+    for m in msgs:
+        by.setdefault(m.get("from", "?"), []).append(m)
+    order = sorted(by, key=lambda s: by[s][-1].get("seq", 0), reverse=True)
+    n = max(0, each_n)
+    blocks = []
+    for s in order:
+        picked = by[s][-n:] if n else []
+        head = "=== %s (last %d of %d) ===" % (s, len(picked), len(by[s]))
+        lines = [head] + [
+            render_msg_block(m) if full else _compact_line(m) for m in picked
+        ]
+        blocks.append("\n".join(lines))
+    return "\n\n".join(blocks)
+
+
 def read_body(args):
     if args.message is not None:
         return args.message
@@ -235,8 +287,11 @@ def cmd_post(args):
         sys.stderr.write("error: empty message body\n")
         return 1
     # Recipients default to broadcast ("all"); narrow with --to a,b to send a
-    # directed message only those agents (and the sender) can see.
-    to = [t.strip() for t in (args.to or "").split(",") if t.strip()] or "all"
+    # directed message only those agents (and the sender) can see. 'all' is the
+    # reserved broadcast keyword, so `--to all` (or empty) stays a broadcast.
+    to = [t.strip() for t in (args.to or "").split(",") if t.strip()]
+    if not to or any(t.lower() == "all" for t in to):
+        to = "all"
     with FileLock(path):
         records = read_records(path)
         seen_before = cursor_for(records, args.as_)
@@ -351,6 +406,33 @@ def cmd_last(args):
     return 0
 
 
+def cmd_digest(args):
+    path = args.file
+    if not os.path.exists(path):
+        sys.stderr.write("error: %s does not exist\n" % path)
+        return 1
+    print(render_digest(read_records(path), args.each, args.as_, args.full))
+    return 0
+
+
+def cmd_join(args):
+    path = args.file
+    if not os.path.exists(path):
+        sys.stderr.write("error: %s does not exist\n" % path)
+        return 1
+    with FileLock(path):
+        records = read_records(path)
+        top = max_seq(records)
+        skipped = len(new_for(records, args.as_))  # backlog they won't now receive
+        set_cursor(path, args.as_, top)
+    if args.digest > 0:
+        print(render_digest(records, args.digest, args.as_, args.full))
+        print()
+    print("Joined as %s at seq %d — skipped %d backlog message(s); now caught up "
+          "(you'll receive only messages posted from now on)." % (args.as_, top, skipped))
+    return 0
+
+
 def cmd_log(args):
     path = args.file
     if not os.path.exists(path):
@@ -416,6 +498,25 @@ def build_parser():
                      help="optional: only consider messages this viewer is allowed to see")
     pla.add_argument("--body", action="store_true", help="print only the message body (no header)")
     pla.set_defaults(func=cmd_last)
+
+    pd = sub.add_parser("digest", help="last N messages from each agent, grouped")
+    pd.add_argument("file")
+    pd.add_argument("--each", type=int, default=1, metavar="N",
+                    help="messages per agent (default 1; 0 = roster only)")
+    pd.add_argument("--as", dest="as_", default=None, metavar="VIEWER",
+                    help="optional: only what this viewer is allowed to see")
+    pd.add_argument("--full", action="store_true",
+                    help="show full message bodies instead of compact one-liners")
+    pd.set_defaults(func=cmd_digest)
+
+    pj = sub.add_parser("join", help="catch up to now; receive only future messages")
+    pj.add_argument("file")
+    pj.add_argument("--as", dest="as_", required=True, metavar="NAME")
+    pj.add_argument("--digest", type=int, default=0, metavar="N",
+                    help="print last N per agent as a primer first (default 0 = silent join)")
+    pj.add_argument("--full", action="store_true",
+                    help="with --digest: full bodies instead of compact one-liners")
+    pj.set_defaults(func=cmd_join)
 
     pl = sub.add_parser("log", help="render the full transcript as markdown")
     pl.add_argument("file")
