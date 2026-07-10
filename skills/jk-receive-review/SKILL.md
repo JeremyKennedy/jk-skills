@@ -218,6 +218,61 @@ You understand 1,2,3,6. Unclear on 4,5.
 "Understand 1,2,3,6. Need clarification on 4 and 5 before implementing."
 ```
 
+## Batch Thread Resolution
+
+When resolving many review threads across multiple PRs (e.g., after a large review cycle), use this workflow instead of handling threads one at a time.
+
+### Get thread IDs
+
+```bash
+# List all unresolved review threads for a PR
+gh api graphql -f query='
+  query($owner: String!, $repo: String!, $pr: Int!) {
+    repository(owner: $owner, name: $repo) {
+      pullRequest(number: $pr) {
+        reviewThreads(first: 100) {
+          nodes {
+            id
+            isResolved
+            comments(first: 1) {
+              nodes { body author { login } }
+            }
+          }
+        }
+      }
+    }
+  }
+' -f owner=OWNER -f repo=REPO -F pr=PRNUM
+```
+
+### Reply then resolve
+
+Always reply before resolving — a resolved thread with no response looks like it was dismissed without reading.
+
+```bash
+# Reply to a review comment
+gh api repos/OWNER/REPO/pulls/PRNUM/comments/COMMENT_ID/replies \
+  -f body="Fixed — [description of what changed]."
+
+# Resolve the thread (GraphQL mutation)
+gh api graphql -f query='
+  mutation($threadId: ID!) {
+    resolveReviewThread(input: {threadId: $threadId}) {
+      thread { isResolved }
+    }
+  }
+' -f threadId=THREAD_NODE_ID
+```
+
+### Parallelization
+
+When resolving threads across multiple PRs, dispatch one agent per PR. Each agent gets:
+- The PR number and repo
+- The list of unresolved threads to evaluate
+- The same verification rules from this skill — evaluate each thread before resolving
+
+Group by PR because threads within a PR may be related (same reviewer concern across files). Threads across PRs are independent.
+
 ## GitHub Thread Replies
 
 When replying to inline review comments on GitHub, reply in the comment thread (`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`), not as a top-level PR comment.
