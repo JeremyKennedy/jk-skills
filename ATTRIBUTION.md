@@ -1,85 +1,11 @@
 # Attribution
 
-This project includes skills and agents derived from [superpowers](https://github.com/obra/superpowers) v4.2.0 / v4.3.1 by Jesse Vincent.
+v1 and v2 of this project included skills and agents derived from
+[superpowers](https://github.com/obra/superpowers) by Jesse Vincent (MIT)
+and [claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
+by Anthropic (Apache 2.0).
 
-The original superpowers code is licensed under the MIT License:
-
-```
-MIT License
-
-Copyright (c) 2025 Jesse Vincent
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-### Derived Skills
-
-The following skills are derived from superpowers and have been modified:
-
-- systematic-debugging (v4.2.0)
-- test-driven-development (v4.2.0)
-- verification-before-completion (v4.2.0)
-- using-git-worktrees (v4.2.0)
-- dispatching-parallel-agents (v4.2.0)
-- writing-skills (v4.2.0)
-- jk-receive-review (from receiving-code-review, v4.2.0)
-- jk-code-review (from requesting-code-review, v4.2.0)
-- jk-finish-branch (from finishing-a-development-branch, v4.2.0)
-- jk-brainstorm (from brainstorming, v4.3.1)
-
-### Derived Agents
-
-- code-reviewer (v4.2.0)
-
----
-
-## Anthropic claude-plugins-official
-
-This project includes agents derived from [claude-plugins-official](https://github.com/anthropics/claude-plugins-official) by Anthropic.
-
-The original code is licensed under the Apache License 2.0:
-
-```
-Copyright 2025 Anthropic, PBC
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-```
-
-### Derived Agents
-
-From **pr-review-toolkit** (made language-agnostic, removed project-specific references):
-
-- silent-failure-hunter
-- test-analyzer (from pr-test-analyzer)
-- doc-analyzer (from comment-analyzer)
-
-From **feature-dev** (adapted for jk-plan integration):
-
-- code-explorer
-- code-architect
+v3 removed all attributed upstream-derived material. The four retained skills
+(`jk-philosophy`, `jk-reflect`, `jk-remember`, `jk-converse`) are original prose.
+`skills/jk-converse/scripts/converse.py` is original repository code written
+for this project.

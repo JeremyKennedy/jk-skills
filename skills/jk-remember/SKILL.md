@@ -1,145 +1,40 @@
 ---
 name: jk-remember
-description: "Use when the user says 'remember this', wants to persist a learning, or at the end of significant work — reflects on how to make things better for future sessions, routes knowledge to agent instructions, docs/, or auto memory."
+description: "Use when the user says 'remember this', wants to persist a learning, or at the end of significant work — routes knowledge to agent instructions, docs/, or auto memory"
 ---
 
 # Remember
 
-**Announce at start:** "I'm using the jk-remember skill to reflect on what we've learned."
-
-Step back and reflect on how to make future sessions better. Persist knowledge to the right place, fix stale documentation, flag process improvements. Can be invoked mid-session with specific context, or on a blank session for a general audit.
+Persist what was learned so future sessions benefit. Route knowledge to the right place, fix stale documentation, flag process improvements.
 
 ## When to Use
 
 - User says "remember this" or "save this"
-- End of a significant work session
-- After discovering something non-obvious
-- On a blank session: general documentation audit and improvement
-- When invoked by jk-execute at persistence checkpoints
+- End of significant work
+- After discovering something non-obvious that future sessions would need
 
 ## The Three Destinations
 
-| Destination | What belongs here | Examples |
-|-------------|------------------|----------|
-| **Agent instructions** | Conventions, commands, gotchas, references to docs/. Every line costs context window, but multi-line entries and sections are fine when justified. Examples: `CLAUDE.md`, `AGENTS.md`, or equivalent. | `just test-unit` requires Docker / See docs/api.md for pagination patterns |
-| **docs/** | Domain knowledge, decisions, reference material. Can be long and detailed, organized by topic. | API pagination patterns / why we chose Postgres / deployment quirks |
-| **Auto memory** | User preferences, collaboration style — about the person, not the project | User prefers Swarm mode / wants terse responses |
+| Destination | What belongs here |
+|---|---|
+| **Agent instructions** | Conventions, commands, gotchas, doc references — things where a wrong assumption causes real problems |
+| **docs/** | Domain knowledge, decisions, reference material — needs depth or explanation |
+| **Auto memory** | User preferences, collaboration style — about the person, not the project |
 
-**Routing test:** Would a different person working on this project need this?
-- Yes → agent instructions or docs/
-- No → auto memory
+**Routing test**: Would a different developer need this? Yes → agent instructions or docs/. No → auto memory.
 
-Does it need depth or is a line enough?
-- One-liner or reference → agent instructions
-- Needs explanation → docs/
-
-### Agent Instructions Rules
-
-Agent instructions files are part of every prompt. Not off-limits, but every addition should be justified.
-
-**Belongs:** project-specific conventions, commands, gotchas, doc references, things where a wrong assumption causes real problems, things not derivable from the code.
-
-**Doesn't belong:** generic advice, things obvious from the code or `just --list`, deep explanations better in docs/, anything already covered.
-
-Use judgment. A three-line gotcha section is fine. A page of API docs is not — put that in docs/ and reference it.
-
-## Depth
-
-jk-remember scales from a quick checkpoint to a full documentation audit. Match the depth to the situation.
-
-**Quick** — invoked by jk-execute at a persistence checkpoint, or user wants to save one specific thing. Skim conversation context, route the obvious stuff, done in under a minute. No subagents.
-
-**Standard** — end of a work session. Reflect on the full conversation, check agent instructions and docs/ for staleness, present changes. A few minutes.
-
-**Deep** — end of a major effort. Dispatch parallel subagents to audit different areas (agent-instructions quality, docs/ coverage, stale commands, plan index health), synthesize findings, present improvements.
-
-**Overhaul** — the project's documentation needs serious work. Invoke `jk-skills:jk-plan` to plan the documentation improvement as a proper project: research the current state, interview the user about what matters, design the doc structure, write an implementation plan, execute with jk-execute. Full planning rigor for doc debt.
-
-For deep/overhaul, check the session's burn rate (see `jk-skills:jk-burn-rate`) to guide model selection and parallelism.
-
-**Background execution:** Prefer non-blocking. Unless the user is waiting for results (e.g., they explicitly invoked `/remember` and want to see the output), run in the background so work can continue. Present results when done.
-
-**How to decide:** Use judgment based on the scope of work. A small bugfix might warrant quick. A complex multi-file execution might warrant standard or even deep. If you're unsure, ask:
-
-> "How thorough? Quick / standard / deep / overhaul?"
+**Depth test**: One-liner or reference → agent instructions. Needs explanation → docs/.
 
 ## Process
 
-### 1. Gather Context
+### Gather
+Reflect on the session: what was missing at the start? What was surprising? What decisions were made and why? Check agent instructions and docs/ for staleness. Check for tool failures that signal missing documentation.
 
-**If mid-session** — reflect on the full conversation:
-- What context was missing at the start that would have made this work faster?
-- What was surprising or non-obvious?
-- What conventions or patterns emerged?
-- What decisions were made and why?
+### Filter
+Skip: things obvious from code, one-off fixes, generic advice, transient state, things already documented. Saving nothing is valid.
 
-**If blank session** — audit the project's documentation health:
-- Read the project agent instructions file (`CLAUDE.md`, `AGENTS.md`, or equivalent). Is anything stale, wrong, or missing?
-- Run `tree docs/`. Is knowledge organized well? Any obvious gaps?
-- Check recent git history. Were there recent changes that should be documented?
-- Look for red flags: commands that would fail, references to deleted files, outdated paths, TODOs never completed, generic advice that wastes context window.
-- **Check for doc sprawl.** If `docs/plans/` has many files: is there an index? Are plans marked with status? Are there undated legacy files? Suggest creating the index, adding status headers, archiving where appropriate.
+### Route
+Integrate into existing structure — never append blindly. For docs/, rewrite the relevant section. For agent instructions, find the right section and add concise, justified content. New files only when the topic is substantial and doesn't fit existing structure.
 
-**Optional deeper checks** — offer these to the user, don't run them automatically:
-- **Stale docs**: cross-reference docs/ against the codebase — do referenced files, commands, and paths still exist? Are documented patterns still used?
-- **Missing docs**: scan the codebase for undocumented areas — modules with no README, complex code with no explanation in docs/, conventions followed in code but not written down anywhere.
-
-**In either case**, also check:
-- Did any tool calls fail or require excessive retries? Each is a signal:
-  - Missing documentation (command wasn't documented, path was wrong)
-  - Missing tooling (a better CLI command or API would prevent this class of failure)
-  - Stale docs (documented command no longer works)
-  - **Missing skill** — if you spent multiple tool calls figuring out a workflow that could be codified, that's a skill waiting to be written
-
-  Surface these to the user — sometimes the fix is better docs, sometimes it's a better tool, sometimes it's a new skill.
-
-- Did you follow a recurring workflow pattern that isn't captured in a skill? Did you work around a skill's limitations? Did you wish a skill existed? Suggest:
-  - **New skill**: if a workflow was repeated or improvised that would benefit from structure. Ask: should this be committed to the repo-local skills/runbooks directory (shared with the team) or the agent's personal skills directory (just for you)?
-  - **Skill update**: if an existing skill was missing a step, had stale advice, or didn't cover an edge case you hit
-
-### 2. Filter
-
-Skip:
-- Things obvious from the code
-- One-off fixes unlikely to recur
-- Generic best practices
-- Transient state
-- Things already well-documented
-
-Saving nothing is a valid outcome. Don't save things just because the skill was invoked.
-
-### 3. Route
-
-**Check existing structure first.** Run `tree docs/` and read the project agent instructions file.
-
-For docs/ updates: read the target file and **integrate the learning into the existing structure.** If the document would benefit from reorganization, rewrite the relevant sections. The goal is a coherent document, not an append log.
-
-For agent-instructions updates: find the right section. Add concise, justified content.
-
-For new doc files: only if the topic is substantial and doesn't fit in an existing file.
-
-### 4. Present
-
-Show the user what you want to change and where, with diffs and reasoning:
-
-```
-### Agent instructions
-**Why:** Missing convention caused a debugging detour.
- ## Testing
-+`just test-unit` — requires Docker running (DB tests hit real Postgres)
-
-### docs/api-patterns.md (rewritten section)
-**Why:** Pagination pattern undocumented.
-[Show the integrated section]
-
-### Auto Memory
-- User prefers deep-tier models for code review agents
-
-### Process Suggestions
-- Tool call `just deploy-staging` failed — command doesn't exist.
-  Consider adding a deploy script or documenting the actual deploy process.
-```
-
-### 5. Apply
-
-Only after user approval.
+### Present and Apply
+Show what changed with reasoning, then apply after user approval.

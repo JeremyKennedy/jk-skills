@@ -5,15 +5,25 @@ errors=0
 
 shopt -s nullglob
 
-# Check all skill directories have SKILL.md
-for dir in skills/*/; do
-    if [[ ! -f "${dir}SKILL.md" ]]; then
-        echo "ERROR: Missing SKILL.md in ${dir}"
-        errors=$((errors + 1))
-    fi
-done
+# ── Inventory: exactly four skills ────────────────────────────────────────
 
-# Check SKILL.md frontmatter has name and description
+actual_skills=($(ls -d skills/*/ 2>/dev/null | xargs -n1 basename | sort))
+expected_skills=("jk-converse" "jk-philosophy" "jk-reflect" "jk-remember")
+
+if [[ "${#actual_skills[@]}" -ne 4 ]]; then
+    echo "ERROR: Expected 4 skill directories, found ${#actual_skills[@]}: ${actual_skills[*]}"
+    errors=$((errors + 1))
+else
+    for i in "${!expected_skills[@]}"; do
+        if [[ "${actual_skills[$i]}" != "${expected_skills[$i]}" ]]; then
+            echo "ERROR: Skill mismatch at index $i: expected ${expected_skills[$i]}, got ${actual_skills[$i]}"
+            errors=$((errors + 1))
+        fi
+    done
+fi
+
+# ── SKILL.md frontmatter ───────────────────────────────────────────────────
+
 for skill in skills/*/SKILL.md; do
     if ! head -20 "$skill" | grep -q '^name:'; then
         echo "ERROR: Missing 'name:' in frontmatter of ${skill}"
@@ -25,14 +35,29 @@ for skill in skills/*/SKILL.md; do
     fi
 done
 
-# Check no superpowers:* references remain
-if grep -r 'superpowers:' skills/ agents/ 2>/dev/null; then
-    echo "ERROR: Found superpowers:* references (should be jk-skills:*)"
+# ── Instruction budgets ────────────────────────────────────────────────────
+
+phil_words=$(sed -n '/^# Development Philosophy/,$p' skills/jk-philosophy/SKILL.md | wc -w)
+if [[ "$phil_words" -gt 250 ]]; then
+    echo "ERROR: jk-philosophy body is $phil_words words (max 250)"
     errors=$((errors + 1))
 fi
 
-# Shipped skills must be host/model neutral. Literal Claude model aliases are
-# allowed only in warnings that explicitly say not to hardcode them.
+total_words=0
+for skill in skills/jk-philosophy/SKILL.md skills/jk-reflect/SKILL.md skills/jk-remember/SKILL.md skills/jk-converse/SKILL.md; do
+    body_start=$(grep -n '^# ' "$skill" | head -1 | cut -d: -f1)
+    if [[ -n "$body_start" ]]; then
+        words=$(sed -n "${body_start},\$p" "$skill" | wc -w)
+        total_words=$((total_words + words))
+    fi
+done
+if [[ "$total_words" -gt 2500 ]]; then
+    echo "ERROR: Combined four SKILL.md bodies are $total_words words (max 2500)"
+    errors=$((errors + 1))
+fi
+
+# ── Host/model neutrality ─────────────────────────────────────────────────
+
 model_alias_refs=$(grep -RInwE '(haiku|sonnet|opus|Haiku|Sonnet|Opus)' skills/*/SKILL.md 2>/dev/null | grep -v 'Never hardcode Claude aliases' | grep -v 'skill mentions Claude model aliases' || true)
 if [[ -n "$model_alias_refs" ]]; then
     echo "ERROR: Found provider-specific Claude model aliases in shipped skills"
@@ -40,7 +65,6 @@ if [[ -n "$model_alias_refs" ]]; then
     errors=$((errors + 1))
 fi
 
-# Shipped skills must not assume CLAUDE.md is the only project instruction file.
 claude_md_refs=$(grep -RInE '\bCLAUDE\.md\b' skills/*/SKILL.md 2>/dev/null | grep -vE 'CLAUDE\.md.*AGENTS\.md|AGENTS\.md.*CLAUDE\.md' || true)
 if [[ -n "$claude_md_refs" ]]; then
     echo "ERROR: Found bare CLAUDE.md references in shipped skills"
@@ -48,7 +72,6 @@ if [[ -n "$claude_md_refs" ]]; then
     errors=$((errors + 1))
 fi
 
-# Shipped skills/references must not contain private personal names.
 personal_refs=$(grep -RInE 'Jeremy|jeremy|Kennedy|Jibbs' skills/*/SKILL.md skills/*/references 2>/dev/null || true)
 if [[ -n "$personal_refs" ]]; then
     echo "ERROR: Found personal-name references in shipped skills"
@@ -56,9 +79,6 @@ if [[ -n "$personal_refs" ]]; then
     errors=$((errors + 1))
 fi
 
-# Pi DeepSeek policy: flash is only for mechanical/no-reasoning tasks; pro is
-# only for explicit user requests. Enforce this where model IDs are mentioned in
-# shipped skill bodies/references so examples cannot drift into defaults.
 deepseek_flash_refs=$(grep -RInE 'deepseek/deepseek-v4-flash|dsv4f' skills/*/SKILL.md skills/*/references 2>/dev/null | grep -viE 'mechanical|no real reasoning|no judgment|purely mechanical' || true)
 if [[ -n "$deepseek_flash_refs" ]]; then
     echo "ERROR: Found deepseek-v4-flash references outside mechanical/no-reasoning guidance"
@@ -73,8 +93,6 @@ if [[ -n "$deepseek_pro_refs" ]]; then
     errors=$((errors + 1))
 fi
 
-# A timeout is a kill/interrupt budget, not a progress signal. Do not bake
-# concrete foreground timeout knobs into shipped skill workflows.
 timeout_refs=$(grep -RInE 'timeoutMs|maxRuntimeMs' skills/*/SKILL.md 2>/dev/null || true)
 if [[ -n "$timeout_refs" ]]; then
     echo "ERROR: Found concrete subagent timeout fields in shipped skills"
@@ -82,19 +100,17 @@ if [[ -n "$timeout_refs" ]]; then
     errors=$((errors + 1))
 fi
 
-# Check agent frontmatter has name and description
-for agent in agents/*.md; do
-    if ! head -10 "$agent" | grep -q '^name:'; then
-        echo "ERROR: Missing 'name:' in frontmatter of ${agent}"
-        errors=$((errors + 1))
-    fi
-    if ! head -10 "$agent" | grep -q '^description:'; then
-        echo "ERROR: Missing 'description:' in frontmatter of ${agent}"
+# ── No retired infrastructure ──────────────────────────────────────────────
+
+for dir in agents hooks upstream .claude; do
+    if [[ -d "$dir" ]]; then
+        echo "ERROR: Retired directory still exists: ${dir}/"
         errors=$((errors + 1))
     fi
 done
 
-# Check shipped Python scripts compile
+# ── Shipped Python scripts compile ─────────────────────────────────────────
+
 if command -v python3 >/dev/null 2>&1; then
     while IFS= read -r py; do
         if ! python3 -c 'import ast,sys; ast.parse(open(sys.argv[1]).read(), sys.argv[1])' "$py" 2>/dev/null; then
@@ -104,14 +120,14 @@ if command -v python3 >/dev/null 2>&1; then
     done < <(find skills -name '*.py' -type f)
 fi
 
-# Check sub-skill references point to existing skills
-for ref in $(grep -roh 'jk-skills:[a-z-]*' skills/ 2>/dev/null | sort -u); do
-    skill_name="${ref#jk-skills:}"
-    if [[ ! -d "skills/${skill_name}" ]]; then
-        echo "ERROR: Sub-skill reference '${ref}' points to non-existent skill"
-        errors=$((errors + 1))
-    fi
-done
+# ── No sub-skill references ────────────────────────────────────────────────
+
+sub_refs=$(grep -roh 'jk-skills:[a-z-]*' skills/ 2>/dev/null || true)
+if [[ -n "$sub_refs" ]]; then
+    echo "ERROR: Found jk-skills: sub-skill references — companions don't cross-reference"
+    echo "$sub_refs"
+    errors=$((errors + 1))
+fi
 
 if [[ $errors -gt 0 ]]; then
     echo ""

@@ -1,46 +1,19 @@
 # jk-skills
 
-A heavyweight agent-skill package for planning, executing, and shipping software. It ships as a Claude Code plugin today, and the skill instructions are written to adapt to other hosts such as Pi and OpenCode. It replaces several plugins with an integrated system: research → interview → design → adversarial review → implementation plan → parallel execution → verification.
+A passive four-skill companion package designed to work alongside [Superpowers](https://github.com/obra/superpowers). Superpowers owns the engineering process (planning, execution, TDD, debugging, code review); jk-skills v3 provides philosophy, reflection, knowledge persistence, and structured agent conversations.
 
-This is opinionated. It expands scope aggressively, demands TDD, runs adversarial review panels, and won't let you ship without proving the work is done. If you want something lighter, this isn't it.
+## Skills
 
-## What It Does
-
-**Planning** — Before writing code, `jk-plan` runs deep codebase research with parallel explorer agents, interviews you to understand the problem, has multiple architects independently design solutions, then runs a 6-reviewer adversarial panel to tear the design apart. It cycles until no critical issues remain.
-
-**Execution** — `jk-execute` takes the plan and runs it in one of four modes:
-
-| Mode | How it works | Best for |
-|------|-------------|----------|
-| **Deep** | One orchestrator dispatches subagents per task, reviews between tasks | Most work — tightly coupled tasks, refactoring |
-| **Direct** | Main thread does the work, you see everything | Risky or uncertain work where you want full visibility |
-| **Swarm** | Parallel subagents on independent files simultaneously | Bulk changes, 3+ independent tasks |
-| **Care** | Like Deep but pauses at meaningful checkpoints for your review | High-stakes changes, unfamiliar codebases |
-
-**Verification** — `jk-prove-it` mechanically verifies the work before you ship. Runs tests, checks the diff, generates a ship report. No "I think it works" — evidence or it didn't happen.
-
-**Knowledge** — `jk-remember` persists what was learned to the right place: CLAUDE.md for project conventions, docs/ for deeper knowledge, auto memory for your preferences. Runs at the end of planning and execution so knowledge compounds across sessions.
-
-**Reflection** — `jk-reflect` steps back and challenges the current direction. Gut check first, then structured analysis. Can dispatch a fresh subagent for an unbiased perspective on complex decisions.
-
-**Burn Rate** — `jk-burn-rate` lets you control token spending: max (deep tier everywhere, go wide), standard (balanced), or light (efficient, cheaper enabled models where quality won't suffer). Never weakens core discipline — just controls how aggressively to spend on discretionary work.
-
-## Philosophy
-
-Code is free. Expand scope relentlessly. Refactor always. Ask more questions. Build on what's already known. Run autonomously — blocking must be conscious and explicit. Every task is an opportunity to leave the codebase better.
-
-Full text: invoke `/jk-philosophy` in a session.
+| Skill | What it does |
+|-------|-------------|
+| `jk-philosophy` | Foundational philosophy: code is free, complexity is expensive, root causes over workarounds, clean cutovers, evidence before assertions, direct communication |
+| `jk-reflect` | Step back and challenge the current direction. Light reflection by default; optional deep reflection with a fresh agent for consequential decisions |
+| `jk-remember` | Route durable knowledge to agent instructions, docs/, or auto memory. Explicit invocation or end of significant work |
+| `jk-converse` | Structured async conversation between two or more agent sessions over a shared JSONL file with automatic turn detection and convergence protocol |
 
 ## Installation
 
-### Claude Code Marketplace
-
-```
-/plugin marketplace add JeremyKennedy/jk-skills
-/plugin install jk-skills@jk-skills
-```
-
-### Nix Flake (NixOS / home-manager)
+### Claude Code (via Nix/home-manager)
 
 ```nix
 # flake.nix inputs:
@@ -54,81 +27,55 @@ imports = [ inputs.jk-skills.nixosModules.default ];
 programs.jk-skills.enable = true;
 ```
 
-**Pick one, not both.** Using both creates duplicate skills.
+### Claude Code Marketplace
 
-## Supersedes
+```
+/plugin marketplace add JeremyKennedy/jk-skills
+/plugin install jk-skills@jk-skills
+```
 
-If you have any of these installed, **uninstall them** — jk-skills absorbs and improves on their functionality:
+### Pi
 
-- **[superpowers](https://github.com/obra/superpowers)** — all skills + code-reviewer agent
-- **[feature-dev](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/feature-dev)** — code-explorer and code-architect agents
-- **[pr-review-toolkit](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/pr-review-toolkit)** — silent-failure-hunter, test-analyzer, doc-analyzer agents
-- **[code-review](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/code-review)** — jk-code-review covers this
-- **[code-simplifier](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/code-simplifier)** — overlaps with built-in review
-- **[claude-md-management](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-md-management)** — jk-remember handles CLAUDE.md + docs/ + memory routing
+```
+pi install git:github.com/JeremyKennedy/jk-skills@v3.0.0
+```
 
-Run `/jk-plugin-check` to detect conflicts automatically.
+### Codex
 
-## All Skills
+```
+codex plugin marketplace add JeremyKennedy/jk-skills --ref v3.0.0
+codex plugin install jk-skills@jk-skills
+```
 
-### Core Workflow (roughly in order of use)
+### OpenCode
 
-| Skill | What it does |
-|-------|-------------|
-| `jk-brainstorm` | Lightweight conversational ideation with optional visual browser companion |
-| `jk-plan` | Research → interview → design → review panel → implementation plan |
-| `jk-execute` | Run plans in Deep / Direct / Swarm / Care mode with TDD and code review |
-| `jk-prove-it` | Mechanical verification, self-review, ship report |
-| `jk-finish-branch` | Analyze branch state, present merge/push/PR/cleanup options |
-| `jk-remember` | Smart knowledge routing: CLAUDE.md / docs/ / auto memory. Scales from quick save to full doc audit |
+Uses the same Nix/home-manager installation path; the skills directory is symlinked under `~/.config/opencode/skills/`.
 
-### Support Skills
+## Requirements
 
-| Skill | What it does |
-|-------|-------------|
-| `jk-reflect` | Step back, challenge assumptions, optionally dispatch fresh subagent for outside perspective |
-| `jk-burn-rate` | Session-level token spending control: max / standard / light |
+- **Superpowers v6.2.0+** — jk-skills v3 is a companion, not a replacement. Install Superpowers separately for planning, execution, TDD, debugging, and code review.
+- The four jk-skills companions are host-neutral and work in Claude Code, Pi, OpenCode, and Codex.
 
-### Development Discipline
+## v2 → v3
 
-| Skill | What it does |
-|-------|-------------|
-| `systematic-debugging` | Root cause investigation before proposing fixes |
-| `test-driven-development` | TDD: failing test → implement → refactor |
-| `verification-before-completion` | Evidence before claims — run verification, confirm output |
-| `jk-code-review` | Dispatch code-reviewer agent (automatic in jk-execute, manual for ad-hoc) |
-| `jk-receive-review` | Handle code review feedback with rigor — challenge assumptions, verify independently |
+v3 is a breaking reduction from 20 skills, 6 agents, and a SessionStart hook to four passive companion skills. Engineering process (planning, execution, debugging, TDD, code review, verification, git worktrees, parallel dispatch, skill writing, plugin checks, branch management, burn rate) moves to Superpowers. The four retained skills are original prose (not derived from upstream).
 
-### Coordination
+If upgrading from v2: uninstall jk-skills v2, install Superpowers v6.2.0+, then install jk-skills v3 as a companion.
 
-| Skill | What it does |
-|-------|-------------|
-| `dispatching-parallel-agents` | Parallel subagent coordination with context isolation |
-| `using-git-worktrees` | Isolated workspace setup with safety verification |
-| `jk-converse` | Structured async conversation between two agents via shared markdown file |
+## Validation
 
-### Meta
+```
+just check          # bash checks + converse Python tests
+nix flake check     # Nix sandbox build
+```
 
-| Skill | What it does |
-|-------|-------------|
-| `using-jk-skills` | Auto-loaded via SessionStart hook. Skill discovery and routing. |
-| `jk-philosophy` | Foundational philosophy: code is free, expand scope, refactor always, heavyweight autonomy |
-| `jk-plugin-check` | Detect installed plugins that jk-skills supersedes |
-| `writing-skills` | Skill authoring and verification |
+## Release Flow
 
-## Agents
-
-| Agent | Used by | What it does |
-|-------|---------|-------------|
-| `code-reviewer` | jk-execute, jk-code-review | Review code against plan and standards |
-| `code-explorer` | jk-plan Phase 1 | Deep codebase analysis |
-| `code-architect` | jk-plan Phase 4 | Design feature architectures |
-| `silent-failure-hunter` | jk-execute round table | Audit error handling for silent failures |
-| `test-analyzer` | jk-execute round table | Behavioral test coverage analysis |
-| `doc-analyzer` | jk-execute round table | Documentation accuracy and staleness detection |
+1. Make changes, run `just check` and `nix flake check`
+2. Bump version in `.claude-plugin/plugin.json`
+3. Commit and push
+4. Tag `v<version>` and push the tag
 
 ## License
 
 GPL v3. See [LICENSE](LICENSE).
-
-Derived from [superpowers](https://github.com/obra/superpowers) (MIT), [claude-plugins-official](https://github.com/anthropics/claude-plugins-official) (Apache 2.0). See [ATTRIBUTION.md](ATTRIBUTION.md).

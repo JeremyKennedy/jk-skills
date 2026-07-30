@@ -5,27 +5,22 @@ description: Set up a structured async conversation between two or more agents v
 
 # Converse
 
-**Announce at start:** "I'm using the jk-converse skill to set up a structured conversation with another agent."
-
 Structured async conversation between two or more agent sessions over a shared
-file, driven by the `converse` script. One agent initiates, the others respond,
-the user bridges the sessions. The script handles message delivery, "what's
-new since you last looked," and waiting — so agents never miscount offsets or
-forget to wait.
+JSONL file, driven by the `converse` script. One agent initiates, the others
+respond, the user bridges the sessions. The script handles message delivery,
+"what's new since you last looked," and waiting — so agents never miscount
+offsets or forget to wait.
 
 ## The Script
 
 A single self-contained Python script (stdlib only, no dependencies) lives
-alongside this skill at:
+alongside this skill. Resolve it to an absolute path once:
 
 ```
 <skill-directory>/scripts/converse.py
 ```
 
-`<skill-directory>` is the base directory the host reports when this skill is
-loaded. **Resolve it to an absolute path now** — you will run it yourself and
-paste it into the handoff block for the other agent. Invoke it as
-`python3 /abs/path/to/converse.py <command> ...`.
+Invoke it as `python3 /abs/path/to/converse.py <command> ...`.
 
 Each conversation is one JSONL file. The script tracks, per participant, which
 messages they have already seen — so any participant can ask "what's new?" and
@@ -36,69 +31,46 @@ get exactly the messages they haven't read yet, from anyone but themselves.
 | Command | What it does |
 |---------|--------------|
 | `init <file> --topic T --context C [--participants a,b]` | Create the conversation. Writes topic + context as the first record. |
-| `post <file> --as NAME [--to A,B] [-m MSG \| -f FILE \| stdin] [--wait]` | Append your message, then print any messages addressed to you that arrived since you last looked. `--to` narrows recipients (default: broadcast). With `--wait`, immediately block for the next reply (one-shot turn loop — see below). |
-| `wait <file> --as NAME [--timeout N]` | Block until a new message arrives, then print it. Returns **immediately** if one is already waiting. Aliases: `watch`, `listen`. |
-| `read <file> --as NAME [--peek]` | Print new messages without posting (for a non-committal catch-up). `--peek` leaves them unread. |
-| `last <file> --from NAME [--as VIEWER] [--body]` | Print the most recent message from a specific agent (does not touch read cursors). `--as` restricts to messages that viewer may see; `--body` prints just the message text. |
-| `digest <file> [--each N] [--as VIEWER] [--full]` | Last `N` messages from each agent (default 1), grouped by agent, most-recently-active first. Compact one-liners unless `--full`. Read-only — touches no cursors. A quick "where does everyone stand" view. |
-| `join <file> --as NAME [--digest N]` | Catch `NAME` up to now: set their cursor to the latest message so they receive **no backlog**, only messages posted afterward. `--digest N` prints the last N per agent first as a primer (default 0 = silent join). Also works as a "mark all read" for existing agents. |
-| `log <file> [--as VIEWER]` | Render the full transcript as readable markdown. `--as` renders only what that viewer may see. |
+| `post <file> --as NAME [--to A,B] [-m MSG \| -f FILE \| stdin] [--wait]` | Append your message, then print any messages addressed to you that arrived since you last looked. `--to` narrows recipients (default: broadcast). With `--wait`, immediately block for the next reply. |
+| `wait <file> --as NAME [--timeout N]` | Block until a new message arrives, then print it. Returns immediately if one is already waiting. |
+| `read <file> --as NAME [--peek]` | Print new messages without posting. `--peek` leaves them unread. |
+| `last <file> --from NAME [--as VIEWER] [--body]` | Print the most recent message from a specific agent (does not touch read cursors). |
+| `digest <file> [--each N] [--as VIEWER] [--full]` | Last N messages from each agent (default 1), grouped by agent, most-recently-active first. Compact one-liners unless `--full`. Read-only. |
+| `join <file> --as NAME [--digest N]` | Catch NAME up to now: set their cursor to the latest message so they receive no backlog, only messages posted afterward. `--digest N` prints the last N per agent first as a primer. |
+| `log <file> [--as VIEWER]` | Render the full transcript as readable markdown. |
 
 Key behaviors:
 
-- **`post` always reports new messages.** After appending, it tells you e.g.
-  `2 new messages:` followed by their content — anything the other agent said
-  while you were composing. If nothing is new, it says so.
-- **`wait` never blocks on a message that already arrived.** It checks first,
-  and only sleeps if there is genuinely nothing new. This eliminates the classic
-  failure of waiting forever on a reply that is already in the file.
-- **`wait` without `--timeout` waits indefinitely.** With `--timeout N` it exits
-  with status `2` after `N` seconds if nothing new arrived.
-- Bodies may be passed with `-m`, read from a file with `-f PATH`, or piped on
-  stdin (use stdin for long multi-line messages).
-- **Messages broadcast to everyone by default.** `--to a,b` sends a *directed*
-  message that only those agents (and the sender) can see — `read`, `wait`,
-  `post`, `last --as`, and `log --as` all filter to what each agent is allowed
-  to see. Prefer broadcasting; narrow only when the info genuinely needn't be
-  shared (e.g. a worker reporting status just to its parent).
+- **`post` always reports new messages.** After appending, it tells you what the other agent said while you were composing. If nothing is new, it says so.
+- **`wait` never blocks on a message that already arrived.** It checks first, and only sleeps if there is genuinely nothing new.
+- **`wait` without `--timeout` waits indefinitely.** With `--timeout N` it exits with status `2` after N seconds.
+- Bodies may be passed with `-m`, read from a file with `-f PATH`, or piped on stdin.
+- **Messages broadcast to everyone by default.** `--to a,b` sends a directed message that only those agents (and the sender) can see. Prefer broadcasting; narrow only when the info genuinely needn't be shared.
 
-> **Do not chain `read … && wait …`.** `read` marks the backlog seen and
-> advances your cursor, so the following `wait` has nothing pending and blocks —
-> you've drained messages you should be *responding to* and then sat idle. Just
-> use `wait`: it returns the pending backlog immediately if there is one (and
-> only blocks when there's genuinely nothing to act on). The loop is
-> **`wait` → act → `post --wait` → act → …**, never drain-then-block.
+> **Do not chain `read … && wait …`.** `read` marks the backlog seen and advances your cursor, so the following `wait` has nothing pending and blocks — you've drained messages you should be responding to and then sat idle. The loop is **`wait` → act → `post --wait` → act → …**, never drain-then-block.
 
 ## Roles
 
-Exactly the same three-party contract as before — the script just replaces the
-manual bookkeeping.
-
 ### You (the initiating agent)
 
-1. **Resolve the script path** and pick conversation + participant names.
-2. **`init`** the conversation file with topic and context.
-3. **`post`** your opening position.
-4. **Give the user a copy-pasteable handoff block** for the other session.
-5. **`wait`** for the response (this is your turn-ending action).
-6. **Read, `post` your reply, `wait` again.** Repeat until convergence.
+1. Resolve the script path and pick conversation + participant names.
+2. `init` the conversation file with topic and context.
+3. `post` your opening position.
+4. Give the user a copy-pasteable handoff block for the other session.
+5. `wait` for the response (this is your turn-ending action).
+6. Read, `post` your reply, `wait` again. Repeat until convergence.
 
 ### The user
 
-Bridges the sessions. They paste your handoff block into the other agent's
-session. They do not mediate content.
+Bridges the sessions. They paste your handoff block into the other agent's session. They do not mediate content.
 
 ### The other agent
 
-In a separate session, without this skill loaded. It gets everything it needs
-from the handoff block: the script path, the file path, its participant name,
-and the command patterns. It `read`s, `post`s, and `wait`s just like you.
+In a separate session, without this skill loaded. It gets everything it needs from the handoff block: the script path, the file path, its participant name, and the command patterns.
 
 ## Step 1: Initialize
 
-Choose an absolute path for the conversation file (project root or `/tmp/`) and
-names for the participants (e.g. `agent-1` / `agent-2`, or descriptive roles
-like `proposer` / `reviewer`). Then:
+Choose an absolute path for the conversation file and names for participants (e.g. `agent-1` / `agent-2`, or descriptive roles). Put enough in `--context` that the other agent can participate cold — it has not seen your conversation history.
 
 ```bash
 python3 /abs/path/converse.py init /abs/conversation.jsonl \
@@ -107,14 +79,11 @@ python3 /abs/path/converse.py init /abs/conversation.jsonl \
   --participants agent-1,agent-2
 ```
 
-Put enough in `--context` that the other agent can participate cold — it has
-not seen your conversation history.
-
 ## Step 2: Post Your Opening
 
 ```bash
 python3 /abs/path/converse.py post /abs/conversation.jsonl --as agent-1 \
-  -m "I propose extracting WidgetStore into its own module. Two questions: (1) keep the existing name? (2) move the cache too, or leave it inline?"
+  -m "I propose extracting WidgetStore. Two questions: (1) keep the existing name? (2) move the cache too?"
 ```
 
 For longer openings, pipe on stdin:
@@ -128,8 +97,7 @@ EOF
 
 ## Step 3: Give the User the Handoff Block
 
-Give the user a single copy-pasteable block for the other session. Fill in the
-real absolute paths and names. The other agent needs nothing else.
+Give the user a single copy-pasteable block for the other session. Fill in the real absolute paths and names.
 
 ````
 Paste this into the other agent session:
@@ -142,39 +110,30 @@ The script:           python3 /abs/path/converse.py
 
 1. See what's been said:
      python3 /abs/path/converse.py read /abs/conversation.jsonl --as agent-2
-   (or `log` for the full transcript)
 
 2. Post your response (it will also report anything new since you looked):
      python3 /abs/path/converse.py post /abs/conversation.jsonl --as agent-2 -f - <<'EOF'
      <your response>
      EOF
 
-3. Wait for the reply — ALWAYS end your turn with this, it blocks until I respond:
+3. Wait for the reply — ALWAYS end your turn with this:
      python3 /abs/path/converse.py wait /abs/conversation.jsonl --as agent-2
-   Run it as the final action of your turn. When it returns, it prints the new
-   message(s); read them, then post your reply and wait again.
+   When it returns, it prints the new message(s); read them, then post your reply and wait again.
 
-Protocol for your messages:
+Protocol:
 - State positions explicitly: "I agree with X" / "I disagree because Y".
 - Number your points when responding to multiple items.
 - End with specific questions or a clear ask.
 
-Convergence: we iterate until we agree. When satisfied, post a message that
-ends with "I confirm this exact scope:" followed by a numbered list. I will do
-the same. Stop after mutual confirmation.
+Convergence: iterate until you agree. When satisfied, post a message that ends
+with "I confirm this exact scope:" followed by a numbered list. I will do the
+same. Stop after mutual confirmation.
 ```
 ````
 
-In synchronous harnesses, run `wait` as the **final foreground action of the
-turn** so control returns to you when the message arrives. In harnesses with
-real async/background execution, you may run `wait` in the background and be
-notified on completion. Either way, the rule is the same: after you `post`, you
-`wait`.
-
 ## Turn Loop
 
-Use the combined `post --wait` so each turn is one call — say your piece, then
-listen for the reply:
+Use `post --wait` so each turn is one call — say your piece, then listen for the reply:
 
 ```
 1. (act on the messages you just received)
@@ -182,61 +141,34 @@ listen for the reply:
 3. read the printed reply, go to 1
 ```
 
-To enter the loop (or when you have nothing to say yet), start with a bare
-`wait` — it returns the current backlog immediately if there is one, otherwise
-blocks for the next message. Then act and switch to `post --wait`.
-
-You cannot "forget to wait" without ending your turn silently — make `wait` or
-`post --wait` the last thing you do every turn until convergence. Never
-`read … && wait …` (that drains the backlog, then blocks instead of letting you
-respond to it).
+To enter the loop, start with a bare `wait` — it returns the current backlog immediately if there is one, otherwise blocks for the next message.
 
 ## Convergence
 
-Conversations must converge. The pattern:
+Conversations must converge with explicit scope confirmation. The pattern:
 
 1. **Opening**: State your position, ask specific questions.
 2. **Response**: Answer each question directly, raise new concerns.
 3. **Synthesis**: Propose a unified position, enumerate exact scope.
-4. **Confirmation**: Both agents post a message ending with
-   "I confirm this exact scope:" followed by a numbered list.
+4. **Confirmation**: Both agents post a message ending with "I confirm this exact scope:" followed by a numbered list. Stop when all participants have confirmed.
 
-Stop when all participants have confirmed. Don't iterate after agreement.
-
-Most conversations converge in 2–4 rounds. If you're past 4 rounds without
-agreement, stop waiting and escalate to the user.
+Most conversations converge in 2–4 rounds. If you're past 4 rounds without agreement, stop waiting and escalate to the user.
 
 ## Conversation Quality
 
-- **Be specific, not diplomatic.** "I disagree because X" not "perhaps we could
-  consider..."
-- **Push back on over-engineering.** If the other agent proposes unnecessary
-  complexity, say so.
-- **Ground arguments in the codebase.** Reference file paths, line numbers,
-  existing patterns.
-- **Respect the user's stated preferences.** If the user already rejected an
-  approach, don't re-propose it.
+- **Be specific, not diplomatic.** "I disagree because X" not "perhaps we could consider..."
+- **Push back on over-engineering.** If the other agent proposes unnecessary complexity, say so.
+- **Ground arguments in the codebase.** Reference file paths, line numbers, existing patterns.
+- **Respect the user's stated preferences.** If the user already rejected an approach, don't re-propose it.
+- **Reject false consensus.** Agreeing to avoid conflict wastes time. If you disagree, say why and propose an alternative.
 
 ## More Than Two Agents
 
-Participants are arbitrary names — pass more than two to `--participants` and
-hand each additional session its own handoff block with its own `--as NAME`.
-Every participant's "what's new" is tracked independently, so a third agent
-joining mid-conversation still sees everything it hasn't read. For a panel,
-designate one participant to call convergence once all have confirmed.
+Pass more than two to `--participants` and hand each additional session its own handoff block. Every participant's "what's new" is tracked independently. For a panel, designate one participant to call convergence once all have confirmed.
 
-For a **parent/worker hierarchy**, workers can broadcast shared findings to all
-but report routine status with `--to parent` so they don't spam siblings — the
-parent sees every worker's directed reports, workers only see broadcasts and
-messages addressed to them. Default to broadcasting; reach for `--to` only when
-the information genuinely doesn't need sharing. (`all` is a reserved recipient
-meaning everyone, so `--to all` is just an explicit broadcast.)
+For a **parent/worker hierarchy**, workers can broadcast shared findings to all but report routine status with `--to parent` so they don't spam siblings. Default to broadcasting; reach for `--to` only when the information genuinely doesn't need sharing.
 
-**Onboarding a new agent into a long thread:** have it `join` rather than
-`read`/`wait` first — otherwise its first call returns the entire backlog. A
-silent `join --as agent-N` starts it caught-up (future messages only); add
-`--digest 2` for a quick last-2-per-agent primer of where everyone stands. To
-review the whole history it can still `log` (or `log --as agent-N`).
+**Onboarding a new agent into a long thread:** have it `join` rather than `read`/`wait` first — otherwise its first call returns the entire backlog. A silent `join --as agent-N` starts it caught-up (future messages only); add `--digest 2` for a quick primer.
 
 ## Common Mistakes
 

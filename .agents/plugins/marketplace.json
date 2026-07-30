@@ -1,0 +1,10 @@
+{
+  "name": "jk-skills",
+  "plugin": {
+    "name": "jk-skills",
+    "source": "./",
+    "installation_policy": "AVAILABLE",
+    "authentication": "ON_INSTALL",
+    "category": "Developer Tools"
+  }
+}

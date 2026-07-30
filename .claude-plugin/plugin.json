@@ -1,12 +1,12 @@
 {
   "name": "jk-skills",
-  "description": "Planning, execution, TDD, debugging, and code review skills with aggressive scope expansion philosophy",
-  "version": "2.11.0",
+  "description": "Four-skill Superpowers companion: philosophy, reflection, knowledge persistence, and structured agent conversations",
+  "version": "3.0.0",
   "author": {
     "name": "Jeremy K"
   },
   "homepage": "https://git.jeremyk.net/jeremy/jk-skills",
   "repository": "https://git.jeremyk.net/jeremy/jk-skills",
   "license": "GPL-3.0",
-  "keywords": ["skills", "planning", "tdd", "debugging", "code-review", "execution"]
+  "keywords": ["skills", "philosophy", "reflection", "memory", "conversation"]
 }

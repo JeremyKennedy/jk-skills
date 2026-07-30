@@ -1,30 +1,21 @@
 # CLAUDE.md
 
-Agent-skill package for planning, execution, TDD, debugging, and code review. It ships through Claude Code today, but shipped skill bodies must stay host-neutral and adapt to Pi/OpenCode/Claude Code.
+A four-skill Superpowers companion. No hooks, agents, or process orchestration — Superpowers owns that layer.
 
 ## Architecture
 
-Flat marketplace+plugin repo. Repo root is both the marketplace and the plugin.
-
 - `.claude-plugin/` — Marketplace + plugin manifests
-- `skills/` — Plugin skills (shipped to users). Each subdirectory has a `SKILL.md` with YAML frontmatter (`name:`, `description:`)
-- `.claude/skills/` — Repo-local skills (maintenance tools, not shipped). Same format as `skills/`.
-- `agents/` — Agent definitions
-- `hooks/` — SessionStart hook (injects `using-jk-skills` into conversation)
-- `upstream/` — Upstream tracking registry
+- `.codex-plugin/` — Codex plugin manifest
+- `.agents/plugins/` — Codex marketplace manifest
+- `package.json` — Pi package manifest
+- `skills/` — Four companion skills
+- `tests/` — Python tests (converse round-trip, inventory, neutrality)
 - `scripts/check.sh` — Validation (run via `just check` or `nix flake check`)
-
-## Dual Distribution
-
-1. **Claude Code marketplace**: Users install via `/plugin marketplace add`
-2. **Nix flake**: `nixosModules.default` configures `programs.claude-code.*`
-
-Pick one, not both (duplicates otherwise).
 
 ## Commands
 
-- `just check` — Run validation
-- `just build` — Validate structure (aliases check)
+- `just check` — Run validation (bash checks + pytest)
+- `just build` — Alias for check
 - `just dev` — Development info
 - `nix flake check` — Nix-wrapped validation
 
@@ -40,88 +31,32 @@ description: Use when [trigger condition] — [what it does]
 ---
 ```
 
-Descriptions must start with "Use when" to clearly indicate when the skill applies.
-
 ### Host-neutral skill text
 
-Shipped skills must not assume Claude Code-only tooling or Anthropic-only models. Prefer harness-agnostic wording when possible. If a workflow needs host-specific tools, reference `skills/using-jk-skills/references/host-adapters.md` and cover Claude Code, Pi, and OpenCode equivalents (`Task` / Pi `subagent` / OpenCode agents, `TodoWrite` / Pi `todo`, `AskUserQuestion` / Pi `ask_user_question`). Use capability tiers (`mechanical`, `focused`, `deep`) instead of literal model aliases (`haiku`, `sonnet`, `opus`) unless the text is explicitly warning not to hardcode them. Productive subagents should prefer async/status control over foreground timeouts; timeouts are kill budgets, not progress signals. Do not mention private user names or personal-machine-specific defaults in shipped skills.
+Shipped skills must be host-neutral: no Claude-only tool names, no personal names, no provider-specific model IDs, no literal sub-skill paths, no unsupported timeout/model frontmatter.
 
-### Announcements
+### Instruction budgets
 
-All user-facing skills must include after the `# Title`:
-```markdown
-**Announce at start:** "I'm using the <skill-name> skill to [action]."
-```
-
-Exceptions: jk-philosophy (foundational reference) and using-jk-skills (meta-skill injected by hook).
-
-### Sub-Skill References
-
-Reference other skills via:
-```markdown
-> **REQUIRED SUB-SKILL:** Use jk-skills:<skill-name>
-```
-
-### Provenance
-
-Cherry-picked skills include a provenance comment:
-```html
-<!-- Derived from superpowers v4.2.0: <original-skill-name> -->
-```
-
-### Philosophy Alignment
-
-All skills should embody the development philosophy: code is free, expand scope relentlessly, refactor always, ask more questions, TDD when building features, envision the ideal end state. See `skills/jk-philosophy/SKILL.md`.
-
-### Autonomy by Default
-
-Skills should run autonomously — ending a turn to wait for user input is a **conscious decision**, not an accident. This plugin is designed for heavyweight autonomous work.
-
-**When blocking is appropriate:** interview questions, user approval gates (plan presentation, doc updates), Care mode checkpoints, decisions only the user can make.
-
-**When blocking is NOT appropriate:** between tasks in Deep/Swarm mode (use the hard directive), between phases that don't need user input, for informational updates that could be a non-blocking message.
-
-If a skill must block, be explicit about it: tell the user what you're waiting for and why. Never silently end a turn.
+- `jk-philosophy` body: ≤250 whitespace-delimited words
+- Combined four `SKILL.md` bodies: ≤2,500 words
+- Enforced by `scripts/check.sh`
 
 ## Adding a Skill
 
 1. Create `skills/<name>/SKILL.md` with frontmatter
-2. Add reference files in `skills/<name>/references/` if needed
-3. Add skill name to `skillNames` list in `flake.nix`
+2. Add to `skillNames` in `flake.nix`
+3. Update `scripts/check.sh` budget limits
 4. Run `just check`
-
-## Adding an Agent
-
-1. Create `agents/<name>.md` with YAML frontmatter (`name:`, `description:`, `model: inherit`)
-2. Add provenance comment if derived from upstream (`<!-- Derived from ... -->`)
-3. Register in `flake.nix` under `programs.claude-code.agents`
-4. Update `upstream/registry.json` absorbed list if applicable
-5. Run `just check`
-
-### Agent Output Format
-
-All review agents must use a consistent per-issue format:
-1. **Location**: file:line
-2. **Severity**: Critical / Important / Minor
-3. **Confidence**: 0-100 (is this a real issue, not a false positive?)
-4. **Issue**: What's wrong
-5. **Recommendation**: Specific fix
 
 ## Releasing
 
-Claude Code caches plugins locally. Users only get updates when the `version` in `.claude-plugin/plugin.json` changes — same version = skip, even if code changed.
-
-**Version bump is MANDATORY.** Every commit that changes shipped content (`skills/`, `agents/`, `hooks/`, `.claude-plugin/`) MUST include a version bump in `.claude-plugin/plugin.json`. Semver: patch for fixes, minor for new/changed skills, major for breaking changes. If you're about to commit and haven't bumped the version, bump it now.
-
-Changes to repo-local files (`.claude/skills/`, `scripts/`, `CLAUDE.md`, `docs/`, `upstream/`) do NOT require a version bump.
-
-**Release flow:**
 1. Make changes, `just check`
-2. Bump `version` in `.claude-plugin/plugin.json` (see above)
-3. Commit and push: `git push` (GitHub mirror is synced automatically)
+2. Bump `version` in `.claude-plugin/plugin.json`
+3. Commit and push
+4. Tag `v<version>` and push the tag
 
-Nix flake users get updates on next `flake lock --update-input jk-skills`. Marketplace users get updates via `/plugin update` or auto-update (disabled by default for third-party marketplaces).
+Every commit that changes shipped content MUST include a version bump. Semver: patch for fixes, minor for new skills, major for breaking changes.
 
 ## Commits
 
-Use conventional commits: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`.
+Conventional commits: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`.
