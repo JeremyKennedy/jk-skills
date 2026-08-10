@@ -1,0 +1,7 @@
+interface:
+  display_name: "Ponytail Audit"
+  short_description: "Find unnecessary complexity in a repository"
+  default_prompt: "Use $ponytail-audit for an explicitly requested repository simplification audit."
+
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Ponytail Review"
+  short_description: "Find unnecessary complexity in a diff"
+  default_prompt: "Use $ponytail-review for an explicitly requested over-engineering review."
+
+policy:
+  allow_implicit_invocation: false

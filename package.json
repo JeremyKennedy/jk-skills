@@ -1,6 +1,6 @@
 {
   "name": "jk-skills",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Four-skill Superpowers companion: philosophy, reflection, knowledge persistence, and structured agent conversations",
   "license": "GPL-3.0",
   "keywords": ["skills", "philosophy", "reflection", "memory", "conversation", "pi-package"],

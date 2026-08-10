@@ -1,0 +1,7 @@
+interface:
+  display_name: "Ponytail"
+  short_description: "Minimum-complexity coding guidance"
+  default_prompt: "Use $ponytail for an explicitly requested minimum-complexity coding pass."
+
+policy:
+  allow_implicit_invocation: false
