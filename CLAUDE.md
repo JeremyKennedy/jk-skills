@@ -8,9 +8,16 @@ A four-skill Superpowers companion. No hooks, agents, or process orchestration �
 - `.codex-plugin/` — Codex plugin manifest
 - `.agents/plugins/` — Codex marketplace manifest
 - `package.json` — Pi package manifest
-- `skills/` — Four companion skills
+- `skills/` — Exactly four first-party `jk-*` skills
+- `adopted-skills/` — Pinned, attributed upstream skill snapshots
 - `tests/` — Python tests (converse round-trip, inventory, neutrality)
 - `scripts/check.sh` — Validation (run via `just check` or `nix flake check`)
+
+### Source boundaries and distribution
+
+- `skills/` is the first-party source area and must retain the exact four-skill inventory.
+- `adopted-skills/` is a source-library area for pinned, attributed upstream snapshots; adopted skills are explicit-only and contain no hooks or extensions.
+- Adopted skills are distributed by Agent Hub, not through the default Pi, Codex, or Claude package paths. Agent Hub owns target distribution; direct installer retirement is a later parity checkpoint.
 
 ## Commands
 
@@ -30,6 +37,7 @@ name: skill-name
 description: Use when [trigger condition] — [what it does]
 ---
 ```
+Adopted skills additionally require `disable-model-invocation: true` in the first 20 lines of `SKILL.md` and `allow_implicit_invocation: false` in `agents/openai.yaml`.
 
 ### Host-neutral skill text
 
@@ -41,12 +49,14 @@ Shipped skills must be host-neutral: no Claude-only tool names, no personal name
 - Combined four `SKILL.md` bodies: ≤2,500 words
 - Enforced by `scripts/check.sh`
 
-## Adding a Skill
+## Adding a first-party skill
 
 1. Create `skills/<name>/SKILL.md` with frontmatter
 2. Add to `skillNames` in `flake.nix`
 3. Update `scripts/check.sh` budget limits
 4. Run `just check`
+
+Adopted upstream snapshots belong under `adopted-skills/` and are distributed by Agent Hub; do not add them to the first-party package manifests or target paths.
 
 ## Releasing
 

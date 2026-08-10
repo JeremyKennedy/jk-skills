@@ -11,6 +11,13 @@ A passive four-skill companion package designed to work alongside [Superpowers](
 | `jk-remember` | Route durable knowledge to agent instructions, docs/, or auto memory. Explicit invocation or end of significant work |
 | `jk-converse` | Structured async conversation between two or more agent sessions over a shared JSONL file with automatic turn detection and convergence protocol |
 
+## Source boundaries and distribution
+
+- `skills/` contains exactly the four first-party `jk-*` skills listed above.
+- `adopted-skills/` contains pinned, attributed snapshots of upstream skills. These snapshots are source-library inputs, not first-party `jk-*` skills.
+- Adopted skills are explicit-only: they require an explicit invocation, use no hooks or extensions, and are not distributed through the default Pi, Codex, or Claude package paths.
+- Agent Hub owns target distribution for adopted skills. Retiring direct installer paths is a later parity checkpoint; the installation paths below cover the first-party skills.
+
 ## Installation
 
 ### Claude Code (via Nix/home-manager)
@@ -54,7 +61,8 @@ Uses the same Nix/home-manager installation path; the skills directory is symlin
 ## Requirements
 
 - **Superpowers v6.2.0+** — jk-skills v3 is a companion, not a replacement. Install Superpowers separately for planning, execution, TDD, debugging, and code review.
-- The four jk-skills companions are host-neutral and work in Claude Code, Pi, OpenCode, and Codex.
+- The four first-party `jk-*` companions are host-neutral and work in Claude Code, Pi, OpenCode, and Codex.
+- Adopted snapshots are explicit-only source inputs managed by Agent Hub, not part of the default package installations above.
 
 ## v2 → v3
 

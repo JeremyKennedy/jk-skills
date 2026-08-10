@@ -22,6 +22,28 @@ else
     done
 fi
 
+# ── Adopted skill inventory and policy ─────────────────────────────────────
+
+adopted_skills=("i-have-adhd" "ponytail" "ponytail-audit" "ponytail-review")
+for skill in "${adopted_skills[@]}"; do
+    skill_dir="adopted-skills/${skill}"
+    test -f "${skill_dir}/SKILL.md" || { echo "ERROR: Missing ${skill_dir}/SKILL.md"; errors=$((errors + 1)); }
+    test -f "${skill_dir}/agents/openai.yaml" || { echo "ERROR: Missing ${skill_dir}/agents/openai.yaml"; errors=$((errors + 1)); }
+    head -20 "${skill_dir}/SKILL.md" | grep -q '^disable-model-invocation: true$' || {
+        echo "ERROR: ${skill} is not manual-only"
+        errors=$((errors + 1))
+    }
+    grep -q '^  allow_implicit_invocation: false$' "${skill_dir}/agents/openai.yaml" || {
+        echo "ERROR: ${skill} Codex policy allows implicit invocation"
+        errors=$((errors + 1))
+    }
+done
+
+if find adopted-skills -type d \( -name hooks -o -name extensions -o -name plugins \) -print -quit | grep -q .; then
+    echo "ERROR: adopted-skills contains runtime extension directories"
+    errors=$((errors + 1))
+fi
+
 # ── SKILL.md frontmatter ───────────────────────────────────────────────────
 
 for skill in skills/*/SKILL.md; do
