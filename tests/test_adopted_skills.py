@@ -20,6 +20,11 @@ def test_adopted_skill_names_and_manual_only_frontmatter():
         assert "disable-model-invocation: true" in lines
 
 
+def test_adopted_skill_descriptions_require_explicit_invocation():
+    for name in EXPECTED:
+        text = (ADOPTED / name / "SKILL.md").read_text()
+        assert f"Manual-only: invoke /{name} explicitly; do not infer it." in text
+
 def test_every_adopted_skill_has_codex_manual_only_policy():
     for name in EXPECTED:
         sidecar = (ADOPTED / name / "agents" / "openai.yaml").read_text()
