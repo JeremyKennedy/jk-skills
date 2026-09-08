@@ -5,13 +5,13 @@ errors=0
 
 shopt -s nullglob
 
-# ── Inventory: exactly four skills ────────────────────────────────────────
+# ── Inventory: exactly five skills ────────────────────────────────────────
 
 actual_skills=($(ls -d skills/*/ 2>/dev/null | xargs -n1 basename | sort))
-expected_skills=("jk-converse" "jk-philosophy" "jk-reflect" "jk-remember")
+expected_skills=("jk-converse" "jk-interview" "jk-philosophy" "jk-reflect" "jk-remember")
 
-if [[ "${#actual_skills[@]}" -ne 4 ]]; then
-    echo "ERROR: Expected 4 skill directories, found ${#actual_skills[@]}: ${actual_skills[*]}"
+if [[ "${#actual_skills[@]}" -ne 5 ]]; then
+    echo "ERROR: Expected 5 skill directories, found ${#actual_skills[@]}: ${actual_skills[*]}"
     errors=$((errors + 1))
 else
     for i in "${!expected_skills[@]}"; do
@@ -66,7 +66,7 @@ if [[ "$phil_words" -gt 250 ]]; then
 fi
 
 total_words=0
-for skill in skills/jk-philosophy/SKILL.md skills/jk-reflect/SKILL.md skills/jk-remember/SKILL.md skills/jk-converse/SKILL.md; do
+for skill in skills/jk-philosophy/SKILL.md skills/jk-reflect/SKILL.md skills/jk-remember/SKILL.md skills/jk-converse/SKILL.md skills/jk-interview/SKILL.md; do
     body_start=$(grep -n '^# ' "$skill" | head -1 | cut -d: -f1)
     if [[ -n "$body_start" ]]; then
         words=$(sed -n "${body_start},\$p" "$skill" | wc -w)
@@ -74,7 +74,7 @@ for skill in skills/jk-philosophy/SKILL.md skills/jk-reflect/SKILL.md skills/jk-
     fi
 done
 if [[ "$total_words" -gt 2500 ]]; then
-    echo "ERROR: Combined four SKILL.md bodies are $total_words words (max 2500)"
+    echo "ERROR: Combined five SKILL.md bodies are $total_words words (max 2500)"
     errors=$((errors + 1))
 fi
 

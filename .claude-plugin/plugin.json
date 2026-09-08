@@ -1,12 +1,12 @@
 {
   "name": "jk-skills",
-  "description": "Four-skill Superpowers companion: philosophy, reflection, knowledge persistence, and structured agent conversations",
-  "version": "3.1.0",
+  "description": "Jeremy K's five-skill companion for philosophy, reflection, knowledge persistence, structured agent conversations, and decision interviewing",
+  "version": "4.0.0",
   "author": {
     "name": "Jeremy K"
   },
   "homepage": "https://git.jeremyk.net/jeremy/jk-skills",
   "repository": "https://git.jeremyk.net/jeremy/jk-skills",
   "license": "GPL-3.0",
-  "keywords": ["skills", "philosophy", "reflection", "memory", "conversation"]
+  "keywords": ["skills", "philosophy", "reflection", "memory", "conversation", "interviewing", "decision-making"]
 }

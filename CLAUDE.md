@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-A four-skill Superpowers companion. No hooks, agents, or process orchestration — Superpowers owns that layer.
+A five-skill Superpowers companion. No hooks, agents, or process orchestration — Superpowers owns that layer.
 
 ## Architecture
 
@@ -8,14 +8,14 @@ A four-skill Superpowers companion. No hooks, agents, or process orchestration �
 - `.codex-plugin/` — Codex plugin manifest
 - `.agents/plugins/` — Codex marketplace manifest
 - `package.json` — Pi package manifest
-- `skills/` — Exactly four first-party `jk-*` skills
+- `skills/` — Exactly five first-party `jk-*` skills
 - `adopted-skills/` — Pinned, attributed upstream skill snapshots
 - `tests/` — Python tests (converse round-trip, inventory, neutrality)
 - `scripts/check.sh` — Validation (run via `just check` or `nix flake check`)
 
 ### Source boundaries and distribution
 
-- `skills/` is the first-party source area and must retain the exact four-skill inventory.
+- `skills/` is the first-party source area and must retain the exact five-skill inventory.
 - `adopted-skills/` is a source-library area for pinned, attributed upstream snapshots; adopted skills are explicit-only and contain no hooks or extensions.
 - Adopted skills are distributed by Agent Hub, not through the default Pi, Codex, or Claude package paths. Agent Hub owns target distribution; direct installer retirement is a later parity checkpoint.
 
@@ -46,7 +46,7 @@ Shipped skills must be host-neutral: no Claude-only tool names, no personal name
 ### Instruction budgets
 
 - `jk-philosophy` body: ≤250 whitespace-delimited words
-- Combined four `SKILL.md` bodies: ≤2,500 words
+- Combined five `SKILL.md` bodies: ≤2,500 words
 - Enforced by `scripts/check.sh`
 
 ## Adding a first-party skill

@@ -6,12 +6,16 @@ and [claude-plugins-official](https://github.com/anthropics/claude-plugins-offic
 by Anthropic (Apache 2.0).
 
 v3 retains the four original skills (`jk-philosophy`, `jk-reflect`,
-`jk-remember`, and `jk-converse`) and adds curated, manual-only snapshots from
-the upstream projects below. The adopted snapshots preserve their instructional
-content while adding explicit-only invocation metadata to the Ponytail skills
-and Codex policy sidecars for all four adopted skills. Upstream hooks,
-extensions, plugin manifests, package files, and unrelated source code are not
-included.
+`jk-remember`, and `jk-converse`) and adds `jk-interview`, an original first-party
+implementation, plus curated, manual-only snapshots from the upstream projects
+below. The adopted snapshots preserve their instructional content while adding
+explicit-only invocation metadata to the Ponytail skills and Codex policy
+sidecars for all four adopted skills. Upstream hooks, extensions, plugin
+manifests, package files, and unrelated source code are not included.
+
+`skills/jk-interview/SKILL.md` is an original first-party implementation
+informed by Matt Pocock's MIT-licensed skills repository:
+https://github.com/mattpocock/skills.
 
 `skills/jk-converse/scripts/converse.py` is original repository code written
 for this project.

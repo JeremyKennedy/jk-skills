@@ -1,5 +1,5 @@
 {
-  description = "jk-skills: Superpowers companion with four standalone skills";
+  description = "jk-skills: Superpowers companion with five standalone skills";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -10,10 +10,11 @@
       let
         cfg = config.programs.jk-skills;
         skillNames = [
+          "jk-converse"
+          "jk-interview"
           "jk-philosophy"
           "jk-reflect"
           "jk-remember"
-          "jk-converse"
         ];
       in {
         options.programs.jk-skills = {
