@@ -82,6 +82,13 @@ just check          # bash checks + converse Python tests
 nix flake check     # Nix sandbox build
 ```
 
+## CI
+
+Merges to `main` are gated on buildbot status contexts (the fleet checker;
+this repo has no in-repo workflow). The authoritative list of required
+contexts is the Forgejo branch-protection config (`status_check_contexts`
+via the API), not this file.
+
 ## Release Flow
 
 1. Make changes, run `just check` and `nix flake check`
