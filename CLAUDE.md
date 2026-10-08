@@ -70,3 +70,13 @@ Every commit that changes shipped content MUST include a version bump. Semver: p
 ## Commits
 
 Conventional commits: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`.
+
+## Branch Discipline
+
+This primary checkout is pinned to `main` (dotman repo-protect; pushes to
+`main` are restricted). NEVER `git checkout`/`git switch` off `main` here —
+branch work happens in a linked worktree, merged via pull request:
+
+    git worktree add .worktrees/<name> -b <type>/<name> origin/main
+
+(Humans: escape hatch `git -c core.hooksPath= ...`.)
