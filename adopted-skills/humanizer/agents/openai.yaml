@@ -1,0 +1,7 @@
+interface:
+  display_name: "Humanizer"
+  short_description: "Rewrite AI-sounding prose to read human"
+  default_prompt: "Use $humanizer on the text you want rewritten to sound human."
+
+policy:
+  allow_implicit_invocation: false

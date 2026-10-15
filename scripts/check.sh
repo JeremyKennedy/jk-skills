@@ -24,7 +24,7 @@ fi
 
 # ── Adopted skill inventory and policy ─────────────────────────────────────
 
-adopted_skills=("i-have-adhd" "ponytail" "ponytail-audit" "ponytail-review")
+adopted_skills=("humanizer" "i-have-adhd" "ponytail" "ponytail-audit" "ponytail-review")
 for skill in "${adopted_skills[@]}"; do
     skill_dir="adopted-skills/${skill}"
     test -f "${skill_dir}/SKILL.md" || { echo "ERROR: Missing ${skill_dir}/SKILL.md"; errors=$((errors + 1)); }
