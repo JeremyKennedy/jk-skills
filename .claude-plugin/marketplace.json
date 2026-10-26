@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "jk-skills",
-  "description": "Five-skill Superpowers companion for Claude Code",
+  "description": "Owner-authored jk-* skill set for Claude Code",
   "owner": {
     "name": "Jeremy K"
   },
