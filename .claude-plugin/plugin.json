@@ -1,7 +1,7 @@
 {
   "name": "jk-skills",
-  "description": "Jeremy K's five-skill companion for philosophy, reflection, knowledge persistence, structured agent conversations, and decision interviewing",
-  "version": "4.0.0",
+  "description": "Jeremy K's five-skill jk-* set for philosophy, reflection, knowledge persistence, structured agent conversations, and decision interviewing",
+  "version": "4.0.1",
   "author": {
     "name": "Jeremy K"
   },

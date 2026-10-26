@@ -1,5 +1,5 @@
 {
-  description = "jk-skills: Superpowers companion with five standalone skills";
+  description = "jk-skills: owner-authored jk-* skill set with five standalone skills";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";

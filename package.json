@@ -1,7 +1,7 @@
 {
   "name": "jk-skills",
   "version": "4.0.0",
-  "description": "Five-skill Superpowers companion: philosophy, reflection, knowledge persistence, structured agent conversations, and decision interviewing",
+  "description": "Owner-authored jk-* skill set: philosophy, reflection, knowledge persistence, structured agent conversations, and decision interviewing",
   "license": "GPL-3.0",
   "keywords": ["skills", "philosophy", "reflection", "memory", "conversation", "interviewing", "decision-making", "pi-package"],
   "pi": {

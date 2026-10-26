@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-A five-skill Superpowers companion. No hooks, agents, or process orchestration — Superpowers owns that layer.
+An owner-authored `jk-*` skill set with five skills. No hooks, agents, or process orchestration — engineering-process guidance lives in each harness's instruction file.
 
 ## Architecture
 
