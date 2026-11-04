@@ -1,6 +1,6 @@
 # jk-skills
 
-An owner-authored set of five `jk-*` skills covering philosophy, reflection, knowledge persistence, structured agent conversations, and deliberate decision interviewing. Engineering-process guidance lives in each harness's instruction file; jk-skills does not depend on or install any companion package. Its Superpowers lineage is attribution only — see [ATTRIBUTION.md](ATTRIBUTION.md).
+An owner-authored set of six `jk-*` skills covering philosophy, reflection, knowledge persistence, structured agent conversations, deliberate decision interviewing, and personal work coordination. Engineering-process guidance lives in each harness's instruction file; jk-skills does not depend on or install any companion package. Its Superpowers lineage is attribution only — see [ATTRIBUTION.md](ATTRIBUTION.md).
 
 ## Skills
 
@@ -9,12 +9,13 @@ An owner-authored set of five `jk-*` skills covering philosophy, reflection, kno
 | `jk-philosophy` | Foundational philosophy: code is free, complexity is expensive, root causes over workarounds, clean cutovers, evidence before assertions, direct communication |
 | `jk-reflect` | Step back and challenge the current direction. Light reflection by default; optional deep reflection with a fresh agent for consequential decisions |
 | `jk-interview` | Structured decision-tree interview for plans, decisions, and ideas; exposes assumptions before moving on |
+| `jk-coordinate` | Personal coordination: what's open, per-initiative focus, to-dos, end-of-day and weekly updates, and a morning run, with state kept in `~/dev/docs` |
 | `jk-remember` | Route durable knowledge to agent instructions, docs/, or auto memory. Explicit invocation or end of significant work |
 | `jk-converse` | Structured async conversation between two or more agent sessions over a shared JSONL file with automatic turn detection and convergence protocol |
 
 ## Source boundaries and distribution
 
-- `skills/` contains exactly the five first-party `jk-*` skills listed above.
+- `skills/` contains exactly the six first-party `jk-*` skills listed above.
 - `adopted-skills/` contains pinned, attributed snapshots of upstream skills. These snapshots are source-library inputs, not first-party `jk-*` skills.
 - Adopted skills are explicit-only: they require an explicit invocation, use no hooks or extensions, and are not distributed through the default Pi, Codex, or Claude package paths.
 - Agent Hub owns target distribution for adopted skills. Retiring direct installer paths is a later parity checkpoint; the installation paths below cover the first-party skills.
@@ -61,7 +62,7 @@ Uses the same Nix/home-manager installation path; the skills directory is symlin
 
 ## Requirements
 
-- The five first-party `jk-*` skills are host-neutral and work in Claude Code, Pi, OpenCode, and Codex.
+- The six first-party `jk-*` skills are host-neutral and work in Claude Code, Pi, OpenCode, and Codex.
 - No companion package is required. Planning, execution, TDD, debugging, and code review are governed by each harness's own instructions.
 - Adopted snapshots are explicit-only source inputs managed by Agent Hub, not part of the default package installations above.
 
