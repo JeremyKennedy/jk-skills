@@ -110,9 +110,9 @@ Reply with Done and Still owed, and update `NOW.md`.
 
 ## Weekly update (`/weekly`)
 
-The Monday canvas draft is the weekly report. Until the canvas integration
-exists, write `~/dev/docs/coordination/reports/<date>-weekly.md`. Jeremy's
-format: open with a version that needs no context ("Tricon reported some
+The Monday canvas draft is the weekly report (see `coordination/canvas/README.md`).
+For an update at any other time, write `~/dev/docs/coordination/reports/<date>-weekly.md`.
+Jeremy's format: open with a version that needs no context ("Tricon reported some
 issues; we've resolved most of them"), separate Done from What's next, put
 Shortcut numbers at the end of each point, order clients BJ, Tricon, Colson,
 BLG, then the rest, and give him the file path.
@@ -130,7 +130,9 @@ BLG, then the rest, and give him the file path.
    flag any STATUS over 60 lines or off-template, and check that every item
    has a link and a date.
 6. Push: `git -C /Users/jeremy/dev/docs push origin main`.
-7. Mondays: draft the canvas update for Jeremy's approval. Never write to it
-   without his OK.
+7. Mondays: follow the Monday procedure in the machine's canvas notes
+   (`coordination/canvas/README.md`): snapshot the canvas, list what changed,
+   write the paste-ready draft, and flag it at the top of NOW.md. Never write to
+   the canvas yourself.
 8. Finish with a summary of at most 10 lines. It's what Jeremy reads first in
    OpenChamber.
