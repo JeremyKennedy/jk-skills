@@ -1,0 +1,701 @@
+#!/usr/bin/env python3
+"""jk-coordinate activity collector.
+
+One read-only digest of recent activity for a coordination home, as a short
+human summary or as --json. Sources: local git, agent sessions, Forgejo, and
+Azure DevOps (for deadlock). Each source is independent: a failing source
+becomes a warning and the rest of the digest still arrives.
+
+    collect --since 1d
+    collect --since 2d --json
+    collect --since "2026-11-09 08:00" --only git,sessions
+    collect --config ~/dev/deadlock/oracle/docs/coordination/collector.json
+
+Read-only toward every external system: git log/status only, read-only SQLite,
+Forgejo GETs, and the read-only `caipas-bridge boards search` / Review Exchange
+`prs` commands. No writes, no prompts, no interactive auth.
+
+The config lives beside the coordination state (see the home README). It names
+the instance, repo roots, Forgejo repos, ADO repos and session databases. This
+file never hardcodes a host or a project.
+"""
+
+from __future__ import annotations
+
+import argparse
+import concurrent.futures as cf
+import datetime as dt
+import json
+import os
+import re
+import sqlite3
+import subprocess
+import sys
+import tempfile
+import threading
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from pathlib import Path
+
+HOME = Path.home()
+DEV = HOME / "dev"
+DAY_START_HOUR = 6  # "today" starts at 06:00 local
+NO_PROMPT_ENV = {
+    **os.environ,
+    "GH_PROMPT_DISABLED": "1",
+    "GIT_TERMINAL_PROMPT": "0",
+    "GCM_INTERACTIVE": "never",
+}
+PATH_PREFIX = f"{HOME}/.local/bin"
+
+_warn_lock = threading.Lock()
+WARNINGS: list[str] = []
+
+
+def warn(source, msg):
+    with _warn_lock:
+        WARNINGS.append(f"{source}: {msg}")
+
+
+def expand(value):
+    return Path(os.path.expandvars(os.path.expanduser(str(value))))
+
+
+# ------------------------------------------------------------------ helpers --
+
+def local(ts):
+    return dt.datetime.fromtimestamp(float(ts)).astimezone()
+
+
+def iso(ts):
+    return local(ts).strftime("%Y-%m-%d %H:%M") if ts else None
+
+
+def iso_dt(value):
+    """Parse an ISO timestamp from an API into epoch seconds, or None."""
+    if not value:
+        return None
+    try:
+        return dt.datetime.fromisoformat(str(value).replace("Z", "+00:00")).timestamp()
+    except ValueError:
+        return None
+
+
+def parse_when(val, now):
+    """'2d' | '12h' | '90m' | '1w' | 'today' | 'yesterday' | 'now' | ISO date or
+    datetime (local unless it carries an offset) | epoch seconds -> epoch seconds.
+
+    'today' and 'yesterday' use a 06:00 day boundary: 'today' at 02:00 means
+    yesterday 06:00. Relative values count back from one captured `now`.
+    """
+    v = (val or "").strip().lower()
+    if v in ("", "now"):
+        return now.timestamp()
+    if v in ("today", "yesterday"):
+        base = now if now.hour >= DAY_START_HOUR else now - dt.timedelta(days=1)
+        if v == "yesterday":
+            base -= dt.timedelta(days=1)
+        return base.replace(hour=DAY_START_HOUR, minute=0, second=0, microsecond=0).timestamp()
+    m = re.fullmatch(r"(\d+(?:\.\d+)?)\s*([mhdw])", v)
+    if m:
+        unit = {"m": "minutes", "h": "hours", "d": "days", "w": "weeks"}[m.group(2)]
+        return (now - dt.timedelta(**{unit: float(m.group(1))})).timestamp()
+    if re.fullmatch(r"\d{9,10}(?:\.\d+)?", v):
+        return float(v)
+    try:
+        d = dt.datetime.fromisoformat(val.strip())
+    except ValueError:
+        raise SystemExit(f"bad time value {val!r}: use 2d, 12h, 90m, today, yesterday, now, "
+                         "an ISO date or datetime, or epoch seconds") from None
+    return (d if d.tzinfo else d.astimezone()).timestamp()
+
+
+def run(cmd, timeout=30, cwd=None, env=None):
+    """Run a command with no TTY and no prompts; returns (stdout, rc, stderr).
+
+    stdout goes through a temp file, not a pipe: large piped output can be
+    truncated by a child that exits early.
+    """
+    child_env = {**NO_PROMPT_ENV, "PATH": f"{PATH_PREFIX}:{NO_PROMPT_ENV.get('PATH', '')}"}
+    if env:
+        child_env.update(env)
+    try:
+        with tempfile.TemporaryFile() as out, tempfile.TemporaryFile() as err:
+            proc = subprocess.run(cmd, stdout=out, stderr=err, stdin=subprocess.DEVNULL,
+                                  timeout=timeout, cwd=cwd, env=child_env)
+            out.seek(0)
+            err.seek(0)
+            return (out.read().decode("utf-8", "replace"), proc.returncode,
+                    err.read().decode("utf-8", "replace"))
+    except subprocess.TimeoutExpired:
+        return "", 124, f"timed out after {timeout}s"
+    except OSError as e:
+        return "", 127, str(e)
+
+
+def last_line(text, n=200):
+    lines = [ln for ln in (text or "").strip().splitlines() if ln.strip()]
+    return (lines[-1] if lines else "")[:n]
+
+
+def squash(text, n):
+    return re.sub(r"\s+", " ", text or "").strip()[:n]
+
+
+def load_json(path, default=None):
+    try:
+        return json.loads(Path(path).read_text())
+    except FileNotFoundError:
+        return default
+    except Exception as e:
+        warn("config", f"{Path(path).name}: {e}")
+        return default
+
+
+def secret_from_file(path):
+    if not path:
+        return None
+    try:
+        return Path(path).read_text().strip() or None
+    except OSError:
+        return None
+
+
+def get_json(url, headers=None, timeout=20):
+    req = urllib.request.Request(url, headers=headers or {}, method="GET")
+    with urllib.request.urlopen(req, timeout=timeout) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+# ---------------------------------------------------------------------- git --
+
+def git_identity(repo):
+    out, rc, _ = run(["git", "-C", str(repo), "config", "user.email"])
+    return out.strip() if rc == 0 and out.strip() else None
+
+
+def collect_git(cfg, since, until):
+    roots = [expand(r) for r in cfg.get("repo_roots") or [DEV]]
+    repos = []
+    for root in roots:
+        if not root.is_dir():
+            warn("git", f"repo root {root} is missing")
+            continue
+        for p in sorted(root.iterdir()):
+            if p.is_dir() and (p / ".git").exists():
+                repos.append(p)
+    author = cfg.get("git_author")
+    seen, lock = set(), threading.Lock()
+    per_repo_cap = int((cfg.get("caps") or {}).get("commits_per_repo", 15))
+    repo_cap = int((cfg.get("caps") or {}).get("git_repos", 40))
+
+    def one(path):
+        repo_author = author or git_identity(path)
+        if not repo_author:
+            warn("git", f"{path.name}: no user.email, commits skipped")
+            return None
+        out = {"repo": path.name, "path": str(path)}
+        branch, _, _ = run(["git", "-C", str(path), "symbolic-ref", "--short", "HEAD"])
+        out["branch"] = branch.strip() or "(detached)"
+        st, _, _ = run(["git", "-C", str(path), "status", "--porcelain"])
+        out["dirty"] = len(st.strip().splitlines()) if st.strip() else 0
+        log, rc, err = run(["git", "-C", str(path), "log", f"--since=@{int(since)}",
+                            f"--until=@{int(until)}", "--author", repo_author,
+                            "--format=%h|%at|%s"], timeout=30)
+        if rc != 0:
+            warn("git", f"{path.name}: git log failed: {last_line(err)}")
+        commits = []
+        for line in log.strip().splitlines() if rc == 0 else []:
+            h, at, subj = (line.split("|", 2) + ["", ""])[:3]
+            with lock:
+                if h in seen:
+                    continue
+                seen.add(h)
+            commits.append({"sha": h, "at": iso(int(at)), "subject": subj[:120]})
+        ab, rc, _ = run(["git", "-C", str(path), "rev-list", "--left-right", "--count",
+                         "@{upstream}...HEAD"])
+        if rc == 0 and len(ab.split()) == 2:
+            out["behind"], out["ahead"] = int(ab.split()[0]), int(ab.split()[1])
+        if not commits and not out["dirty"]:
+            return None
+        out["author"] = repo_author
+        out["commit_count"] = len(commits)
+        out["commits"] = commits[:per_repo_cap]
+        return out
+
+    with cf.ThreadPoolExecutor(max_workers=8) as ex:
+        result = [r for r in ex.map(one, repos) if r]
+    result.sort(key=lambda r: (-r["commit_count"], r["repo"]))
+    return {"repos": result[:repo_cap], "repo_count": len(result)}
+
+
+# ----------------------------------------------------------------- sessions --
+
+def _oc_text(data):
+    try:
+        return squash(json.loads(data).get("text"), 200)
+    except Exception:
+        return ""
+
+
+def collect_opencode(cfg, since, until):
+    db = expand((cfg.get("sessions") or {}).get("opencode_db")
+                or "~/.local/share/opencode/opencode.db")
+    if not db.exists():
+        return {"error": f"no {db}"}
+    cap = int((cfg.get("caps") or {}).get("sessions", 40))
+    lo, hi = int(since * 1000), int(until * 1000)
+    con = sqlite3.connect(f"file:{db}?mode=ro", uri=True, timeout=10)
+    try:
+        con.execute("PRAGMA query_only = 1")
+        msgs = {r[0]: r[1:] for r in con.execute(
+            "SELECT session_id, count(*), max(time_created), sum(type = 'user') FROM session_message "
+            "WHERE time_created >= ? AND time_created < ? GROUP BY session_id", (lo, hi))}
+        created = {r[0] for r in con.execute(
+            "SELECT id FROM session_v2 WHERE time_created >= ? AND time_created < ?", (lo, hi))}
+        active = set(msgs) | created
+        info = {}
+        cols = ["id", "parent_id", "title", "directory", "created", "archived", "agent", "model"]
+
+        def load(ids):
+            ids = [i for i in ids if i and i not in info]
+            for i in range(0, len(ids), 400):
+                chunk = ids[i:i + 400]
+                for row in con.execute(
+                        "SELECT id, parent_id, title, directory, time_created, time_archived, agent, model "
+                        f"FROM session_v2 WHERE id IN ({','.join('?' * len(chunk))})", chunk):
+                    info[row[0]] = dict(zip(cols, row, strict=True))
+
+        load(active)
+        for _ in range(10):  # walk subagent chains up to their top-level session
+            missing = {s["parent_id"] for s in info.values()
+                       if s["parent_id"] and s["parent_id"] not in info}
+            if not missing:
+                break
+            load(missing)
+
+        def top(sid):
+            hops = 0
+            while info.get(sid, {}).get("parent_id") in info and hops < 20:
+                sid, hops = info[sid]["parent_id"], hops + 1
+            return sid
+
+        tops = {}
+        for sid in active:
+            t = tops.setdefault(top(sid), {"msgs": 0, "user": 0, "last": 0, "sub": 0, "sub_msgs": 0, "sub_last": 0})
+            n, last, users = msgs.get(sid, (0, 0, 0))
+            c = (info.get(sid) or {}).get("created") or 0
+            act = max(last or 0, c if lo <= c < hi else 0)
+            if sid == top(sid):
+                t["msgs"] += n
+                t["user"] += users or 0
+                t["last"] = max(t["last"], act)
+            else:
+                t["sub"] += 1
+                t["sub_msgs"] += n
+                t["sub_last"] = max(t["sub_last"], act)
+
+        sessions = []
+        for sid, t in tops.items():
+            s = info.get(sid)
+            if not s:
+                continue
+            last_u = con.execute("SELECT data FROM session_message WHERE session_id = ? AND type = 'user' "
+                                 "AND time_created >= ? AND time_created < ? ORDER BY seq DESC LIMIT 1",
+                                 (sid, lo, hi)).fetchone()
+            last_act = max(t["last"], t["sub_last"]) / 1000
+            sessions.append({"session": sid, "title": (s["title"] or "")[:120],
+                             "directory": s["directory"], "created": iso(s["created"] / 1000),
+                             "last_activity": iso(last_act), "last_activity_ts": last_act,
+                             "archived": bool(s["archived"]), "agent": s["agent"],
+                             "messages_in_window": t["msgs"], "prompts_in_window": t["user"],
+                             "subagent_sessions_active": t["sub"],
+                             "subagent_messages_in_window": t["sub_msgs"],
+                             "top_level": s["parent_id"] is None,
+                             "last_prompt_in_window": _oc_text(last_u[0]) if last_u else ""})
+    finally:
+        con.close()
+    sessions.sort(key=lambda s: s["last_activity_ts"], reverse=True)
+    return {"count": len(sessions), "cap": cap, "sessions": sessions[:cap],
+            "subagent_sessions_active": sum(t["sub"] for t in tops.values())}
+
+
+def collect_omp(cfg, since, until):
+    db = expand((cfg.get("sessions") or {}).get("omp_db") or "~/.omp/agent/history.db")
+    if not db.exists():
+        return {"error": f"no {db}"}
+    cap = int((cfg.get("caps") or {}).get("sessions", 40))
+    con = sqlite3.connect(f"file:{db}?mode=ro", uri=True, timeout=10)
+    try:
+        rows = con.execute("SELECT session_id, title, updated_at FROM session_titles "
+                           "WHERE updated_at >= ? AND updated_at < ? ORDER BY updated_at DESC",
+                           (since, until)).fetchall()
+        out = []
+        for sid, title, upd in rows[:cap]:
+            r = con.execute("SELECT prompt, cwd FROM history WHERE session_id = ? "
+                            "ORDER BY created_at ASC LIMIT 1", (sid,)).fetchone()
+            out.append({"session": sid, "title": (title or "")[:120], "updated": iso(upd),
+                        "cwd": (r[1] if r else "") or "", "first_prompt": squash(r[0], 200) if r else ""})
+        return {"count": len(rows), "sessions": out}
+    finally:
+        con.close()
+
+
+def _user_text(content):
+    texts = [content] if isinstance(content, str) else [
+        b.get("text", "") for b in content or []
+        if isinstance(b, dict) and b.get("type") in ("text", "input_text")]
+    return next((x for x in texts if x.strip() and not x.lstrip().startswith(("<", "{"))), None)
+
+
+def collect_claude(cfg, since, until):
+    projdir = expand((cfg.get("sessions") or {}).get("claude_dir") or "~/.claude/projects")
+    if not projdir.exists():
+        return {"error": f"no {projdir}"}
+    cap = int((cfg.get("caps") or {}).get("sessions", 40))
+    files = [f for f in projdir.rglob("*.jsonl") if since <= f.stat().st_mtime < until]
+    files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
+    out = []
+    for f in files[:cap]:
+        first = last = session = None
+        with open(f, errors="replace") as fh:
+            for line in fh:
+                try:
+                    obj = json.loads(line)
+                except ValueError:
+                    continue
+                if obj.get("isSidechain"):
+                    continue
+                session = obj.get("sessionId") or session
+                if obj.get("type") == "user":
+                    t = _user_text((obj.get("message") or {}).get("content"))
+                    if t:
+                        first, last = first or t, t
+        out.append({"project": f.parent.name, "session": session,
+                    "modified": iso(f.stat().st_mtime), "first_user": squash(first, 200),
+                    "last_user": squash(last, 200)})
+    return {"count": len(files), "sessions": out}
+
+
+# ------------------------------------------------------------------ Forgejo --
+
+def collect_forgejo(cfg, since, until):
+    fcfg = cfg.get("forgejo")
+    if not fcfg:
+        return None
+    token = os.environ.get("FORGEJO_API_TOKEN") or secret_from_file(expand(fcfg.get("token_file", "")))
+    if not token:
+        warn("forgejo", "no token (FORGEJO_API_TOKEN or token_file)")
+        return {"error": "no token"}
+    base = fcfg.get("base_url", "https://git.jeremyk.net/api/v1").rstrip("/")
+    repos = fcfg.get("repos") or []
+    cap = int((cfg.get("caps") or {}).get("forgejo_items", 60))
+    headers = {"Authorization": f"token {token}", "Accept": "application/json"}
+
+    def one(repo):
+        out = {"repo": repo, "items": [], "open_pulls": []}
+        try:
+            issues = get_json(f"{base}/repos/{repo}/issues?state=all&limit=50&sort=recentupdate", headers)
+        except (urllib.error.URLError, ValueError) as e:
+            warn("forgejo", f"{repo}: issues failed: {e}")
+            return out
+        for it in issues or []:
+            updated = iso_dt(it.get("updated_at"))
+            if updated is None or not (since <= updated < until):
+                continue
+            out["items"].append({
+                "number": it.get("number"), "title": (it.get("title") or "")[:160],
+                "state": it.get("state"), "is_pr": bool(it.get("pull_request")),
+                "author": (it.get("user") or {}).get("login"),
+                "assignees": [a.get("login") for a in it.get("assignees") or []],
+                "labels": [l.get("name") for l in it.get("labels") or []],
+                "comments": it.get("comments"), "updated": iso(updated),
+                "url": it.get("html_url"),
+            })
+        try:
+            pulls = get_json(f"{base}/repos/{repo}/pulls?state=open&limit=50", headers)
+        except (urllib.error.URLError, ValueError) as e:
+            warn("forgejo", f"{repo}: pulls failed: {e}")
+            pulls = []
+        for pr in pulls or []:
+            out["open_pulls"].append({
+                "number": pr.get("number"), "title": (pr.get("title") or "")[:160],
+                "author": (pr.get("user") or {}).get("login"),
+                "head": (pr.get("head") or {}).get("ref"),
+                "updated": iso(iso_dt(pr.get("updated_at"))),
+                "url": pr.get("html_url"),
+            })
+        out["items"].sort(key=lambda x: x["updated"] or "", reverse=True)
+        out["open_pulls"].sort(key=lambda x: x["updated"] or "", reverse=True)
+        return out
+
+    with cf.ThreadPoolExecutor(max_workers=6) as ex:
+        results = list(ex.map(one, repos))
+    items = [i for r in results for i in r["items"]]
+    items.sort(key=lambda x: x["updated"] or "", reverse=True)
+    return {"repos": results, "items": items[:cap], "item_count": len(items)}
+
+
+# ---------------------------------------------------------------------- ADO --
+
+REVEX_CACHE_DAYS = 7
+
+
+def revex_client(rcfg):
+    """Return a path to the current Review Exchange client, downloading it when
+    missing or stale. The client is Review Exchange-owned; a stale copy sends
+    the retired bearer token, so refresh it."""
+    url = rcfg.get("client_url")
+    cache = expand(rcfg.get("client_cache") or "~/.cache/jk-coordinate/review_exchange.py")
+    if not url:
+        return cache if cache.exists() else None
+    fresh = cache.exists() and (time.time() - cache.stat().st_mtime) < REVEX_CACHE_DAYS * 86400
+    if fresh:
+        return cache
+    username = rcfg.get("username")
+    password = secret_from_file(expand(rcfg.get("app_password_file", "")))
+    if not (username and password):
+        warn("ado", "review-exchange credentials missing")
+        return cache if cache.exists() else None
+    try:
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        req = urllib.request.Request(url, method="GET")
+        import base64
+        cred = base64.b64encode(f"{username}:{password}".encode()).decode()
+        req.add_header("Authorization", f"Basic {cred}")
+        with urllib.request.urlopen(req, timeout=20) as response:
+            cache.write_bytes(response.read())
+    except (urllib.error.URLError, OSError) as e:
+        warn("ado", f"review-exchange client download failed: {e}")
+        return cache if cache.exists() else None
+    return cache
+
+
+def collect_ado(cfg, since, until):
+    acfg = cfg.get("ado")
+    if not acfg:
+        return None
+    bridge = expand(acfg.get("bridge") or "~/.local/bin/caipas-bridge")
+    if not bridge.exists():
+        warn("ado", f"bridge missing at {bridge}")
+        return {"error": "bridge missing"}
+    out = {"boards": [], "pulls": [], "warnings": []}
+
+    # boards is project-scoped: one call, whatever repos are configured.
+    limit = str(int(acfg.get("boards_assigned_limit", 25)))
+    stdout, rc, err = run([str(bridge), "boards", "search", "--assigned-to", "me",
+                           "--limit", limit], timeout=90)
+    if rc != 0:
+        warn("ado", f"boards search failed: {last_line(err or stdout)}")
+    else:
+        try:
+            payload = json.loads(stdout[stdout.index("{"):])
+        except ValueError:
+            warn("ado", "unparseable boards output")
+        else:
+            project = payload.get("repo") or "app"
+            items = (payload.get("transient_output") or {}).get("items") or []
+            for it in items:
+                out["boards"].append({
+                    "repo": project, "id": it.get("id"), "type": it.get("type"),
+                    "state": it.get("state"), "title": (it.get("title") or "")[:160],
+                    "iteration": it.get("iteration_path"), "url": it.get("url"),
+                })
+
+    rcfg = acfg.get("review_exchange")
+    if rcfg:
+        client = revex_client(rcfg)
+        password = secret_from_file(expand(rcfg.get("app_password_file", "")))
+        if client and client.exists() and password:
+            env = {
+                "REVIEW_EXCHANGE_URL": rcfg.get("url", ""),
+                "REVIEW_EXCHANGE_USERNAME": rcfg.get("username", ""),
+                "REVIEW_EXCHANGE_APP_PASSWORD": password,
+            }
+            stdout, rc, err = run([sys.executable, str(client), "prs", "--state", "open",
+                                   "--sort", "priority"], timeout=60, env=env)
+            if rc != 0:
+                warn("ado", f"review-exchange prs failed: {last_line(err or stdout)}")
+            else:
+                try:
+                    payload = json.loads(stdout[stdout.index("{"):])
+                except ValueError:
+                    warn("ado", "unparseable review-exchange output")
+                else:
+                    allowed = set(acfg.get("repos") or [])
+                    for pr in (payload.get("work_items") or payload.get("prs")
+                               or payload.get("items") or []):
+                        if allowed and pr.get("repo") not in allowed:
+                            continue
+                        out["pulls"].append({
+                            "repo": pr.get("repo"), "id": pr.get("pr_id") or pr.get("id"),
+                            "title": (pr.get("title") or "")[:160],
+                            "state": pr.get("state"), "priority": pr.get("priority"),
+                            "plate_owner": pr.get("plate_owner"),
+                            "plate_reason": pr.get("plate_reason"),
+                            "open_findings": pr.get("open_findings"),
+                            "updated": pr.get("updated_at"),
+                            "url": pr.get("pr_url") or pr.get("url"),
+                        })
+        else:
+            warn("ado", "review-exchange client or credentials unavailable")
+
+    return out
+
+
+# ------------------------------------------------------------------ summary --
+
+def print_summary(d):
+    w = d["window"]
+    print(f"Coordination digest for {d['instance']} · {w['since']} → {w['until']}")
+    print()
+    git = d.get("git") or {}
+    if git.get("error"):
+        print(f"git: {git['error']}")
+    else:
+        print(f"git: {len(git.get('repos') or [])} repos with activity")
+        for r in (git.get("repos") or [])[:10]:
+            dirty = f", {r['dirty']} dirty" if r.get("dirty") else ""
+            ahead = f", {r['ahead']} ahead" if r.get("ahead") else ""
+            print(f"- {r['repo']} [{r['branch']}]: {r['commit_count']} commits{dirty}{ahead}")
+            for c in r["commits"][:3]:
+                print(f"    {c['sha']} {c['at']} {c['subject']}")
+    print()
+    sess = d.get("sessions") or {}
+    for name in ("opencode", "omp", "claude"):
+        s = sess.get(name) or {}
+        if s.get("error"):
+            print(f"{name}: {s['error']}")
+            continue
+        print(f"{name}: {s.get('count', 0)} sessions in window")
+        for item in (s.get("sessions") or [])[:5]:
+            title = item.get("title") or item.get("first_user") or item.get("first_prompt") or ""
+            print(f"- {item.get('last_activity') or item.get('updated') or item.get('modified')}: {title}")
+    print()
+    fj = d.get("forgejo")
+    if fj and not fj.get("error"):
+        print(f"forgejo: {fj.get('item_count', 0)} items moved, "
+              f"{sum(len(r['open_pulls']) for r in fj.get('repos') or [])} open PRs")
+        for it in (fj.get("items") or [])[:10]:
+            kind = "PR" if it.get("is_pr") else "issue"
+            print(f"- {it['repo']} #{it['number']} [{it['state']}] {kind}: {it['title']}")
+        for r in fj.get("repos") or []:
+            for pr in (r.get("open_pulls") or [])[:5]:
+                print(f"- open PR {r['repo']} #{pr['number']}: {pr['title']} ({pr['head']})")
+    elif fj and fj.get("error"):
+        print(f"forgejo: {fj['error']}")
+    ado = d.get("ado")
+    if ado and not ado.get("error"):
+        print(f"ado: {len(ado.get('boards') or [])} board items assigned, "
+              f"{len(ado.get('pulls') or [])} open PRs")
+        for it in (ado.get("boards") or [])[:10]:
+            print(f"- {it['repo']} {it['id']} [{it['state']}] {it['type']}: {it['title']}")
+        for pr in (ado.get("pulls") or [])[:10]:
+            plate = f" ({pr['plate_reason']}, {pr['plate_owner']})" if pr.get("plate_reason") else ""
+            print(f"- {pr['repo']} #{pr['id']} [{pr['state']}] {pr['title']}{plate}")
+    elif ado and ado.get("error"):
+        print(f"ado: {ado['error']}")
+    if d.get("warnings"):
+        print()
+        print("warnings:")
+        for x in d["warnings"]:
+            print(f"- {x}")
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Read-only coordination activity collector.")
+    ap.add_argument("--config", default=None,
+                    help="collector.json path (default: <home>/collector.json; the home "
+                         "is the directory holding this coordination state)")
+    ap.add_argument("--home", default=None,
+                    help="coordination home; default is two levels above this script "
+                         "(scripts/ is inside the home)")
+    ap.add_argument("--since", default="1d")
+    ap.add_argument("--until", default="now")
+    ap.add_argument("--only", default=None)
+    ap.add_argument("--skip", default=None)
+    ap.add_argument("--json", action="store_true")
+    args = ap.parse_args()
+
+    if args.config:
+        config_path = expand(args.config)
+        home = config_path.parent
+    else:
+        home = expand(args.home) if args.home else Path(__file__).resolve().parent.parent
+        config_path = home / "collector.json"
+    cfg = load_json(config_path, {})
+    if cfg is None:
+        cfg = {}
+    cfg.setdefault("instance", home.name)
+
+    now = dt.datetime.now().astimezone()
+    since = parse_when(args.since, now)
+    until = parse_when(args.until, now)
+    if until <= since:
+        raise SystemExit("--until must be after --since")
+
+    all_sources = ["git", "sessions", "forgejo", "ado"]
+    only = {s.strip() for s in (args.only or "").split(",") if s.strip()}
+    skip = {s.strip() for s in (args.skip or "").split(",") if s.strip()}
+    wanted = [s for s in all_sources if (not only or s in only) and s not in skip]
+
+    t0 = time.time()
+    digest = {
+        "instance": cfg.get("instance"),
+        "home": str(home),
+        "generated_at": iso(now.timestamp()),
+        "window": {"since": iso(since), "until": iso(until),
+                   "since_epoch": int(since), "until_epoch": int(until)},
+        "warnings": WARNINGS,
+        "timings": {},
+    }
+
+    jobs = {}
+    if "git" in wanted:
+        jobs["git"] = lambda: collect_git(cfg, since, until)
+    if "sessions" in wanted:
+        def sessions():
+            out = {}
+            with cf.ThreadPoolExecutor(max_workers=3) as ex:
+                futs = {
+                    "opencode": ex.submit(collect_opencode, cfg, since, until),
+                    "omp": ex.submit(collect_omp, cfg, since, until),
+                    "claude": ex.submit(collect_claude, cfg, since, until),
+                }
+                for k, f in futs.items():
+                    try:
+                        out[k] = f.result()
+                    except Exception as e:
+                        warn("sessions", f"{k}: {e}")
+                        out[k] = {"error": str(e)}
+            return out
+        jobs["sessions"] = sessions
+    if "forgejo" in wanted:
+        jobs["forgejo"] = lambda: collect_forgejo(cfg, since, until)
+    if "ado" in wanted:
+        jobs["ado"] = lambda: collect_ado(cfg, since, until)
+
+    with cf.ThreadPoolExecutor(max_workers=4) as ex:
+        futs = {name: ex.submit(fn) for name, fn in jobs.items()}
+        for name, f in futs.items():
+            started = time.time()
+            try:
+                digest[name] = f.result()
+            except Exception as e:
+                warn(name, f"source failed: {e}")
+                digest[name] = {"error": str(e)}
+            digest["timings"][name] = round(time.time() - started, 1)
+
+    digest["warnings"] = WARNINGS
+    digest["elapsed_seconds"] = round(time.time() - t0, 1)
+
+    if args.json:
+        print(json.dumps(digest, indent=2, sort_keys=False))
+    else:
+        print_summary(digest)
+
+
+if __name__ == "__main__":
+    main()
