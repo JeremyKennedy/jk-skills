@@ -1,5 +1,6 @@
 ---
 name: jk-reflect
+version: "1.0.0"
 description: "Use when needing to step back from the current work — gain objectivity, challenge assumptions, evaluate approach"
 ---
 

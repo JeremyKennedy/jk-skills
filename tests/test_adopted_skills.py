@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ADOPTED = ROOT / "adopted-skills"
-EXPECTED = ("humanizer", "i-have-adhd", "ponytail", "ponytail-audit", "ponytail-review")
+EXPECTED = ("humanizer", "i-have-adhd")
 
 
 def read_frontmatter(skill_path: Path) -> list[str]:
@@ -12,23 +12,25 @@ def read_frontmatter(skill_path: Path) -> list[str]:
     return text[4:end].splitlines()
 
 
-def test_adopted_skill_names_and_manual_only_frontmatter():
+def test_adopted_skill_inventory_and_frontmatter():
     assert sorted(path.name for path in ADOPTED.iterdir() if path.is_dir()) == sorted(EXPECTED)
     for name in EXPECTED:
         lines = read_frontmatter(ADOPTED / name / "SKILL.md")
         assert f"name: {name}" in lines
-        assert "disable-model-invocation: true" in lines
+        assert any(line.startswith("version:") for line in lines)
+        assert "disable-model-invocation: true" not in lines
 
 
-def test_adopted_skill_descriptions_require_explicit_invocation():
+def test_adopted_skill_descriptions_carry_triggers():
     for name in EXPECTED:
         text = (ADOPTED / name / "SKILL.md").read_text()
-        assert f"Manual-only: invoke /{name} explicitly; do not infer it." in text
+        assert "Use when" in text or "Use whenever" in text or "Use during" in text
 
-def test_every_adopted_skill_has_codex_manual_only_policy():
+
+def test_adopted_skill_codex_policy_allows_implicit_invocation():
     for name in EXPECTED:
         sidecar = (ADOPTED / name / "agents" / "openai.yaml").read_text()
-        assert "allow_implicit_invocation: false" in sidecar
+        assert "allow_implicit_invocation: true" in sidecar
 
 
 def test_adopted_skills_contain_no_runtime_extensions():
