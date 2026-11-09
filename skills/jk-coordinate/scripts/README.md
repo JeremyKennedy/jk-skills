@@ -35,6 +35,7 @@ or datetime, or epoch seconds. The window is half-open, `[since, until)`.
 {
   "instance": "personal",
   "repo_roots": ["~/dev"],
+  "repo_exclude": ["deadlock"],
   "git_author": null,
   "forgejo": {
     "base_url": "https://git.jeremyk.net/api/v1",
@@ -53,6 +54,8 @@ or datetime, or epoch seconds. The window is half-open, `[since, until)`.
 
 - `git_author`: null means each repo's own `user.email`. Set it when the
   coordination identity differs from the repo identity.
+- `repo_exclude`: repo directory names to skip, so a project with its own
+  coordination home does not appear in another instance's digest.
 - `forgejo.repos` is an allowlist; there is no global scan. `token_file` is read
   only for the request; the token is never printed.
 - `ado` is for deadlock only: `bridge` is the `caipas-bridge` launcher, and
