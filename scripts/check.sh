@@ -24,19 +24,22 @@ fi
 
 # ── Adopted skill inventory and policy ─────────────────────────────────────
 
-adopted_skills=("humanizer" "i-have-adhd" "ponytail" "ponytail-audit" "ponytail-review")
+adopted_skills=("humanizer" "i-have-adhd")
 for skill in "${adopted_skills[@]}"; do
     skill_dir="adopted-skills/${skill}"
     test -f "${skill_dir}/SKILL.md" || { echo "ERROR: Missing ${skill_dir}/SKILL.md"; errors=$((errors + 1)); }
     test -f "${skill_dir}/agents/openai.yaml" || { echo "ERROR: Missing ${skill_dir}/agents/openai.yaml"; errors=$((errors + 1)); }
-    head -20 "${skill_dir}/SKILL.md" | grep -q '^disable-model-invocation: true$' || {
-        echo "ERROR: ${skill} is not manual-only"
-        errors=$((errors + 1))
-    }
-    grep -q '^  allow_implicit_invocation: false$' "${skill_dir}/agents/openai.yaml" || {
-        echo "ERROR: ${skill} Codex policy allows implicit invocation"
-        errors=$((errors + 1))
-    }
+    if head -20 "${skill_dir}/SKILL.md" | grep -q '^disable-model-invocation: true$'; then
+        grep -q '^  allow_implicit_invocation: false$' "${skill_dir}/agents/openai.yaml" || {
+            echo "ERROR: ${skill} is manual-only but Codex policy allows implicit invocation"
+            errors=$((errors + 1))
+        }
+    else
+        grep -q '^  allow_implicit_invocation: true$' "${skill_dir}/agents/openai.yaml" || {
+            echo "ERROR: ${skill} is auto-invocable but Codex policy blocks implicit invocation"
+            errors=$((errors + 1))
+        }
+    fi
 done
 
 if find adopted-skills -type d \( -name hooks -o -name extensions -o -name plugins \) -print -quit | grep -q .; then
@@ -53,6 +56,10 @@ for skill in skills/*/SKILL.md; do
     fi
     if ! head -20 "$skill" | grep -q '^description:'; then
         echo "ERROR: Missing 'description:' in frontmatter of ${skill}"
+        errors=$((errors + 1))
+    fi
+    if ! head -20 "$skill" | grep -q '^version:'; then
+        echo "ERROR: Missing 'version:' in frontmatter of ${skill}"
         errors=$((errors + 1))
     fi
 done

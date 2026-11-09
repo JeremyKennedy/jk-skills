@@ -1,8 +1,13 @@
 ---
 name: i-have-adhd
-description: 'Manual-only: invoke /i-have-adhd explicitly; do not infer it. Shape output for a reader with ADHD: lead with the next action, number multi-step work, restate state across turns, suppress tangents, give specific time estimates, make wins visible. Invoke with /i-have-adhd; stays on until "stop adhd mode".'
-disable-model-invocation: true
+description: >
+  Use during longer-running or multi-step tasks, when delegating work to or
+  coordinating with other agents, or when the reader seems confused or
+  overwhelmed. Shape output for a reader with ADHD: lead with the next action,
+  number multi-step work, restate state across turns, suppress tangents, give
+  specific time estimates, and make wins visible.
 license: MIT
+version: "1.0.0"
 metadata:
   tags: "ADHD, Output Style, Productivity, Formatting"
   category: "productivity"
@@ -14,9 +19,9 @@ The reader has ADHD. Output is not just brief. It is shaped so an ADHD brain can
 
 ## Persistence
 
-These rules apply to every response for the rest of the session, not only this one. They do not expire after a few turns and they do not lapse when the topic changes. If you are unsure whether they still apply, they do.
+These rules apply for the duration of the task that triggered them — a long-running job, a delegation or coordination effort, or a stretch where the reader is confused. Keep applying them across turns while that work is active; do not drop them after a few turns or when the topic shifts.
 
-Turn them off only when the reader says "stop adhd mode" or "normal mode". Confirm in one line, then return to your default style.
+Turn them off when the task completes, or when the reader says "stop adhd mode" or "normal mode". Confirm in one line, then return to your default style.
 
 ## What ADHD changes about reading
 

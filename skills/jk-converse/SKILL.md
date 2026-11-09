@@ -1,5 +1,6 @@
 ---
 name: jk-converse
+version: "1.0.0"
 description: Set up a structured async conversation between two or more agents via a shared JSONL file and the converse script — automatic turn detection, convergence protocol, persistent record
 ---
 

@@ -1,16 +1,14 @@
 ---
 name: humanizer
 description: >
-  Manual-only: invoke /humanizer explicitly; do not infer it. Rewrite
-  AI-sounding text so it reads like the writer without changing what it says.
-  Use when editing or reviewing prose for AI tells: not-X-but-Y contrasts,
-  one-line closers, staged openers, forced triads, dashes everywhere, inflated
-  claims, sales language, stock AI words, bold labels, or filler. Based on
-  Wikipedia's "Signs of AI writing."
-disable-model-invocation: true
+  Use whenever drafting, rewriting, or reviewing prose — emails, docs,
+  messages, reports, or any text someone else will read — to remove AI writing
+  tells: not-X-but-Y contrasts, one-line closers, staged openers, forced
+  triads, dashes everywhere, inflated claims, sales language, stock AI words,
+  bold labels, or filler. Rewrite so it reads like the writer without changing
+  what it says. Based on Wikipedia's "Signs of AI writing."
 license: MIT
-metadata:
-  version: "3.1.0"
+version: "3.1.0"
 ---
 
 # Humanizer: remove AI writing patterns

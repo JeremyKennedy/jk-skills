@@ -1,5 +1,6 @@
 ---
 name: jk-philosophy
+version: "1.0.0"
 description: "Use as foundational philosophy for all development work"
 ---
 

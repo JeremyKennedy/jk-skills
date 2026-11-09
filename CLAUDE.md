@@ -16,7 +16,7 @@ An owner-authored `jk-*` skill set with five skills. No hooks, agents, or proces
 ### Source boundaries and distribution
 
 - `skills/` is the first-party source area and must retain the exact five-skill inventory.
-- `adopted-skills/` is a source-library area for pinned, attributed upstream snapshots; adopted skills are explicit-only and contain no hooks or extensions.
+- `adopted-skills/` is a source-library area for pinned, attributed upstream snapshots; adopted skills contain no hooks or extensions and are manual-only unless explicitly opted into model invocation.
 - Adopted skills are distributed by Agent Hub, not through the default Pi, Codex, or Claude package paths. Agent Hub owns target distribution; direct installer retirement is a later parity checkpoint.
 
 ## Commands
@@ -37,7 +37,7 @@ name: skill-name
 description: Use when [trigger condition] — [what it does]
 ---
 ```
-Adopted skills additionally require `disable-model-invocation: true` in the first 20 lines of `SKILL.md` and `allow_implicit_invocation: false` in `agents/openai.yaml`.
+Adopted skills default to manual-only (`disable-model-invocation: true` in the first 20 lines of `SKILL.md` and `allow_implicit_invocation: false` in `agents/openai.yaml`). Opt into model invocation only when the skill's trigger is deliberate and narrow.
 
 ### Host-neutral skill text
 
