@@ -39,8 +39,9 @@ Each home holds the same shape:
 - `NOW.md`: everything that needs the user, ranked, plus an Inbox.
 - `initiatives/<slug>/STATUS.md` and `log.md` for each project or initiative.
 - `templates/`: the STATUS and log formats.
-- `scripts/collect` and `collector.json`: the activity collector and its
-  config (see `scripts/README.md`).
+- `scripts/collect` (in this skill) and `collector.json` (in the home): the
+  activity collector and its config (see `scripts/README.md`). Run
+  `python3 ~/.agents/skills/jk-coordinate/scripts/collect --config <home>/collector.json`.
 
 The deadlock home also carries its standup briefs, current state and briefs;
 follow its README and the `standup-prep` format there.
