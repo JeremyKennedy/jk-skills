@@ -74,12 +74,13 @@ follow its README and the `standup-prep` format there.
 1. Read `NOW.md`. If its "Updated" time is more than 2 hours old, or a refresh
    is asked for, run the home's collector for the window since then and fold
    the changes into the touched STATUS files and `NOW.md`.
-2. Reply in at most 10 lines: time-sensitive items first, then what needs the
-   user, ranked by the home README (stale first; decision > reply > promise >
-   in progress; oldest first). Each needs-you item is a short block, not a
-   fragment: the action in plain words, then `Recommendation:` with what you
-   would do and the trade-off, then the ask ("reply go and I'll …"). Bare codes
-   are not a summary.
+2. Reply with the top items (at most five; time-sensitive first, then what
+   needs the user, ranked by the home README: stale first; decision > reply >
+   promise > in progress; oldest first). Each needs-you item is a short block,
+   not a fragment: the action in plain words, then `Recommendation:` with what
+   you would do and the trade-off, then the ask ("reply go and I'll …"). Bare
+   codes are not a summary. Aim under about 15 lines; if the queue is longer,
+   say how many items are left and offer the full list.
 3. End with one to three offers, such as "draft the reply?".
 
 ## Focus on one initiative (`/focus <name>`)
