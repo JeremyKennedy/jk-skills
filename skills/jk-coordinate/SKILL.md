@@ -1,7 +1,7 @@
 ---
 name: jk-coordinate
 description: "Use when asked what's open, where something stands, to focus on a project or initiative, to capture a to-do, for an end-of-day or weekly update, or when running the morning coordination run. Keeps coordination state in files (personal at ~/dev/docs/coordination, deadlock at ~/dev/deadlock/oracle/docs/coordination) so sessions stay disposable."
-version: 1.1.0
+version: 1.2.0
 metadata:
   category: jk
   tags: [coordination, status, todo, triage, daily]
@@ -35,7 +35,8 @@ wins.
 
 Each home holds the same shape:
 
-- `NOW.md`: everything that needs the user, ranked, plus an Inbox.
+- `NOW.md`: everything that needs the user, ranked, each item with a
+  recommendation and the ask, plus an Inbox.
 - `initiatives/<slug>/STATUS.md` and `log.md` for each project or initiative.
 - `templates/`: the STATUS and log formats.
 - `scripts/collect` (in this skill) and `collector.json` (in the home): the
@@ -58,6 +59,13 @@ follow its README and the `standup-prep` format there.
   document text; post only after approval; log the link afterwards.
 - **Decisions go through the question tool,** recommendation first, with the
   trade-off in one line.
+- **Every needs-you item carries a recommendation and an ask.** Never hand the
+  user a bare question. Say what you would do, why, the trade-off in one line,
+  and the exact reply that authorizes it ("reply go and I'll book it"). If you
+  truly have no preference, say so and name the smallest reversible option.
+- **No bare codes.** A code like `DW` or `NB` is a filing aid, never a
+  sentence. Every mention in chat and in the files carries the plain-language
+  action next to it.
 - **Short in chat, detailed in files.** The user rarely reads the docs; the
   chat answer is what they see.
 
@@ -66,9 +74,13 @@ follow its README and the `standup-prep` format there.
 1. Read `NOW.md`. If its "Updated" time is more than 2 hours old, or a refresh
    is asked for, run the home's collector for the window since then and fold
    the changes into the touched STATUS files and `NOW.md`.
-2. Reply in at most 10 lines: time-sensitive items first, then what needs the
-   user, ranked by the home README (stale first; decision > reply > promise >
-   in progress; oldest first). One line each, with link and age.
+2. Reply with the top items (at most five; time-sensitive first, then what
+   needs the user, ranked by the home README: stale first; decision > reply >
+   promise > in progress; oldest first). Each needs-you item is a short block,
+   not a fragment: the action in plain words, then `Recommendation:` with what
+   you would do and the trade-off, then the ask ("reply go and I'll …"). Bare
+   codes are not a summary. Aim under about 15 lines; if the queue is longer,
+   say how many items are left and offer the full list.
 3. End with one to three offers, such as "draft the reply?".
 
 ## Focus on one initiative (`/focus <name>`)
@@ -140,7 +152,7 @@ references at the end of each point.
 2. For each touched initiative: append a "since last look" log entry and update
    STATUS.
 3. Rewrite `NOW.md`: time-sensitive first, ranking per the README, stale items
-   escalated.
+   escalated. Every item states the action, a recommendation and the ask.
 4. Cleanup: commit leftover coordination edits (only coordination files), flag
    any STATUS over 60 lines or off-template, and check that every item has a
    link and a date.
