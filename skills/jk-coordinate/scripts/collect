@@ -178,13 +178,14 @@ def git_identity(repo):
 
 def collect_git(cfg, since, until):
     roots = [expand(r) for r in cfg.get("repo_roots") or [DEV]]
+    exclude = set(cfg.get("repo_exclude") or [])
     repos = []
     for root in roots:
         if not root.is_dir():
             warn("git", f"repo root {root} is missing")
             continue
         for p in sorted(root.iterdir()):
-            if p.is_dir() and (p / ".git").exists():
+            if p.is_dir() and (p / ".git").exists() and p.name not in exclude:
                 repos.append(p)
     author = cfg.get("git_author")
     seen, lock = set(), threading.Lock()
