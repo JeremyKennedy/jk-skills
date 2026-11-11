@@ -35,8 +35,8 @@ wins.
 
 Each home holds the same shape:
 
-- `NOW.md`: everything that needs the user, ranked, each item with a
-  recommendation and the ask, plus an Inbox.
+- `NOW.md`: everything that needs the user, ranked, each item with numbered
+  next steps, a recommendation and a unique authorization phrase, plus an Inbox.
 - `initiatives/<slug>/STATUS.md` and `log.md` for each project or initiative.
 - `templates/`: the STATUS and log formats.
 - `scripts/collect` (in this skill) and `collector.json` (in the home): the
@@ -59,10 +59,15 @@ follow its README and the `standup-prep` format there.
   document text; post only after approval; log the link afterwards.
 - **Decisions go through the question tool,** recommendation first, with the
   trade-off in one line.
-- **Every needs-you item carries a recommendation and an ask.** Never hand the
-  user a bare question. Say what you would do, why, the trade-off in one line,
-  and the exact reply that authorizes it ("reply go and I'll book it"). If you
-  truly have no preference, say so and name the smallest reversible option.
+- **Every needs-you item carries next steps, a recommendation and a unique
+  authorization phrase.** Never hand the user a bare question. Give the action
+  in plain words, the concrete next steps (numbered, at most three, naming the
+  accounts and files involved), what you would do with the trade-off in one
+  line, and the exact reply that authorizes it. The reply must name the action
+  ("book the car", "send PIPEDA", "restore ATS orders") and must not repeat
+  another pending item's phrase: several items are usually open at once, so a
+  bare "go" is ambiguous. If you truly have no preference, say so and name the
+  smallest reversible option.
 - **No bare codes.** A code like `DW` or `NB` is a filing aid, never a
   sentence. Every mention in chat and in the files carries the plain-language
   action next to it.
@@ -85,10 +90,11 @@ follow its README and the `standup-prep` format there.
 3. Then the top items that need the user (at most five; time-sensitive first,
    ranked by the home README: stale first; decision > reply > promise > in
    progress; oldest first). Each is a short block, not a fragment: the action
-   in plain words, then `Recommendation:` with what you would do and the
-   trade-off, then the ask ("reply go and I'll …"). Bare codes are not a
-   summary. Aim under about 20 lines; if the queue is longer, say how many
-   items are left and offer the full list.
+   in plain words, then the numbered next steps, then `Recommendation:` with
+   what you would do and the trade-off, then the authorization phrase, unique to
+   that item ("book the car", "send PIPEDA") — never a bare "go" shared across
+   items. Bare codes are not a summary. Aim under about 20 lines; if the queue
+   is longer, say how many items are left and offer the full list.
 4. End with one to three offers, such as "draft the reply?".
 
 ## Focus on one initiative (`/focus <name>`)
@@ -160,7 +166,9 @@ references at the end of each point.
 2. For each touched initiative: append a "since last look" log entry and update
    STATUS.
 3. Rewrite `NOW.md`: time-sensitive first, ranking per the README, stale items
-   escalated. Every item states the action, a recommendation and the ask.
+   escalated. Every item states the action, numbered next steps, a
+   recommendation, and a unique authorization phrase — never a bare "go" shared
+   by several items.
 4. Cleanup: commit leftover coordination edits (only coordination files), flag
    any STATUS over 60 lines or off-template, and check that every item has a
    link and a date.
