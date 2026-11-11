@@ -1,7 +1,7 @@
 ---
 name: jk-coordinate
 description: "Use when asked what's open, where something stands, to focus on a project or initiative, to capture a to-do, for an end-of-day or weekly update, or when running the morning coordination run. Keeps coordination state in files (personal at ~/dev/docs/coordination, deadlock at ~/dev/deadlock/oracle/docs/coordination) so sessions stay disposable."
-version: 1.3.0
+version: 1.4.0
 metadata:
   category: jk
   tags: [coordination, status, todo, triage, daily]
@@ -168,7 +168,8 @@ references at the end of each point.
 3. Rewrite `NOW.md`: time-sensitive first, ranking per the README, stale items
    escalated. Every item states the action, numbered next steps, a
    recommendation, and a unique authorization phrase — never a bare "go" shared
-   by several items.
+   by several items. Refresh the `Updated` stamp and the next-run line in the
+   header; a stale stamp makes the file look unread.
 4. Cleanup: commit leftover coordination edits (only coordination files), flag
    any STATUS over 60 lines or off-template, and check that every item has a
    link and a date.
@@ -177,6 +178,9 @@ references at the end of each point.
    behind other commands.
 6. Deadlock: follow its README's standup procedure and refresh the current
    state.
-7. Finish with a summary that opens with what was done since the previous run
-   (three to six items with dates and links), then the asks. It's what the user
-   reads first, and what he reports from.
+7. Finish with a summary under about 15 lines. First `Done since <time>`:
+   three to six items with dates and links. Then at most five `Needs you`
+   items, each naming the action, its numbered next step, the recommendation,
+   and the unique authorization phrase — never a bare "go" repeated across
+   items. Close with any source that failed. It is what the user reads first,
+   and what he reports from.
