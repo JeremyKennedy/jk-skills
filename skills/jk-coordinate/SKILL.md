@@ -7,9 +7,6 @@ metadata:
   tags: [coordination, status, todo, triage, daily]
   related_skills: [jk-interview, writing-style]
 ---
-<!-- agent-hub: managed -->
-<!-- agent-hub-kind: skill -->
-<!-- agent-hub-id: opaque-bf5730d41577 -->
 
 
 # Coordinate
