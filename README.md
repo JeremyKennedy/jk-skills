@@ -47,13 +47,13 @@ programs.jk-skills.enable = true;
 ### Pi
 
 ```
-pi install git:github.com/JeremyKennedy/jk-skills@v4.0.2
+pi install git:github.com/JeremyKennedy/jk-skills@v4.0.3
 ```
 
 ### Codex
 
 ```
-codex plugin marketplace add JeremyKennedy/jk-skills --ref v4.0.2
+codex plugin marketplace add JeremyKennedy/jk-skills --ref v4.0.3
 codex plugin install jk-skills@jk-skills
 ```
 

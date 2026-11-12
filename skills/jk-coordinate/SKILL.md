@@ -1,7 +1,7 @@
 ---
 name: jk-coordinate
-description: "Use when asked what's open, where something stands, to focus on a project or initiative, to capture a to-do, for an end-of-day or weekly update, or when running the morning coordination run. Keeps coordination state in files (personal at ~/dev/docs/coordination, deadlock at ~/dev/deadlock/oracle/docs/coordination) so sessions stay disposable."
-version: 1.4.0
+description: "Use for coordination state: what's open, project focus, capturing to-dos, and end-of-day/weekly or morning updates."
+version: 1.4.1
 metadata:
   category: jk
   tags: [coordination, status, todo, triage, daily]

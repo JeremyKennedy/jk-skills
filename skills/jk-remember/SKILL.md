@@ -1,7 +1,7 @@
 ---
 name: jk-remember
-version: "1.0.0"
-description: "Use when the user says 'remember this', wants to persist a learning, or at the end of significant work — routes knowledge to agent instructions, docs/, or auto memory"
+version: "1.0.1"
+description: "Use when the user says 'remember this' or wants to persist a learning: routes knowledge to instructions, docs, or memory."
 ---
 
 # Remember
