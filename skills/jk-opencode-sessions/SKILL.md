@@ -42,6 +42,30 @@ Inside OpenCode the same capability is native — prefer the tools over shelling
 
 Claude, Codex and Hermes have no such tools; shell out to `ocsession`.
 
+## Subagent or separate session
+
+A bounded task whose result you need back in this conversation gets a subagent. It runs inside the
+current session, reports back, and nests under it in the sidebar. It cannot be prompted.
+
+A new initiative with its own direction and follow-ups gets a separate session. It becomes a root
+in the sidebar, and you reach it with `session_send`.
+
+A subtask does not get a root session. Root sessions per subtask fill the sidebar with conversations
+nobody revisits.
+
+## Message protocol
+
+Send through the OpenCode API: `session_send` inside OpenCode, `ocsession send` elsewhere.
+
+Sign every message with your session title and id, and say how to reply:
+
+```
+From: <session title> (ses_...)
+Reply: load the jk-opencode-sessions skill, then session_send to ses_...
+```
+
+Your id is the `ses_...` in your session context, or `ocsession list --all` beside your title.
+
 ## Rules that matter
 
 - **Use `--wait` / `wait` when you need the answer.** Delivery is a steer into the target's
