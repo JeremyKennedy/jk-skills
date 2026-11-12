@@ -1,5 +1,5 @@
 {
-  description = "jk-skills: owner-authored jk-* skill set with five standalone skills";
+  description = "jk-skills: owner-authored jk-* skill set with seven standalone skills";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -11,7 +11,9 @@
         cfg = config.programs.jk-skills;
         skillNames = [
           "jk-converse"
+          "jk-coordinate"
           "jk-interview"
+          "jk-opencode-sessions"
           "jk-philosophy"
           "jk-reflect"
           "jk-remember"

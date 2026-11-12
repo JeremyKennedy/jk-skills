@@ -73,15 +73,15 @@ if [[ "$phil_words" -gt 250 ]]; then
 fi
 
 total_words=0
-for skill in skills/jk-philosophy/SKILL.md skills/jk-reflect/SKILL.md skills/jk-remember/SKILL.md skills/jk-converse/SKILL.md skills/jk-interview/SKILL.md; do
+for skill in skills/*/SKILL.md; do
     body_start=$(grep -n '^# ' "$skill" | head -1 | cut -d: -f1)
     if [[ -n "$body_start" ]]; then
         words=$(sed -n "${body_start},\$p" "$skill" | wc -w)
         total_words=$((total_words + words))
     fi
 done
-if [[ "$total_words" -gt 2500 ]]; then
-    echo "ERROR: Combined five SKILL.md bodies are $total_words words (max 2500)"
+if [[ "$total_words" -gt 4500 ]]; then
+    echo "ERROR: Combined seven SKILL.md bodies are $total_words words (max 4500)"
     errors=$((errors + 1))
 fi
 

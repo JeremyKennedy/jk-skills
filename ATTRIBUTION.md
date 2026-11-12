@@ -5,10 +5,10 @@ v1 and v2 of this project included skills and agents derived from
 and [claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 by Anthropic (Apache 2.0).
 
-v3 retains the five original skills (`jk-philosophy`, `jk-reflect`,
-`jk-remember`, `jk-converse`, and `jk-interview`, an original first-party
-implementation), plus curated, attributed snapshots from the upstream projects
-below. The adopted snapshots preserve their instructional content while adding
+v3 retains the seven original skills (`jk-philosophy`, `jk-reflect`,
+`jk-remember`, `jk-converse`, `jk-interview`, `jk-coordinate`, and
+`jk-opencode-sessions`, all original first-party implementations), plus
+curated, attributed snapshots from the upstream projects below. The adopted snapshots preserve their instructional content while adding
 invocation metadata and Codex policy sidecars where needed. Upstream hooks,
 extensions, plugin manifests, package files, and unrelated source code are not
 included.
