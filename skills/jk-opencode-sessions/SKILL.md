@@ -45,7 +45,7 @@ Claude, Codex and Hermes have no such tools; shell out to `ocsession`.
 ## Subagent or separate session
 
 A bounded task whose result you need back in this conversation gets a subagent. It runs inside the
-current session, reports back, and nests under it in the sidebar. It cannot be prompted.
+current session, reports back, and nests under it in the sidebar. You can still message it.
 
 A new initiative with its own direction and follow-ups gets a separate session. It becomes a root
 in the sidebar, and you reach it with `session_send`.
