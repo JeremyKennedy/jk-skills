@@ -57,7 +57,8 @@ nobody revisits.
 
 Send through the OpenCode API: `session_send` inside OpenCode, `ocsession send` elsewhere.
 
-Open every message with your session title and id, the reply expectation, and how to answer:
+Open every message with your session title and id, the reply expectation in your own words, and how
+to answer:
 
 ```
 From: <session title> (ses_...)
@@ -65,7 +66,7 @@ Reply needed: no, unless something breaks
 Reply: load jk-opencode-sessions, then session_send to ses_...
 ```
 
-Use `yes, acknowledge immediately` or `yes, after completion` when you need an answer. Your id is the
+Write what you need, such as an acknowledgement now or a report after the task. Your id is the
 `ses_...` in your session context, or `ocsession list --all` beside your title.
 
 ## Rules that matter
