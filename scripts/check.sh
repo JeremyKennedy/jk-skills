@@ -5,13 +5,13 @@ errors=0
 
 shopt -s nullglob
 
-# ── Inventory: exactly six skills ─────────────────────────────────────────
+# ── Inventory: exactly seven skills ───────────────────────────────────────
 
 actual_skills=($(ls -d skills/*/ 2>/dev/null | xargs -n1 basename | sort))
-expected_skills=("jk-converse" "jk-coordinate" "jk-interview" "jk-philosophy" "jk-reflect" "jk-remember")
+expected_skills=("jk-converse" "jk-coordinate" "jk-interview" "jk-opencode-sessions" "jk-philosophy" "jk-reflect" "jk-remember")
 
-if [[ "${#actual_skills[@]}" -ne 6 ]]; then
-    echo "ERROR: Expected 6 skill directories, found ${#actual_skills[@]}: ${actual_skills[*]}"
+if [[ "${#actual_skills[@]}" -ne 7 ]]; then
+    echo "ERROR: Expected 7 skill directories, found ${#actual_skills[@]}: ${actual_skills[*]}"
     errors=$((errors + 1))
 else
     for i in "${!expected_skills[@]}"; do
