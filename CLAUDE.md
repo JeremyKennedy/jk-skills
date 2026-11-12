@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-An owner-authored `jk-*` skill set with five skills. No hooks, agents, or process orchestration — engineering-process guidance lives in each harness's instruction file.
+An owner-authored `jk-*` skill set with seven skills. No hooks, agents, or process orchestration — engineering-process guidance lives in each harness's instruction file.
 
 ## Architecture
 
@@ -8,14 +8,14 @@ An owner-authored `jk-*` skill set with five skills. No hooks, agents, or proces
 - `.codex-plugin/` — Codex plugin manifest
 - `.agents/plugins/` — Codex marketplace manifest
 - `package.json` — Pi package manifest
-- `skills/` — Exactly five first-party `jk-*` skills
+- `skills/` — Exactly seven first-party `jk-*` skills
 - `adopted-skills/` — Pinned, attributed upstream skill snapshots
 - `tests/` — Python tests (converse round-trip, inventory, neutrality)
 - `scripts/check.sh` — Validation (run via `just check` or `nix flake check`)
 
 ### Source boundaries and distribution
 
-- `skills/` is the first-party source area and must retain the exact five-skill inventory.
+- `skills/` is the first-party source area and must retain the exact seven-skill inventory.
 - `adopted-skills/` is a source-library area for pinned, attributed upstream snapshots; adopted skills contain no hooks or extensions and are manual-only unless explicitly opted into model invocation.
 - Adopted skills are distributed by Agent Hub, not through the default Pi, Codex, or Claude package paths. Agent Hub owns target distribution; direct installer retirement is a later parity checkpoint.
 
@@ -37,7 +37,7 @@ name: skill-name
 description: Use when [trigger condition] — [what it does]
 ---
 ```
-Adopted skills default to manual-only (`disable-model-invocation: true` in the first 20 lines of `SKILL.md` and `allow_implicit_invocation: false` in `agents/openai.yaml`). Opt into model invocation only when the skill's trigger is deliberate and narrow.
+Adopted skills are model-invocable by default: their `SKILL.md` carries no `disable-model-invocation: true` and `agents/openai.yaml` sets `allow_implicit_invocation: true`, which `tests/test_adopted_skills.py` asserts. Opt a skill out by adding `disable-model-invocation: true` in the first 20 lines of `SKILL.md` and `allow_implicit_invocation: false` in `agents/openai.yaml` together.
 
 ### Host-neutral skill text
 
@@ -46,7 +46,7 @@ Shipped skills must be host-neutral: no Claude-only tool names, no personal name
 ### Instruction budgets
 
 - `jk-philosophy` body: ≤250 whitespace-delimited words
-- Combined five `SKILL.md` bodies: ≤2,500 words
+- Combined seven `SKILL.md` bodies: ≤4,500 words
 - Enforced by `scripts/check.sh`
 
 ## Adding a first-party skill

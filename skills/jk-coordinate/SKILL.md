@@ -5,7 +5,7 @@ version: 1.4.0
 metadata:
   category: jk
   tags: [coordination, status, todo, triage, daily]
-  related_skills: [jk-interview, writing-style]
+  related_skills: [jk-interview]
 ---
 
 
