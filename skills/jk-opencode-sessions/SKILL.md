@@ -1,7 +1,7 @@
 ---
 name: jk-opencode-sessions
-version: "1.0.0"
-description: Use when you need to message, ping, read, or hand work to another OpenCode session on the same host instead of starting a new conversation. Covers the ocsession CLI, the session_send/session_read/session_list tools, openchamber session links, and when waiting for a reply is safe.
+version: "1.0.1"
+description: "Use to message, read, or hand work to another OpenCode session on the same host via ocsession and the session_* tools."
 ---
 
 # OpenCode Sessions

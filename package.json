@@ -1,6 +1,6 @@
 {
   "name": "jk-skills",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "Owner-authored jk-* skill set: philosophy, reflection, knowledge persistence, structured agent conversations, cross-session messaging, decision interviewing, and personal work coordination",
   "license": "GPL-3.0",
   "keywords": ["skills", "philosophy", "reflection", "memory", "conversation", "interviewing", "decision-making", "pi-package"],

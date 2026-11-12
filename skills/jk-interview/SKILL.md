@@ -1,7 +1,7 @@
 ---
 name: jk-interview
-version: "1.0.0"
-description: "Use when the user explicitly asks for an interview, stress test, or challenge about a plan, decision, or idea — run a structured decision-tree interview."
+version: "1.0.1"
+description: "Use when the user asks for an interview, stress test, or challenge about a plan, decision, or idea."
 ---
 
 # Interview
