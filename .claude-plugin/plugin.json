@@ -1,7 +1,7 @@
 {
   "name": "jk-skills",
-  "description": "Jeremy K's seven-skill jk-* set for philosophy, reflection, knowledge persistence, structured agent conversations, cross-session messaging, decision interviewing, and personal work coordination",
-  "version": "4.0.3",
+  "description": "Jeremy K's jk-* set for philosophy, reflection, knowledge persistence, cross-session messaging, decision interviewing, and personal work coordination",
+  "version": "5.0.0",
   "author": {
     "name": "Jeremy K"
   },

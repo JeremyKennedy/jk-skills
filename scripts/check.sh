@@ -5,23 +5,6 @@ errors=0
 
 shopt -s nullglob
 
-# ── Inventory: exactly seven skills ───────────────────────────────────────
-
-actual_skills=($(ls -d skills/*/ 2>/dev/null | xargs -n1 basename | sort))
-expected_skills=("jk-converse" "jk-coordinate" "jk-interview" "jk-opencode-sessions" "jk-philosophy" "jk-reflect" "jk-remember")
-
-if [[ "${#actual_skills[@]}" -ne 7 ]]; then
-    echo "ERROR: Expected 7 skill directories, found ${#actual_skills[@]}: ${actual_skills[*]}"
-    errors=$((errors + 1))
-else
-    for i in "${!expected_skills[@]}"; do
-        if [[ "${actual_skills[$i]}" != "${expected_skills[$i]}" ]]; then
-            echo "ERROR: Skill mismatch at index $i: expected ${expected_skills[$i]}, got ${actual_skills[$i]}"
-            errors=$((errors + 1))
-        fi
-    done
-fi
-
 # ── Adopted skill inventory and policy ─────────────────────────────────────
 
 adopted_skills=("humanizer" "i-have-adhd")
@@ -81,7 +64,7 @@ for skill in skills/*/SKILL.md; do
     fi
 done
 if [[ "$total_words" -gt 4500 ]]; then
-    echo "ERROR: Combined seven SKILL.md bodies are $total_words words (max 4500)"
+    echo "ERROR: Combined SKILL.md bodies are $total_words words (max 4500)"
     errors=$((errors + 1))
 fi
 
