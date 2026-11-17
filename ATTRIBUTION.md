@@ -75,3 +75,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Impeccable
+
+Impeccable — Paul Bakaus — https://github.com/pbakaus/impeccable
+Revision: 4.9.1
+License: Apache 2.0 — https://www.apache.org/licenses/LICENSE-2.0
+
+Vendored as `adopted-skills/impeccable` from the official
+`npx impeccable install --scope=project --providers=claude --no-hooks` output:
+`SKILL.md`, `reference/`, and `scripts/`. The engine binary is installed outside
+this repository by the launcher. Upstream hooks and provider agents are not
+vendored; Agent Hub delivers the skill, and the skill runs without hooks.
+Refresh the snapshot with `just impeccable-update`.

@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ADOPTED = ROOT / "adopted-skills"
-EXPECTED = ("humanizer", "i-have-adhd")
+EXPECTED = ("humanizer", "i-have-adhd", "impeccable")
 
 
 def read_frontmatter(skill_path: Path) -> list[str]:
