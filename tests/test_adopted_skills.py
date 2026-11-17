@@ -21,10 +21,15 @@ def test_adopted_skill_inventory_and_frontmatter():
         assert "disable-model-invocation: true" not in lines
 
 
+TRIGGER_PHRASES = ("Use when", "Use whenever", "Use during", "Use to")
+
+
 def test_adopted_skill_descriptions_carry_triggers():
+    # Upstream copy is vendored verbatim, so accept any trigger phrasing the
+    # snapshot ships with rather than rewriting its frontmatter.
     for name in EXPECTED:
         text = (ADOPTED / name / "SKILL.md").read_text()
-        assert "Use when" in text or "Use whenever" in text or "Use during" in text
+        assert any(phrase in text for phrase in TRIGGER_PHRASES)
 
 
 def test_adopted_skill_codex_policy_allows_implicit_invocation():
