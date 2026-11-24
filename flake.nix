@@ -10,6 +10,7 @@
       let
         cfg = config.programs.jk-skills;
         skillNames = [
+          "jk-android-video"
           "jk-coordinate"
           "jk-interview"
           "jk-opencode-sessions"

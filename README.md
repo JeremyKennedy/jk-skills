@@ -9,6 +9,7 @@ An owner-authored set of `jk-*` skills covering philosophy, reflection, knowledg
 | `jk-philosophy` | Foundational philosophy: code is free, complexity is expensive, root causes over workarounds, clean cutovers, evidence before assertions, direct communication |
 | `jk-reflect` | Step back and challenge the current direction. Light reflection by default; optional deep reflection with a fresh agent for consequential decisions |
 | `jk-interview` | Structured decision-tree interview for plans, decisions, and ideas; exposes assumptions before moving on |
+| `jk-android-video` | Record an Android app as video or GIF evidence: emulator or device, APK build and install, taps visible in the clip, WebView driving over DevTools |
 | `jk-coordinate` | Personal coordination: what's open, per-initiative focus, to-dos, end-of-day and weekly updates, and a morning run, with state kept in `~/dev/docs` |
 | `jk-remember` | Route durable knowledge to agent instructions, docs/, or auto memory. Explicit invocation or end of significant work |
 | `jk-opencode-sessions` | Message, read, and hand work to another OpenCode session on the same host through `ocsession` and the `session_*` tools, including safe wait semantics |
