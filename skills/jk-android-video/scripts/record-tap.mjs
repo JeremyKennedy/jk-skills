@@ -101,7 +101,7 @@ const evaluate = async (client, expression) => {
   return result.result?.value ?? null;
 };
 
-const client = new Cdp();
+const client = new Cdp(wsUrl);
 await client.connect();
 await client.send('Page.enable');
 await client.send('Runtime.enable');
