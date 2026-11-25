@@ -1,7 +1,7 @@
 ---
 name: jk-coordinate
 description: "Use for coordination state: what's open, project focus, capturing to-dos, and end-of-day/weekly or morning updates."
-version: 1.4.1
+version: 1.4.2
 metadata:
   category: jk
   tags: [coordination, status, todo, triage, daily]
@@ -126,7 +126,13 @@ and "source: the user". If it's unclear where it belongs, add it to the
   context, its exact write scope, and read-only rules otherwise. Save its
   result.
 - **Long or hands-on work** (PR fixes, migrations, imports): a separate Build
-  session the user can open in OpenChamber:
+  session the user can open in OpenChamber. In an OpenChamber session the
+  `openchamber` tool does it in one call: `session.create` with `title`,
+  `agent: "build"`, the absolute `directory`, the brief as `prompt`, and
+  `returnResult: true`. The session belongs to the user, and its final answer
+  arrives in this chat as a message when it finishes, so do not wait or poll.
+
+  Elsewhere (plain OpenCode, Claude, Codex) create it through the API:
 
   ```bash
   sid=$(opencode api post /api/session --data '{"title":"<Name>: <task>","agent":"build","location":{"directory":"<abs path>"}}' | jq -r '.data.id')

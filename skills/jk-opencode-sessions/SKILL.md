@@ -1,7 +1,7 @@
 ---
 name: jk-opencode-sessions
-version: "1.0.1"
-description: "Use to message, read, or hand work to another OpenCode session on the same host via ocsession and the session_* tools."
+version: "1.1.0"
+description: "Use to message, read, or hand work to another OpenCode session on the same host via ocsession, the session_* tools, or OpenChamber's openchamber tool."
 ---
 
 # OpenCode Sessions
@@ -42,20 +42,43 @@ Inside OpenCode the same capability is native — prefer the tools over shelling
 
 Claude, Codex and Hermes have no such tools; shell out to `ocsession`.
 
+## OpenChamber control tool
+
+In an OpenChamber-managed session the `openchamber` tool carries the same work
+as actions, and it is the better path there:
+
+- `session.send` — `sessionId`, `prompt`, optional `agent`, `model`, `variant`,
+  `returnResult`.
+- `session.create` — `title`, `prompt`, optional `agent`, `model`,
+  `directory`/`projectId`, `worktree`, `pullRequest`, `returnResult`.
+- `session.fork`, `session.list` (`inWork`, `busy`, `query`, `withStatus`),
+  `session.status`, `session.messages` (`role`, `last`, `all`),
+  `session.markDone`, `session.track`.
+
+`returnResult: true` on create/send/fork with a prompt delivers the session's
+final answer back into this chat as a message when it finishes, and records you
+as the sender. It replaces waiting: do not poll, sleep, or call
+`session.messages` to wait for it. The agent tool refuses `wait` (CLI only);
+`session.messages` returns the current messages and status without waiting.
+
+Use the plain tools for fire-and-forget pings, and in a plain OpenCode session
+where the `openchamber` tool does not exist.
+
 ## Subagent or separate session
 
 A bounded task whose result you need back in this conversation gets a subagent. It runs inside the
 current session, reports back, and nests under it in the sidebar. You can still message it.
 
 A new initiative with its own direction and follow-ups gets a separate session. It becomes a root
-in the sidebar, and you reach it with `session_send`.
+in the sidebar, and you reach it with `session_send` (or `openchamber` `session.send`).
 
 A subtask does not get a root session. Root sessions per subtask fill the sidebar with conversations
 nobody revisits.
 
 ## Message protocol
 
-Send through the OpenCode API: `session_send` inside OpenCode, `ocsession send` elsewhere.
+Send through the OpenCode API: `session_send` inside OpenCode, `ocsession send`
+elsewhere, or `openchamber` `session.send` in an OpenChamber session.
 
 Open every message with this header:
 
@@ -70,10 +93,16 @@ Load skill: jk-opencode-sessions
 something breaks. Your id is the `ses_...` in your session context, or `ocsession list --all` beside
 your title.
 
+When you send with `returnResult` — or dispatch with `session.create` and
+`returnResult` — drop the `How to reply` line. The answer comes back on its
+own and the transcript links it to you. Keep the line for fire-and-forget
+messages that need a reply.
+
 ## Rules that matter
 
-- **Use `--wait` / `wait` when you need the answer.** Delivery is a steer into the target's
-  queue; the target works on its own and there is no reply event to subscribe to.
+- **Need the answer?** In OpenChamber set `returnResult` on the send or create; do not wait or
+  poll. Elsewhere use `--wait` / `wait`: delivery is a steer into the target's queue, the
+  target works on its own, and there is no reply event to subscribe to.
 - **Read back after a fire-and-forget send** rather than assuming it landed.
 - **The message list is capped at 50 newest-first server-side.** `read --limit` slices that
   page; older messages need paging.
@@ -87,8 +116,9 @@ your title.
 ## Verification
 
 A send returns `sent to <id> (delivery: steer)` from the CLI, or the CLI's output through the
-tool. `ocsession status <id>` confirms the session exists and shows its directory before you
-trust a reply.
+tool. With `returnResult`, the result carries `resultDelivery: pending` (or `not-scheduled` with
+the reason) — a dispatch that did not land says so, and the session keeps running. `ocsession
+status <id>` confirms the session exists and shows its directory before you trust a reply.
 
 ## Auth
 
